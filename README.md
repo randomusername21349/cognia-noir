@@ -117,4 +117,6 @@ MIT — see [LICENSE](LICENSE).
 
 ## Credits
 
-Built on conventions from the Obsidian theme dev community. Inspired by Notion's surface palette and macOS Sequoia's chrome.
+Inspired by Notion's surface palette and macOS Sequoia's chrome. Built on conventions from the Obsidian theme dev community.
+
+Several patterns and chrome shapes (top-bar tab pills, view-header buttons, bubble nav buttons, panel-box geometry) are Velocity-inspired. Translucency and color-variant techniques referenced AnuPpuccin's `translucency.scss`, the Things theme's `obsidian.css`, and Catppuccin's palette work during early prototyping. The Zen color variant takes its name and tone direction from the Zen browser. None of these themes' CSS is reproduced here; the patterns are reimplemented in this codebase. All visual code in this repo is original to Cognia Noir, licensed MIT.
