@@ -87,6 +87,37 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.13 (post-v1.10.12 audit follow-ups. (1) Default accent and
+            inline code now clear WCAG AA on every text-bearing surface
+            in every default Background tone variant, not just Zen.
+            Earlier audits had only checked canvas, sidebar, and code
+            surfaces; bg-elevated (modals, popovers, dropdowns) was
+            missed. Fixed: dark Charcoal bg-elevated #2a2a2a -> #282828
+            (accent ratio 4.44 -> 4.56). Dark Warm bg-elevated
+            #2f2c2a -> #2b2826 (accent 4.29 -> 4.53, inline 4.44 ->
+            4.69). Light Charcoal bg-elevated #e3e2e0 -> #e8e7e5
+            (accent 4.45 -> 4.67). Light Warm bg-tertiary #e6e0d4 ->
+            #ece6d9 (accent 4.39 -> 4.64) and bg-elevated #ddd6c8 ->
+            #e9e3d5 (accent 3.99 -> 4.51). Pure Black and Zen variants
+            already passed at v1.10.12. Lifted-tray values for non-Zen
+            variants are decorative chrome (no text lands on them) and
+            are unchanged. (2) Kanban added to the translucent leaf-
+            content force-paint opt-out chain in all three locations
+            (sections 4 dark, 4 light, and the .mod-root chain).
+            obsidian-community/obsidian-kanban registers a full Preact
+            leaf with data-type "kanban"; without the opt-out, the
+            theme would paint over its internal styling the same way
+            it would for Excalidraw or Canvas. (3) Bubble nav comment
+            tightened to be honest about which transitions are
+            compositor-friendly: transform and opacity are; the
+            background-color and border-color hover changes still
+            paint, but the size reveal does not reflow. (4) Modal-
+            backdrop !important cluster (.modal-bg) now carries an
+            inline rationale comment matching the documentation
+            pattern used for other !important uses. (5) Empty
+            authorUrl field removed from manifest.json; the field is
+            optional in Obsidian's manifest spec and an empty string
+            is metadata noise.)
    v1.10.12 (deferred visual changes from the v1.10.11 review pass.
             (1) Zen Background tone reworked for WCAG AA. Approach
             picked: adjust surface luminance, keep the shared default
@@ -725,7 +756,7 @@ settings:
   --cn-bg-primary: #1d1d1d;
   --cn-bg-secondary: #202020;
   --cn-bg-tertiary: #252525;
-  --cn-bg-elevated: #2a2a2a;
+  --cn-bg-elevated: #282828;
   /* Tray painted behind the note panel in section 4b. Needs to be
      visibly different from --cn-bg-primary or the rounded corners
      of the note read as the same color and look square. Sits a few
@@ -858,7 +889,7 @@ settings:
   --cn-bg-primary: #ffffff;
   --cn-bg-secondary: #f7f6f3;
   --cn-bg-tertiary: #ebebea;
-  --cn-bg-elevated: #e3e2e0;
+  --cn-bg-elevated: #e8e7e5;
   /* Tray painted behind the note panel in section 4b. Sits a few stops
      below the white note so the rounded corners of the leaf read against
      a clearly different tone instead of disappearing into the canvas. */
@@ -981,7 +1012,7 @@ settings:
   --cn-bg-primary: #1c1a18;
   --cn-bg-secondary: #232120;
   --cn-bg-tertiary: #2a2725;
-  --cn-bg-elevated: #2f2c2a;
+  --cn-bg-elevated: #2b2826;
 }
 
 /* Zen: warm-gray identity carried via hue (red/orange undertone) rather
@@ -1011,8 +1042,8 @@ settings:
 .theme-light.cn-bg-warm {
   --cn-bg-primary: #f7f3ec;
   --cn-bg-secondary: #f0ebe1;
-  --cn-bg-tertiary: #e6e0d4;
-  --cn-bg-elevated: #ddd6c8;
+  --cn-bg-tertiary: #ece6d9;
+  --cn-bg-elevated: #e9e3d5;
 }
 
 /* Zen light parity. v1.10.12 raised the surfaces toward near-white-warm
@@ -1278,7 +1309,7 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-leaf,
 /* Plugin leaves (Terminal, Excalidraw, Smart Connections graph) assume
    an opaque container; opt them out of the transparent force so they
    render correctly over vibrancy. */
-body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]),
+body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="kanban"]):not([data-type="smart-connections-view"]),
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root,
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-left-split,
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-right-split,
@@ -1336,7 +1367,7 @@ body.is-translucent.theme-light .workspace-leaf,
 /* Plugin leaves opted out for the same reason as the dark counterpart
    above: their internal styling assumes an opaque container, and our
    bg-primary force-paint can collide with their own backgrounds. */
-body.is-translucent.theme-light .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]) {
+body.is-translucent.theme-light .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="kanban"]):not([data-type="smart-connections-view"]) {
   background-color: var(--cn-bg-primary);
 }
 
@@ -1426,7 +1457,7 @@ body:not(.is-mobile) .workspace-split.mod-right-split .workspace-tabs {
 /* Translucent dark: section 4 already forces workspace-splits
    transparent so vibrancy shows through. Force the note leaf body
    solid so the rounded card still reads against the vibrancy. */
-body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]) {
+body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="kanban"]):not([data-type="smart-connections-view"]) {
   background-color: var(--cn-bg-primary);
 }
 
@@ -1759,6 +1790,10 @@ hr {
   background-color: var(--cn-bg-elevated);
 }
 
+/* !important needed because Obsidian sets the modal backdrop's
+   background-color and backdrop-filter via app.css at equal
+   specificity; without !important the cascade order leaves either
+   the dim or the blur from stock styling in place. */
 .modal-bg {
   background-color: var(--cn-modal-backdrop) !important;
   backdrop-filter: blur(6px) !important;
@@ -2204,12 +2239,14 @@ body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
   transform-origin: center;
   transform: scale(0.65);
   opacity: 0.85;
-  /* v1.10.12: transform and opacity only. Container occupies its natural
+  /* v1.10.12 / v1.10.13: the size reveal is compositor-friendly
+     (transform: scale and opacity). Container occupies its natural
      size; the visual "pill" comes from scaling it down at rest. Hover
-     and focus-within scale back to 100 percent and brighten. No layout-
-     triggering properties on the transition list, so the compositor
-     handles every frame. The section-22 universal prefers-reduced-motion
-     rule still neutralizes these transitions. */
+     and focus-within scale back to 100 percent and brighten. The
+     background-color and border-color hover changes still paint, but
+     no layout reflow happens per frame. The section-22 universal
+     prefers-reduced-motion rule still neutralizes every transition
+     in the list. */
   transition: transform var(--cn-transition),
               opacity var(--cn-transition),
               background-color var(--cn-transition),
