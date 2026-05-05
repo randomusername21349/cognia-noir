@@ -1,8 +1,10 @@
 # Cognia Noir
 
-A Notion-inspired Obsidian theme. Minimal, calm, dark and light modes. SF Pro typography. True macOS vibrancy when Obsidian's Translucent Window is enabled.
+Cognia Noir is a Notion-inspired Obsidian theme tuned to feel calm. Dark mode reads like Notion's surface palette at low light; light mode keeps the same restraint on warm off-white. Sidebars round into the canvas, the note panel lifts off a soft tray tone, and SF Pro carries every surface meant to be read for hours. On macOS with Translucent Window enabled, the chrome paints over real NSVisualEffectView vibrancy so the desktop wallpaper shows through.
 
-![Cognia Noir](screenshot.png)
+<p align="center">
+  <img src="screenshot.png" alt="Cognia Noir" />
+</p>
 
 ## Features
 
@@ -11,7 +13,7 @@ A Notion-inspired Obsidian theme. Minimal, calm, dark and light modes. SF Pro ty
 - Rounded note panel and sidebars with a contrasting tray tone underneath.
 - Native macOS vibrancy: enable Settings > Appearance > Translucent Window. The theme paints sidebars and chrome over `NSVisualEffectView` so the desktop wallpaper shows through.
 - Plugin-safe vibrancy: Excalidraw and Smart Connections leaves are opted out of the translucent leaf-content force-paint so they render correctly. Core Canvas is also opted out as a defensive measure.
-- WCAG AA contrast on primary text, accent, and inline code in the default Charcoal palette. Other Background tone variants (notably Zen) trade some contrast for tone; check legibility against your content if you switch.
+- WCAG AA contrast on primary text, accent, and inline code in all default Background tone variants.
 - Honors `prefers-reduced-motion: reduce` (all transitions and animations disabled).
 - Snappy hover and focus feedback (`100ms ease-out`) on nav titles, tab headers, links, inputs, buttons, and tags. State-change and layout transitions stay on a slower symmetric curve.
 
@@ -33,7 +35,7 @@ A Notion-inspired Obsidian theme. Minimal, calm, dark and light modes. SF Pro ty
 ## Compatibility
 
 - Minimum Obsidian version: 1.5.0.
-- Designed and tested on macOS. Windows and Linux render correctly minus the macOS-specific vibrancy effect.
+- Designed and tested on macOS only. Not tested on Windows or Linux. The macOS vibrancy effect requires NSVisualEffectView and will not apply on other platforms; other surfaces are unverified there.
 - Mobile (iPad and phone): supported. iPad gets the full desktop chrome; phone scales appropriately.
 
 ## Gallery
@@ -106,6 +108,7 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 
 See the version history at the top of `theme.css` for a full per-version log. Highlights:
 
+- **1.10.12**: Zen Background tone reworked so the default accent and inline code clear WCAG AA on every Zen surface in both modes (full contrast table in `theme.css`). Bubble nav animation moved off layout-triggering `max-height` / `max-width` to compositor-friendly `transform: scale` and opacity. README WCAG note re-broadened to cover all default Background tone variants. Windows/Linux compatibility note clarified as untested.
 - **1.10.11**: Excalidraw control reset narrowed (replaced `all: unset` with targeted overrides). Core Canvas added to the translucent leaf-content opt-out chain. Smart Connections reference comments corrected (data-type is the related-notes view, not a graph canvas). README narrowed the WCAG AA claim to the default Charcoal palette and clarified the Style Settings layout.
 - **1.10.10**: removed a `display:none` rule that was hiding the sidebar resize handle. Added `--cn-transition-fast` (100 ms ease-out) for hover and focus feedback on nav titles, tab headers, links, inputs, buttons, and tags.
 - **1.10.7**: added `prefers-reduced-motion: reduce` block.

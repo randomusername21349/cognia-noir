@@ -87,6 +87,43 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.12 (deferred visual changes from the v1.10.11 review pass.
+            (1) Zen Background tone reworked for WCAG AA. Approach
+            picked: adjust surface luminance, keep the shared default
+            accent and inline code. The Zen identity now carries via
+            warm hue (red/orange undertone) instead of mid-gray
+            lightness, so every Zen surface clears AA against the
+            default accent (#5b8def dark / #3a5fc7 light), default
+            inline code (#ee6666 dark / #a8201a light), and primary
+            text (#e8e8e8 dark / #37352f light). Dark Zen surfaces
+            moved from #5a5755 / #4f4c4a / #656260 / #6e6b68 to
+            #1f1c19 / #181613 / #25221f / #2a2724. Light Zen surfaces
+            moved from #ebe9e5 / #e0ddd8 / #d6d3ce / #cbc7c1 to
+            #f5f3ef / #eeece8 / #ece9e4 / #e9e6e1. Sidebar-lifted
+            and lifted-tray overrides retuned for the new scale; the
+            old Zen-specific border override (rgba 0.08 / 0.14) is
+            dropped because the darker dark-Zen surfaces no longer
+            need the bump above the theme-dark default (rgba 0.06 /
+            0.10). Verified contrast ratios in order bg-primary /
+            bg-secondary / bg-tertiary / bg-elevated:
+              Dark Zen primary: 13.84, 14.74, 12.91, 12.12.
+              Dark Zen accent:   5.25,  5.59,  4.90,  4.60.
+              Dark Zen inline:   5.43,  5.78,  5.07,  4.76.
+              Light Zen primary:11.06, 10.39, 10.13,  9.85.
+              Light Zen accent:  5.20,  4.89,  4.76,  4.63.
+              Light Zen inline:  6.56,  6.17,  6.01,  5.84.
+            All ratios clear the 4.5:1 body-text threshold. Charcoal,
+            Pure Black, and Warm tone variants are unchanged in
+            appearance and contrast. (2) Bubble nav animation moved
+            off layout-triggering max-height / max-width to
+            compositor-friendly transform: scale and opacity. The
+            visual idiom is refined: buttons stay visible at rest,
+            scaled to 65 percent with reduced opacity, and spring to
+            full size on hover or focus-within. No layout reflow per
+            frame. Children no longer toggle opacity 0 to 1; the
+            scale-in carries the reveal. The universal section-22
+            prefers-reduced-motion block still neutralizes the new
+            transitions.)
    v1.10.11 (review-driven fixes from outside-eye audit before the
             obsidian-releases submission was reviewed. (1) Excalidraw
             opt-out narrowed: replaced the previous all: unset block on
@@ -947,17 +984,18 @@ settings:
   --cn-bg-elevated: #2f2c2a;
 }
 
-/* Zen: soft warm mid-gray inspired by Zen browser. Notably lighter than
-   charcoal, sidebar slightly darker than canvas to mirror Zen's layout.
-   White text (#e8e8e8) clears 5.7:1 on bg-primary; bold (#ffffff) clears
-   6.5:1. Borders and overlays already use rgba so they adapt. */
+/* Zen: warm-gray identity carried via hue (red/orange undertone) rather
+   than mid-gray lightness. v1.10.12 pulled the surfaces toward charcoal-
+   warm so the default accent and inline code clear WCAG AA on every
+   surface (full ratio table in the v1.10.12 entry). Sidebar slightly
+   darker than canvas to mirror Zen browser's layout. Borders and
+   overlays already use rgba so they adapt to the new surface tones
+   without explicit overrides. */
 .theme-dark.cn-bg-zen {
-  --cn-bg-primary: #5a5755;
-  --cn-bg-secondary: #4f4c4a;
-  --cn-bg-tertiary: #656260;
-  --cn-bg-elevated: #6e6b68;
-  --cn-border-subtle: rgba(255, 255, 255, 0.08);
-  --cn-border-strong: rgba(255, 255, 255, 0.14);
+  --cn-bg-primary: #1f1c19;
+  --cn-bg-secondary: #181613;
+  --cn-bg-tertiary: #25221f;
+  --cn-bg-elevated: #2a2724;
 }
 
 /* Background tone variants — light mode. The "Pure black" knob inverts
@@ -977,12 +1015,15 @@ settings:
   --cn-bg-elevated: #ddd6c8;
 }
 
-/* Zen light parity — soft warm light gray, sidebar slightly darker. */
+/* Zen light parity. v1.10.12 raised the surfaces toward near-white-warm
+   so the default light accent (#3a5fc7) and inline code (#a8201a) clear
+   AA on every surface, including bg-elevated. Sidebar slightly darker
+   than canvas to mirror Zen browser's layout. */
 .theme-light.cn-bg-zen {
-  --cn-bg-primary: #ebe9e5;
-  --cn-bg-secondary: #e0ddd8;
-  --cn-bg-tertiary: #d6d3ce;
-  --cn-bg-elevated: #cbc7c1;
+  --cn-bg-primary: #f5f3ef;
+  --cn-bg-secondary: #eeece8;
+  --cn-bg-tertiary: #ece9e4;
+  --cn-bg-elevated: #e9e6e1;
 }
 
 /* Translucency tint intensity (alpha of the dark wash over macOS vibrancy).
@@ -1007,7 +1048,7 @@ settings:
 .theme-dark.cn-sidebar-lifted { --background-secondary: #1b1b1b; }
 .theme-dark.cn-sidebar-lifted.cn-bg-black { --background-secondary: #0a0a0a; }
 .theme-dark.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #1f1d1c; }
-.theme-dark.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #46433f; }
+.theme-dark.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #110f0d; }
 
 /* Sidebar contrast variants — light */
 .theme-light.cn-sidebar-border .workspace-split.mod-left-split,
@@ -1019,7 +1060,7 @@ settings:
 .theme-light.cn-sidebar-lifted { --background-secondary: #f1f0ed; }
 .theme-light.cn-sidebar-lifted.cn-bg-black { --background-secondary: #f0f0f0; }
 .theme-light.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #ebe5d9; }
-.theme-light.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #ddd9d3; }
+.theme-light.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #e6e3de; }
 
 /* Sidebar-lifted in opaque mode: section 4b force-paints
    .workspace-split.{root,left,right} with var(--cn-bg-note-tray)
@@ -1034,12 +1075,12 @@ settings:
 .theme-dark.cn-sidebar-lifted              { --cn-bg-note-tray: #0d0d0d; }
 .theme-dark.cn-sidebar-lifted.cn-bg-black  { --cn-bg-note-tray: #050505; }
 .theme-dark.cn-sidebar-lifted.cn-bg-warm   { --cn-bg-note-tray: #131110; }
-.theme-dark.cn-sidebar-lifted.cn-bg-zen    { --cn-bg-note-tray: #3a3735; }
+.theme-dark.cn-sidebar-lifted.cn-bg-zen    { --cn-bg-note-tray: #0a0908; }
 
 .theme-light.cn-sidebar-lifted             { --cn-bg-note-tray: #cdcbc6; }
 .theme-light.cn-sidebar-lifted.cn-bg-black { --cn-bg-note-tray: #e2e2e2; }
 .theme-light.cn-sidebar-lifted.cn-bg-warm  { --cn-bg-note-tray: #ddd6c8; }
-.theme-light.cn-sidebar-lifted.cn-bg-zen   { --cn-bg-note-tray: #c4c0bb; }
+.theme-light.cn-sidebar-lifted.cn-bg-zen   { --cn-bg-note-tray: #cdcbc6; }
 
 /* Sidebar-lifted in dark translucent mode: outer-shell containers are
    forced transparent, so paint a subtle dark tint to give Lifted a
@@ -2155,40 +2196,32 @@ body.cn-bubble-nav:not(.is-mobile) .nav-header {
 body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
   flex-wrap: nowrap;
   justify-content: center;
-  max-height: 6px;
-  max-width: 36px;
   background-color: var(--cn-soft-overlay);
   border: 1px solid var(--cn-border-subtle);
   border-radius: 999px;
   padding: 3px 6px;
   overflow: hidden;
-  /* max-height and max-width trigger layout reflow on every animation
-     frame. A wrapper element would let us use grid-template-rows: 0fr -> 1fr
-     (compositor-friendly), but Obsidian's DOM has no available wrapper here.
-     Padding is kept constant (collapsed and expanded share 3px 6px) to
-     eliminate one layout-triggering property from the transition list. */
-  transition: max-height var(--cn-transition),
-              max-width var(--cn-transition),
+  transform-origin: center;
+  transform: scale(0.65);
+  opacity: 0.85;
+  /* v1.10.12: transform and opacity only. Container occupies its natural
+     size; the visual "pill" comes from scaling it down at rest. Hover
+     and focus-within scale back to 100 percent and brighten. No layout-
+     triggering properties on the transition list, so the compositor
+     handles every frame. The section-22 universal prefers-reduced-motion
+     rule still neutralizes these transitions. */
+  transition: transform var(--cn-transition),
+              opacity var(--cn-transition),
               background-color var(--cn-transition),
               border-color var(--cn-transition);
 }
 
-body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container > * {
-  opacity: 0;
-  transition: opacity var(--cn-transition);
-}
-
 body.cn-bubble-nav:not(.is-mobile) .nav-header:hover .nav-buttons-container,
 body.cn-bubble-nav:not(.is-mobile) .nav-header:focus-within .nav-buttons-container {
-  max-height: 48px;
-  max-width: 400px;
+  transform: scale(1);
+  opacity: 1;
   background-color: var(--cn-medium-overlay);
   border-color: var(--cn-border-strong);
-}
-
-body.cn-bubble-nav:not(.is-mobile) .nav-header:hover .nav-buttons-container > *,
-body.cn-bubble-nav:not(.is-mobile) .nav-header:focus-within .nav-buttons-container > * {
-  opacity: 1;
 }
 
 /* Search input below the bubble shouldn't slide as the bubble
