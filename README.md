@@ -1,6 +1,6 @@
 # Cognia Noir
 
-Cognia Noir is a Notion-inspired Obsidian theme tuned to feel calm. Dark mode reads like Notion's surface palette at low light; light mode keeps the same restraint on warm off-white. Sidebars round into the canvas, the note panel lifts off a soft tray tone, and SF Pro carries every surface meant to be read for hours. On macOS with Translucent Window enabled, the chrome paints over real NSVisualEffectView vibrancy so the desktop wallpaper shows through.
+Cognia Noir is a Notion and Zen-inspired Obsidian theme tuned to feel calm. Dark mode reads like Notion's surface palette at low light; light mode keeps the same restraint on warm off-white. Sidebars round into the canvas, the note panel lifts off a soft tray tone, and SF Pro carries every surface meant to be read for hours. On macOS with Translucent Window enabled, the chrome paints over real NSVisualEffectView vibrancy so the desktop wallpaper shows through.
 
 <p align="center">
   <img src="screenshot.png" alt="Cognia Noir" />
