@@ -4,8 +4,10 @@
    `body.is-translucent:not(.is-fullscreen)` pattern (workspace layers go
    transparent so the NSVisualEffectView shows through). Light mode uses a
    white wash over vibrancy; dark mode uses a black wash.
-   Plugin-safe: workspace leaves for Excalidraw and Smart Connections canvas
-   are opted out of the translucent leaf-content force-paint. Highlightr is
+   Plugin-safe: workspace leaves for Excalidraw and Smart Connections (the
+   related-notes view, data-type="smart-connections-view") are opted out of
+   the translucent leaf-content force-paint, plus core Canvas as a defensive
+   measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
    v1.7.2 (light mode opaque Notion-style + force-paint outer shell
@@ -85,6 +87,24 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.11 (review-driven fixes from outside-eye audit before the
+            obsidian-releases submission was reviewed. (1) Excalidraw
+            opt-out narrowed: replaced the previous all: unset block on
+            .excalidraw form controls with targeted color/font overrides
+            and a checkbox appearance restore. all: unset stripped
+            inheritance the plugin relies on for layout, accessibility
+            affordances, and its own custom controls; the new block
+            keeps the theme out of Excalidraw's way without nuking
+            anything. (2) Core Canvas added to the translucent leaf-
+            content opt-out chain (data-type="canvas") in all three
+            opt-out selectors. Defensive: keeps Cognia Noir from force-
+            painting or force-transparency on Canvas leaves where
+            Canvas's own grid, cards, and edges should win. (3) Smart
+            Connections reference comments corrected: the data-type
+            "smart-connections-view" is the related-notes view, not a
+            graph canvas. The header comment on line 7 and the rule
+            comment near line 1926 now agree with the section 19 head
+            comment about what that view actually is.)
    v1.10.10 (resize + transition fixes. (1) Removed the
             .workspace-split.mod-left-split > hr /
             hr.workspace-leaf-resize-handle display:none rule that
@@ -104,7 +124,7 @@
             buttons / status-bar, and tag pills. Deliberately NOT
             applied to checkboxes (state-change, not hover), scrollbar
             thumbs (fade behavior), bubble-nav layout reflow, or
-            clickable-icon press transforms — those benefit from the
+            clickable-icon press transforms. Those benefit from the
             slower symmetric easing.)
    v1.10.9 (housekeeping. (1) --inline-title-size, --inline-title-weight,
             --inline-title-line-height moved from both themed blocks to
@@ -1217,7 +1237,7 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-leaf,
 /* Plugin leaves (Terminal, Excalidraw, Smart Connections graph) assume
    an opaque container; opt them out of the transparent force so they
    render correctly over vibrancy. */
-body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-leaf-content:not([data-type="terminal"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]),
+body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]),
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root,
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-left-split,
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-right-split,
@@ -1275,7 +1295,7 @@ body.is-translucent.theme-light .workspace-leaf,
 /* Plugin leaves opted out for the same reason as the dark counterpart
    above: their internal styling assumes an opaque container, and our
    bg-primary force-paint can collide with their own backgrounds. */
-body.is-translucent.theme-light .workspace-leaf-content:not([data-type="terminal"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]) {
+body.is-translucent.theme-light .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]) {
   background-color: var(--cn-bg-primary);
 }
 
@@ -1365,7 +1385,7 @@ body:not(.is-mobile) .workspace-split.mod-right-split .workspace-tabs {
 /* Translucent dark: section 4 already forces workspace-splits
    transparent so vibrancy shows through. Force the note leaf body
    solid so the rounded card still reads against the vibrancy. */
-body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .workspace-leaf-content:not([data-type="terminal"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]) {
+body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="smart-connections-view"]) {
   background-color: var(--cn-bg-primary);
 }
 
@@ -1895,34 +1915,37 @@ body:not(.is-mobile) .status-bar > * {
    they do not leak in. The block below catches any residual leakage.
    ============================================================ */
 
-/* Excalidraw — plugin owns its full UI surface. Use `unset` so the
-   plugin's own CSS cascades through; `revert` would force user-agent
-   defaults and break the plugin's intended look. */
+/* Excalidraw: plugin owns its full UI surface. Targeted overrides only
+   so Excalidraw's own CSS cascades unimpeded. The previous `all: unset`
+   approach was a sledgehammer that stripped layout, accessibility
+   affordances, and inheritance the plugin relies on; v1.10.11 narrowed
+   it to color/font reset on form controls and a checkbox appearance
+   restore so checkboxes inside Excalidraw still look like checkboxes
+   rather than picking up the theme's custom checkbox styling.
+   If a future audit finds Cognia Noir styles leaking into Excalidraw
+   form controls, scope a targeted fix to that exact property rather
+   than reintroducing all: unset. */
+.excalidraw {
+  color: initial;
+}
+
 .excalidraw button,
 .excalidraw input,
 .excalidraw textarea,
-.excalidraw select,
-.excalidraw input[type="checkbox"] {
-  all: unset;
+.excalidraw select {
+  font: inherit;
 }
 
-/* Re-enable native form behavior for inputs after `all: unset` */
-.excalidraw input,
-.excalidraw textarea,
-.excalidraw select,
-.excalidraw button {
-  display: revert;
-  cursor: revert;
-  user-select: revert;
-}
 .excalidraw input[type="checkbox"] {
   appearance: auto;
   -webkit-appearance: auto;
-  display: inline-block;
-  cursor: pointer;
 }
 
-/* Smart Connections graph canvas — leave alone */
+/* Smart Connections related-notes view: leave any inline canvas
+   element alone. The data-type "smart-connections-view" is the
+   related-notes panel, not a graph canvas. The canvas selector here
+   is defensive in case a future Smart Connections build embeds a
+   canvas inside that view. */
 .smart-connections-view canvas { background: revert; }
 
 /* ============================================================

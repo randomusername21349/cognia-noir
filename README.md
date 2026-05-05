@@ -10,10 +10,10 @@ A Notion-inspired Obsidian theme. Minimal, calm, dark and light modes. SF Pro ty
 - SF Pro for UI; SF Pro Text for note bodies; SF Mono for code.
 - Rounded note panel and sidebars with a contrasting tray tone underneath.
 - Native macOS vibrancy: enable Settings > Appearance > Translucent Window. The theme paints sidebars and chrome over `NSVisualEffectView` so the desktop wallpaper shows through.
-- Plugin-safe vibrancy: Excalidraw and Smart Connections canvas leaves are opted out of the translucent leaf-content force-paint so they render correctly.
-- WCAG AA contrast on accent, inline code, secondary text, and faint text in both modes.
+- Plugin-safe vibrancy: Excalidraw and Smart Connections leaves are opted out of the translucent leaf-content force-paint so they render correctly. Core Canvas is also opted out as a defensive measure.
+- WCAG AA contrast on primary text, accent, and inline code in the default Charcoal palette. Other Background tone variants (notably Zen) trade some contrast for tone; check legibility against your content if you switch.
 - Honors `prefers-reduced-motion: reduce` (all transitions and animations disabled).
-- Snappier hover and focus feedback (`100ms ease-out`) on nav titles, tab headers, links, inputs, buttons, and tags. State-change and layout transitions stay on a slower symmetric curve.
+- Snappy hover and focus feedback (`100ms ease-out`) on nav titles, tab headers, links, inputs, buttons, and tags. State-change and layout transitions stay on a slower symmetric curve.
 
 ## Install
 
@@ -72,48 +72,49 @@ Internal links with hover underline, tag pills with rounded background, inline L
 
 ## Style Settings
 
-If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin installed, Cognia Noir exposes the following knobs.
+If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin installed, Cognia Noir exposes 14 knobs under one "Look and feel" section. The lists below group them for readability; in the actual Style Settings panel they appear in one continuous scroll.
 
 ### Look and feel
 
-- **Accent color** — Used for links, focus rings, and selection. Defaults clear WCAG AA against each theme's canvas. Separate light and dark defaults.
-- **Inline code color** — Color of `inline code` text. Defaults clear WCAG AA against each theme's code background. Separate light and dark defaults.
-- **Background tone** — Charcoal (default), Pure Black (OLED-friendly), Warm charcoal (slight warmth), or Zen.
-- **Sidebar contrast** — How the sidebars separate from the main editor. Flat (default), Subtle border, or Lifted (slightly darker).
-- **Translucency tint** — Strength of the dark wash layered over macOS vibrancy. Pure vibrancy, Light, Medium (default), or Heavy. Pure shows raw vibrancy; Heavy dims it for legibility on bright wallpapers. Requires Settings > Appearance > Translucent Window enabled.
-- **Heading scale** — Compact, Comfortable (default), or Large.
+- **Accent color**: used for links, focus rings, and selection. Defaults clear WCAG AA against each theme's canvas. Separate light and dark defaults.
+- **Inline code color**: color of `inline code` text. Defaults clear WCAG AA against each theme's code background. Separate light and dark defaults.
+- **Background tone**: Charcoal (default), Pure Black (OLED-friendly), Warm charcoal (slight warmth), or Zen.
+- **Sidebar contrast**: how the sidebars separate from the main editor. Flat (default), Subtle border, or Lifted (slightly darker).
+- **Translucency tint**: strength of the dark wash layered over macOS vibrancy. Pure vibrancy, Light, Medium (default), or Heavy. Pure shows raw vibrancy; Heavy dims it for legibility on bright wallpapers. Requires Settings > Appearance > Translucent Window enabled.
+- **Heading scale**: Compact, Comfortable (default), or Large.
 
-![Style Settings: look and feel](screenshots/05-style-settings-look-and-feel.png)
+![Style Settings panel, top of scroll](screenshots/05-style-settings-look-and-feel.png)
 
 ### Typography
 
-- **Editor font size** — Slider, 12 to 20 px (default 16).
-- **UI font** — Font for UI chrome (sidebars, tabs, buttons, dialogs). Inter (default), Avenir Next, or System (SF Pro).
-- **Note font** — Font for note content (editor and reading view). SF Pro (default), New York (Apple serif), Georgia (classic serif), or Avenir Next.
-- **Heading font** — Font for H1-H6. SF Pro Display (default), New York, or Georgia. Pair with the note font for a matched look.
-- **Note line height** — Slider, 1.4 to 2.0 (default 1.65).
+- **Editor font size**: slider, 12 to 20 px (default 16).
+- **UI font**: font for UI chrome (sidebars, tabs, buttons, dialogs). Inter (default), Avenir Next, or System (SF Pro).
+- **Note font**: font for note content (editor and reading view). SF Pro (default), New York (Apple serif), Georgia (classic serif), or Avenir Next.
+- **Heading font**: font for H1 through H6. SF Pro Display (default), New York, or Georgia. Pair with the note font for a matched look.
+- **Note line height**: slider, 1.4 to 2.0 (default 1.65).
 
-![Style Settings: typography](screenshots/05-style-settings-fonts.png)
+![Style Settings panel, mid scroll](screenshots/05-style-settings-fonts.png)
 
 ### Layout
 
-- **Line width** — Maximum width of the note content area. Slider, 500 to 1400 px (default 700, matching Obsidian's stock default).
-- **Bubble nav buttons** — Collapses the file explorer / bookmarks action row (new note, new folder, sort, expand) into a small pill that expands on hover. Inspired by Velocity.
+- **Line width**: maximum width of the note content area. Slider, 500 to 1400 px (default 700, matching Obsidian's stock default).
+- **Bubble nav buttons**: collapses the file explorer / bookmarks action row (new note, new folder, sort, expand) into a small pill that expands on hover. Inspired by Velocity.
 
-![Style Settings: layout](screenshots/05-style-settings-layout.png)
+![Style Settings panel, bottom of scroll](screenshots/05-style-settings-layout.png)
 
 ## Changelog
 
 See the version history at the top of `theme.css` for a full per-version log. Highlights:
 
-- **1.10.10** — Removed a `display:none` rule that was hiding the sidebar resize handle. Added `--cn-transition-fast` (100 ms ease-out) for hover and focus feedback on nav titles, tab headers, links, inputs, buttons, and tags.
-- **1.10.7** — Added `prefers-reduced-motion: reduce` block.
-- **1.10.6** — Three Style Settings knobs (heading font, note font, color variants).
-- **1.7.x** — Initial Notion-inspired surface palette, rounded note and sidebar corners, macOS vibrancy support.
+- **1.10.11**: Excalidraw control reset narrowed (replaced `all: unset` with targeted overrides). Core Canvas added to the translucent leaf-content opt-out chain. Smart Connections reference comments corrected (data-type is the related-notes view, not a graph canvas). README narrowed the WCAG AA claim to the default Charcoal palette and clarified the Style Settings layout.
+- **1.10.10**: removed a `display:none` rule that was hiding the sidebar resize handle. Added `--cn-transition-fast` (100 ms ease-out) for hover and focus feedback on nav titles, tab headers, links, inputs, buttons, and tags.
+- **1.10.7**: added `prefers-reduced-motion: reduce` block.
+- **1.10.6**: three Style Settings knobs (heading font, note font, color variants).
+- **1.7.x**: initial Notion-inspired surface palette, rounded note and sidebar corners, macOS vibrancy support.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
 ## Credits
 
