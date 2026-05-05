@@ -79,25 +79,25 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 - **Accent color** — Used for links, focus rings, and selection. Defaults clear WCAG AA against each theme's canvas. Separate light and dark defaults.
 - **Inline code color** — Color of `inline code` text. Defaults clear WCAG AA against each theme's code background. Separate light and dark defaults.
 - **Background tone** — Charcoal (default), Pure Black (OLED-friendly), Warm charcoal (slight warmth), or Zen.
-- **Sidebar contrast** — Flat (default) or lifted (sidebar visually separates from the main editor).
-- **Translucency tint** — Strength of the dark wash layered over macOS vibrancy. Pure shows raw vibrancy; Heavy dims it for legibility on bright wallpapers. Requires Settings > Appearance > Translucent Window enabled.
-- **Heading scale** — Comfortable (default) or other density options.
+- **Sidebar contrast** — How the sidebars separate from the main editor. Flat (default), Subtle border, or Lifted (slightly darker).
+- **Translucency tint** — Strength of the dark wash layered over macOS vibrancy. Pure vibrancy, Light, Medium (default), or Heavy. Pure shows raw vibrancy; Heavy dims it for legibility on bright wallpapers. Requires Settings > Appearance > Translucent Window enabled.
+- **Heading scale** — Compact, Comfortable (default), or Large.
 
 ![Style Settings: look and feel](screenshots/05-style-settings-look-and-feel.png)
 
 ### Typography
 
-- **Editor font size** — Slider (default 16).
-- **UI font** — Font for UI chrome (sidebars, tabs, buttons, dialogs). Default Inter.
-- **Note font** — Font for note content (editor and reading view). Default SF Pro.
-- **Heading font** — Font for H1-H6. Default SF Pro Display. Pair with the note font for a matched look.
-- **Note line height** — Slider for line spacing in note content. Default 1.65.
+- **Editor font size** — Slider, 12 to 20 px (default 16).
+- **UI font** — Font for UI chrome (sidebars, tabs, buttons, dialogs). Inter (default), Avenir Next, or System (SF Pro).
+- **Note font** — Font for note content (editor and reading view). SF Pro (default), New York (Apple serif), Georgia (classic serif), or Avenir Next.
+- **Heading font** — Font for H1-H6. SF Pro Display (default), New York, or Georgia. Pair with the note font for a matched look.
+- **Note line height** — Slider, 1.4 to 2.0 (default 1.65).
 
 ![Style Settings: typography](screenshots/05-style-settings-fonts.png)
 
 ### Layout
 
-- **Line width** — Maximum width of the note content area. Obsidian default is 700 px.
+- **Line width** — Maximum width of the note content area. Slider, 500 to 1400 px (default 700, matching Obsidian's stock default).
 - **Bubble nav buttons** — Collapses the file explorer / bookmarks action row (new note, new folder, sort, expand) into a small pill that expands on hover. Inspired by Velocity.
 
 ![Style Settings: layout](screenshots/05-style-settings-layout.png)
