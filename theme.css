@@ -87,6 +87,21 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.14 (three bug fixes. (1) Bubble nav reverted from v1.10.12's
+            scale(0.65)/opacity approach back to a height-collapse model:
+            .nav-buttons-container collapses to max-height:0 at rest and
+            expands to max-height:40px on hover/focus-within. A 28x3px
+            pill-dash indicator added via ::after on .nav-header gives a
+            visible hover affordance when buttons are folded. (2) Light
+            mode missing variables: --cn-note-line-height and
+            --cn-heading-font were defined only in .theme-dark; in light
+            mode note content fell back to browser-default line height and
+            headings fell back to Inter. Both variables now defined in
+            .theme-light at the same defaults as dark. (3) Inline title
+            font: was hardcoded to "SF Pro Display" regardless of the
+            Style Settings heading font knob. Changed to
+            var(--cn-heading-font) so New York and Georgia selections now
+            apply to the inline title as well as the headings.)
    v1.10.13 (post-v1.10.12 audit follow-ups. (1) Default accent and
             inline code now clear WCAG AA on every text-bearing surface
             in every default Background tone variant, not just Zen.
@@ -937,6 +952,8 @@ settings:
   --workspace-background-translucent: rgba(255, 255, 255, var(--cn-tint-alpha));
 
   --cn-editor-font-size: 16px;
+  --cn-note-line-height: 1.65;
+  --cn-heading-font: "SF Pro Display", -apple-system, system-ui, sans-serif;
 
   --background-primary: var(--cn-bg-primary);
   --background-primary-alt: var(--cn-bg-secondary);
@@ -1256,7 +1273,7 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 .markdown-source-view .inline-title,
 .markdown-preview-view .inline-title,
 .inline-title {
-  font-family: "SF Pro Display", -apple-system, system-ui, sans-serif;
+  font-family: var(--cn-heading-font);
   font-weight: var(--inline-title-weight);
   font-size: var(--inline-title-size);
   line-height: var(--inline-title-line-height);
@@ -2226,6 +2243,30 @@ body.cn-bubble-nav:not(.is-mobile) .nav-header {
   flex-direction: column;
   align-items: center;
   padding: 6px 6px 4px;
+  position: relative;
+}
+
+/* Small pill dash visible at rest as the hover affordance.
+   Fades out when buttons expand so it doesn't compete with them. */
+body.cn-bubble-nav:not(.is-mobile) .nav-header::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background-color: var(--cn-border-strong);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity var(--cn-transition);
+}
+
+body.cn-bubble-nav:not(.is-mobile) .nav-header:hover::after,
+body.cn-bubble-nav:not(.is-mobile) .nav-header:focus-within::after {
+  opacity: 0;
 }
 
 body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
@@ -2235,19 +2276,14 @@ body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
   border: 1px solid var(--cn-border-subtle);
   border-radius: 999px;
   padding: 3px 6px;
+  max-height: 0;
   overflow: hidden;
-  transform-origin: center;
-  transform: scale(0.65);
-  opacity: 0.85;
-  /* v1.10.12 / v1.10.13: the size reveal is compositor-friendly
-     (transform: scale and opacity). Container occupies its natural
-     size; the visual "pill" comes from scaling it down at rest. Hover
-     and focus-within scale back to 100 percent and brighten. The
-     background-color and border-color hover changes still paint, but
-     no layout reflow happens per frame. The section-22 universal
-     prefers-reduced-motion rule still neutralizes every transition
-     in the list. */
-  transition: transform var(--cn-transition),
+  opacity: 0;
+  /* Buttons fold to zero height at rest; expand on hover.
+     max-height ceiling (40px) covers the full button row.
+     Section-22 prefers-reduced-motion block neutralizes
+     every transition in this list. */
+  transition: max-height var(--cn-transition),
               opacity var(--cn-transition),
               background-color var(--cn-transition),
               border-color var(--cn-transition);
@@ -2255,7 +2291,7 @@ body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
 
 body.cn-bubble-nav:not(.is-mobile) .nav-header:hover .nav-buttons-container,
 body.cn-bubble-nav:not(.is-mobile) .nav-header:focus-within .nav-buttons-container {
-  transform: scale(1);
+  max-height: 40px;
   opacity: 1;
   background-color: var(--cn-medium-overlay);
   border-color: var(--cn-border-strong);
