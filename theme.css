@@ -31,9 +31,12 @@
            no brightness/contrast filters, no universal-selector traps.
            Theme is perf-clean. Corrected header comment that misdescribed
            Highlightr as an opted-out leaf — it has no leaf to opt out of.
-           When adding a plugin opt-out: update both translucent-dark
-           (line ~689) and translucent-light (line ~746) :not() chains,
-           and verify the plugin actually registers a workspace leaf.)
+           When adding a plugin opt-out: update the translucent-dark
+           :not() chain (section 4, dark block), the translucent-light
+           :not() chain (section 4, light block), and the .mod-root
+           :not() chain (section 4b). Search "workspace-leaf-content:not"
+           to locate all three. Verify the plugin registers a workspace
+           leaf before adding it.)
    v1.7.5 (note panel softened: dark Charcoal --cn-bg-primary lifted from
            #191919 to #1d1d1d so the note sits closer to the sidebar tone,
            and added section 4b to round the note's top-left and
@@ -87,6 +90,65 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.16 (audit pass: bugs, dead CSS, and performance. (1) BUG: Pure
+            Black dark variant -- --cn-bg-note-tray was inheriting
+            #131313 from .theme-dark while --cn-bg-primary is #0d0d0d,
+            making the tray LIGHTER than the note and inverting the
+            lifted-card hierarchy. Fixed: --cn-bg-note-tray: #050505
+            added to .theme-dark.cn-bg-black. (2) BUG: .modal-title
+            font-family was hardcoded to "SF Pro Display" -- missed in
+            the v1.10.14 pass that fixed inline-title. Changed to
+            var(--cn-heading-font) so New York / Georgia Style Settings
+            selections apply to modal titles. (3) BUG: Sidebar border
+            option (cn-sidebar-border) added border-left AND border-right
+            to both sidebars, including the outer edge against the window
+            frame. Fixed: left sidebar gets border-right only; right
+            sidebar gets border-left only. (4) BUG: Resize divider colors
+            were hardcoded hex (#b8b8bb dark / #888888 light) that do not
+            adapt to Pure Black, Warm, or Zen variants. Replaced with
+            var(--cn-divider) / var(--divider-color-hover). Transition
+            changed from raw 0.15s ease to var(--cn-transition-fast) to
+            match the theme token system. (5) DEAD CSS: .modal in section
+            10 set border-radius: var(--cn-radius-lg) (12px) that was
+            always overridden by the section 19b 18px value; .suggestion-
+            container, .menu similarly set var(--cn-radius) (8px) always
+            overridden by 14px. Consolidated: authoritative values now
+            live in section 10; section 19b duplicate overrides removed.
+            (6) DEAD CSS: --h1-size through --h6-size, --h1-weight through
+            --h6-weight, --h1-line-height through --h6-line-height,
+            --cn-editor-font-size, --cn-note-line-height, and
+            --cn-heading-font were defined identically in both .theme-dark
+            and .theme-light. Moved to :root following the same pattern as
+            --inline-title-* vars in v1.10.9. Themed blocks now only
+            contain mode-sensitive tokens. (7) DEAD CSS: Two identical
+            body:not(.is-phone).mod-root.view-header .view-actions
+            selectors (padding and margin-left) merged into one rule.
+            (8) DEAD CSS: Light Zen cn-sidebar-lifted tray was #cdcbc6 --
+            the same as Charcoal, which lacks Zen's warm hue. Changed to
+            #c8c5c0 (one stop darker, warm undertone). (9) PERF: Added
+            contain: layout to .nav-buttons-container so the max-height
+            hover animation does not cascade layout recalculations to
+            parent/sibling elements. clip-path was evaluated as a
+            compositor-friendly alternative but rejected: it does not
+            collapse layout height, leaving a 40px gap at rest.
+            CORRECTIONS (found during post-session review): (a) BUG-1
+            left cn-sidebar-lifted.cn-bg-black at #050505, identical to
+            the new default Pure Black tray -- Lifted had no visible
+            effect. Updated to #000000. (b) BUG-4 used var(--cn-divider)
+            (rgba 0.22) for the resize divider default state; on Pure
+            Black this renders at ~2:1 contrast, below the 3:1 minimum
+            for interactive elements. Replaced with rgba(255,255,255,0.35)
+            dark / rgba(55,53,47,0.28) light -- visible and non-stark.)
+   v1.10.15 (split-pane resize divider visibility. --divider-color was
+            not set by the theme, so it resolved through
+            --background-modifier-border -> --cn-border-subtle ->
+            rgba(255,255,255,0.06) in dark mode, making the center line
+            between split windows nearly invisible. Fixed: --divider-color
+            now set to --cn-divider (rgba(255,255,255,0.22) dark /
+            rgba(55,53,47,0.16) light), matching the value already used
+            for hr elements in section 9. --divider-color-hover added for
+            a visible affordance on hover. A 0.15s transition on
+            .workspace-leaf-resize-divider gives a smooth brighten effect.)
    v1.10.14 (three bug fixes. (1) Bubble nav reverted from v1.10.12's
             scale(0.65)/opacity approach back to a height-collapse model:
             .nav-buttons-container collapses to max-height:0 at rest and
@@ -757,6 +819,39 @@ settings:
   --inline-title-size: 1.6em;
   --inline-title-weight: 700;
   --inline-title-line-height: 1.2;
+  /* Editor font size and line height — driven by Style Settings sliders.
+     Previously duplicated identically in both .theme-dark and .theme-light. */
+  --cn-editor-font-size: 16px;
+  --cn-note-line-height: 1.65;
+  /* Heading font default — overridden by body.cn-heading-* class rules from
+     Style Settings. Previously duplicated in both themed blocks. */
+  --cn-heading-font: "SF Pro Display", -apple-system, system-ui, sans-serif;
+  /* Heading sizes, weights, line-heights — mode-independent (same in dark and
+     light). Colors stay in each themed block (--h1-color through --h6-color).
+     Compressed scale: H1-H4 as linear hierarchy; H5/H6 as eyebrow labels. */
+  --h1-size: 2.1em;
+  --h2-size: 1.6em;
+  --h3-size: 1.3em;
+  --h4-size: 1.1em;
+  --h5-size: 1.0em;
+  --h6-size: 0.9em;
+  --h1-weight: 800;
+  --h2-weight: 700;
+  --h3-weight: 700;
+  --h4-weight: 600;
+  --h5-weight: 700;
+  --h6-weight: 700;
+  --h1-line-height: 1.2;
+  --h2-line-height: 1.25;
+  --h3-line-height: 1.3;
+  --h4-line-height: 1.35;
+  --h5-line-height: 1.4;
+  --h6-line-height: 1.4;
+  /* Shared horizontal inset for sidebar panel boxes (folder box,
+     plugin-leaf boxes, vault-profile pseudo). Locks all left-column
+     panels to the same x-coordinate. Previously a standalone :root
+     block in section 19b; moved here per the section 0 pattern. */
+  --cn-panel-side-inset: 8px;
 }
 
 /* ============================================================
@@ -819,11 +914,6 @@ settings:
   --cn-tint-alpha: 0.18;
   --workspace-background-translucent: rgba(0, 0, 0, var(--cn-tint-alpha));
 
-  /* Editor font size, line height, and line width — driven by Style Settings */
-  --cn-editor-font-size: 16px;
-  --cn-note-line-height: 1.65;
-  --cn-heading-font: "SF Pro Display", -apple-system, system-ui, sans-serif;
-
   /* Default mapping (Translucent Window OFF or fullscreen): solid surfaces.
      Under .is-translucent the workspace layers are forced transparent in
      section 4 so vibrancy shows through. */
@@ -833,6 +923,8 @@ settings:
   --background-secondary-alt: var(--cn-bg-tertiary);
   --background-modifier-border: var(--cn-border-subtle);
   --background-modifier-border-hover: var(--cn-border-strong);
+  --divider-color: var(--cn-divider);
+  --divider-color-hover: rgba(255, 255, 255, 0.42);
   --background-modifier-border-focus: var(--cn-accent);
   --background-modifier-hover: var(--cn-bg-tertiary);
   --background-modifier-active-hover: var(--cn-bg-elevated);
@@ -851,28 +943,7 @@ settings:
   --interactive-accent: var(--cn-accent);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading sizes. Compressed scale with H1–H4 as the linear hierarchy
-     and H5/H6 styled as uppercase eyebrow labels (see rules block) so
-     they read as a different category rather than just "smaller bold". */
-  --h1-size: 2.1em;
-  --h2-size: 1.6em;
-  --h3-size: 1.3em;
-  --h4-size: 1.1em;
-  --h5-size: 1.0em;
-  --h6-size: 0.9em;
-  --h1-weight: 800;
-  --h2-weight: 700;
-  --h3-weight: 700;
-  --h4-weight: 600;
-  --h5-weight: 700;
-  --h6-weight: 700;
-  --h1-line-height: 1.2;
-  --h2-line-height: 1.25;
-  --h3-line-height: 1.3;
-  --h4-line-height: 1.35;
-  --h5-line-height: 1.4;
-  --h6-line-height: 1.4;
-
+  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root. */
   --h1-color: #ffffff;
   --h2-color: #ffffff;
   --h3-color: #ffffff;
@@ -951,16 +1022,14 @@ settings:
   --cn-tint-alpha: 0.0;
   --workspace-background-translucent: rgba(255, 255, 255, var(--cn-tint-alpha));
 
-  --cn-editor-font-size: 16px;
-  --cn-note-line-height: 1.65;
-  --cn-heading-font: "SF Pro Display", -apple-system, system-ui, sans-serif;
-
   --background-primary: var(--cn-bg-primary);
   --background-primary-alt: var(--cn-bg-secondary);
   --background-secondary: var(--cn-bg-secondary);
   --background-secondary-alt: var(--cn-bg-tertiary);
   --background-modifier-border: var(--cn-border-subtle);
   --background-modifier-border-hover: var(--cn-border-strong);
+  --divider-color: var(--cn-divider);
+  --divider-color-hover: rgba(55, 53, 47, 0.38);
   --background-modifier-border-focus: var(--cn-accent);
   --background-modifier-hover: var(--cn-soft-overlay);
   --background-modifier-active-hover: var(--cn-medium-overlay);
@@ -979,27 +1048,7 @@ settings:
   --interactive-accent: var(--cn-accent);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading scale — same as dark */
-  --h1-size: 2.1em;
-  --h2-size: 1.6em;
-  --h3-size: 1.3em;
-  --h4-size: 1.1em;
-  --h5-size: 1.0em;
-  --h6-size: 0.9em;
-  --h1-weight: 800;
-  --h2-weight: 700;
-  --h3-weight: 700;
-  --h4-weight: 600;
-  --h5-weight: 700;
-  --h6-weight: 700;
-  --h1-line-height: 1.2;
-  --h2-line-height: 1.25;
-  --h3-line-height: 1.3;
-  --h4-line-height: 1.35;
-  --h5-line-height: 1.4;
-  --h6-line-height: 1.4;
-
-  /* Notion convention: H1–H4 same color, H5/H6 muted as eyebrow labels */
+  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root. */
   --h1-color: #37352f;
   --h2-color: #37352f;
   --h3-color: #37352f;
@@ -1023,6 +1072,12 @@ settings:
   --cn-bg-secondary: #141414;
   --cn-bg-tertiary: #1c1c1c;
   --cn-bg-elevated: #222222;
+  /* Tray must be darker than bg-primary so the note card reads as lifted
+     on a base. The .theme-dark default tray (#131313) is lighter than
+     #0d0d0d, inverting the hierarchy. Setting to #050505 restores it.
+     (The cn-sidebar-lifted override correctly had #050505 already; this
+     fixes the default Flat sidebar setting.) */
+  --cn-bg-note-tray: #050505;
 }
 
 .theme-dark.cn-bg-warm {
@@ -1087,9 +1142,15 @@ settings:
    removed; --cn-tint-alpha stays at the .theme-light block default (0.0). */
 
 /* Sidebar contrast variants — dark */
-.theme-dark.cn-sidebar-border .workspace-split.mod-left-split,
-.theme-dark.cn-sidebar-border .workspace-split.mod-right-split {
+/* Sidebar border on the inner edge only -- the edge that faces the note.
+   Left sidebar's left edge and right sidebar's right edge sit against
+   the window frame (no adjacent content), so a border there is noise.
+   The panel boxes in section 19b provide their own inner border; this
+   option adds a separator at the split level for users who want it. */
+.theme-dark.cn-sidebar-border .workspace-split.mod-left-split {
   border-right: 1px solid var(--cn-border-subtle);
+}
+.theme-dark.cn-sidebar-border .workspace-split.mod-right-split {
   border-left: 1px solid var(--cn-border-subtle);
 }
 
@@ -1099,9 +1160,11 @@ settings:
 .theme-dark.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #110f0d; }
 
 /* Sidebar contrast variants — light */
-.theme-light.cn-sidebar-border .workspace-split.mod-left-split,
-.theme-light.cn-sidebar-border .workspace-split.mod-right-split {
+/* Same inner-edge-only rule for light mode. */
+.theme-light.cn-sidebar-border .workspace-split.mod-left-split {
   border-right: 1px solid var(--cn-border-subtle);
+}
+.theme-light.cn-sidebar-border .workspace-split.mod-right-split {
   border-left: 1px solid var(--cn-border-subtle);
 }
 
@@ -1121,14 +1184,21 @@ settings:
    in section 4b, so the tray override only takes effect on
    workspace-splits where it doesn't conflict). */
 .theme-dark.cn-sidebar-lifted              { --cn-bg-note-tray: #0d0d0d; }
-.theme-dark.cn-sidebar-lifted.cn-bg-black  { --cn-bg-note-tray: #050505; }
+/* #000000: one stop darker than the Pure Black default tray (#050505).
+   The BUG-1 fix in v1.10.16 set the default tray to #050505, making this
+   override identical to it. Updated so Lifted still deepens the sidebar. */
+.theme-dark.cn-sidebar-lifted.cn-bg-black  { --cn-bg-note-tray: #000000; }
 .theme-dark.cn-sidebar-lifted.cn-bg-warm   { --cn-bg-note-tray: #131110; }
 .theme-dark.cn-sidebar-lifted.cn-bg-zen    { --cn-bg-note-tray: #0a0908; }
 
 .theme-light.cn-sidebar-lifted             { --cn-bg-note-tray: #cdcbc6; }
 .theme-light.cn-sidebar-lifted.cn-bg-black { --cn-bg-note-tray: #e2e2e2; }
 .theme-light.cn-sidebar-lifted.cn-bg-warm  { --cn-bg-note-tray: #ddd6c8; }
-.theme-light.cn-sidebar-lifted.cn-bg-zen   { --cn-bg-note-tray: #cdcbc6; }
+/* Zen lifted tray: one stop darker than Zen's default tray (#d8d6d1),
+   with Zen's warm red/orange undertone, so lifted reads as "deeper"
+   on Zen's slightly off-white surfaces (primary #f5f3ef vs #ffffff).
+   Previously copied Charcoal's value (#cdcbc6) which lacks the hue. */
+.theme-light.cn-sidebar-lifted.cn-bg-zen   { --cn-bg-note-tray: #c8c5c0; }
 
 /* Sidebar-lifted in dark translucent mode: outer-shell containers are
    forced transparent, so paint a subtle dark tint to give Lifted a
@@ -1787,7 +1857,10 @@ hr {
 }
 
 .modal {
-  border-radius: var(--cn-radius-lg);
+  /* 18px radius: chunkier than --cn-radius-lg (12px) without going
+     full Velocity (22px). Authoritative value -- the section 19b
+     duplicate override has been removed. */
+  border-radius: 18px;
   background-color: var(--cn-bg-secondary);
   border: 1px solid var(--cn-border-subtle);
   box-shadow: 0 12px 48px var(--cn-modal-shadow);
@@ -1818,7 +1891,9 @@ hr {
 }
 
 .modal-title {
-  font-family: "SF Pro Display", -apple-system, system-ui, sans-serif;
+  /* var(--cn-heading-font) follows the Style Settings heading font knob
+     (same fix as v1.10.14 applied to inline-title). */
+  font-family: var(--cn-heading-font);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -1827,7 +1902,9 @@ hr {
 .suggestion-container, .menu {
   background-color: var(--cn-bg-secondary);
   border: 1px solid var(--cn-border-subtle);
-  border-radius: var(--cn-radius);
+  /* 14px radius: matches the section 19b chrome model. Authoritative
+     value -- the section 19b duplicate override has been removed. */
+  border-radius: 14px;
   /* Per-theme shadow alpha (heavy in dark, soft in light) so popovers
      match the rest of the modal chrome and don't drop a heavy black
      shadow over a light canvas. */
@@ -2217,7 +2294,7 @@ a.external-link:focus-visible,
         - Vault profile / vault switcher pill
         - View-header right-side action FABs
         - Status bar items
-        - Modal / menu / popover radius bump
+        - Popover / tooltip corner radius (modal/menu radii moved to section 10)
         - Ribbon box, folder panel box, vault-profile pseudo box
    ============================================================ */
 
@@ -2279,10 +2356,15 @@ body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  /* Buttons fold to zero height at rest; expand on hover.
-     max-height ceiling (40px) covers the full button row.
-     Section-22 prefers-reduced-motion block neutralizes
-     every transition in this list. */
+  /* contain: layout isolates the max-height reflow to this element so the
+     animation does not cascade to parent/sibling layout recalculations.
+     clip-path was evaluated as an alternative (compositor-friendly, no
+     reflow) but rejected: clip-path does not collapse layout height, so
+     the container would still occupy 40px of space at rest, creating a
+     gap that pushes the search input down. max-height remains the correct
+     approach; contain: layout limits its propagation cost.
+     Section-22 prefers-reduced-motion block neutralizes every transition. */
+  contain: layout;
   transition: max-height var(--cn-transition),
               opacity var(--cn-transition),
               background-color var(--cn-transition),
@@ -2351,14 +2433,6 @@ body:not(.is-mobile) .clickable-icon:active > .svg-icon {
      - Translucency-aware: shape changes only — no background
        paint that would fight section 4's transparent chrome.
    ============================================================ */
-
-/* Shared horizontal inset for sidebar panel boxes (folder box,
-   plugin-leaf boxes, vault-profile pseudo). Locking these to a
-   single token keeps all left-column panels edge-aligned even
-   if a future tweak nudges the value. The vault-profile pseudo
-   still depends on its parent matching the file-explorer column
-   width — see the comment above its rule for that caveat. */
-:root { --cn-panel-side-inset: 8px; }
 
 /* --- Apple-style continuous corners on rounded chrome ---
    Scoped to :not(.is-phone) for consistency with the rest of
@@ -2528,11 +2602,14 @@ body:not(.is-phone) .view-actions .clickable-icon:not(.mod-bookmark):hover {
    to the tab pill above and to the window's right edge by default,
    so they read as crammed into the corner. Small top padding pushes
    the whole group down a few pixels, and the right padding shifts
-   them inward. Scoped to non-phone in line with the FAB rule above
-   — mobile uses native iOS spacing. */
+   them inward. margin-left: auto pins .view-actions to the right
+   edge so any future stock-layout change in Obsidian cannot drift
+   the action icons left again. Scoped to non-phone in line with
+   the FAB rule above -- mobile uses native iOS spacing. */
 body:not(.is-phone) .mod-root .view-header .view-actions {
   padding-top: 10px;
   padding-right: 12px;
+  margin-left: auto;
 }
 
 /* Hide the centered .view-header-title text. With pill tabs
@@ -2556,14 +2633,6 @@ body:not(.is-phone) .mod-root .view-header-title-container .view-header-title {
   visibility: hidden;
 }
 
-/* Belt-and-suspenders: pin .view-actions to the right edge so any
-   future stock-layout change in Obsidian (or a Style Settings
-   toggle that alters the title-container) cannot drift the action
-   icons left again. */
-body:not(.is-phone) .mod-root .view-header .view-actions {
-  margin-left: auto;
-}
-
 /* --- Status bar items —
    Section 14 handles the parent pill (position, radius, body).
    This block only styles the clickable items inside. */
@@ -2572,19 +2641,10 @@ body:not(.is-phone) .mod-root .view-header .view-actions {
   padding: 2px 6px;
 }
 
-/* --- Modal / menu / popover corner radius bump ---
-   Cognia Noir uses --cn-radius-lg (12px) for modals; Velocity
-   sits at 22px. Compromise at 18px so the dialog reads as a
-   chunkier surface without going full Velocity. */
-.modal {
-  border-radius: 18px;
-}
-
-.suggestion-container,
-.menu {
-  border-radius: 14px;
-}
-
+/* --- Popover / tooltip corner radius ---
+   Modal (18px) and suggestion-container/menu (14px) radii are set
+   directly in section 10 where those elements are first defined.
+   Popovers and tooltips aren't in section 10 so they stay here. */
 .popover,
 .tooltip {
   border-radius: 10px;
@@ -2720,6 +2780,31 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
    inspecting for a stray top border in DevTools. */
 .workspace-split.mod-left-split > .workspace-sidedock-vault-profile {
   border-top: none !important;
+}
+
+/* v1.10.15  Split-pane resize divider visibility.
+   DevTools confirmed: the element is hr.workspace-leaf-resize-handle
+   (not .workspace-leaf-resize-divider), and Obsidian renders the
+   visible line via border-inline-end (not background-color). Scoped to
+   .mod-root so the sidebar resize handle is not affected.
+   Values are fixed rgba overlays calibrated for findability at rest and
+   a clear brightening on hover, without being as stark as the original
+   hardcoded #b8b8bb (dark) / #888888 (light). Using pure --cn-divider
+   (0.22 opacity) was a v1.10.16 regression: on Pure Black it rendered
+   at ~2:1 contrast, below the 3:1 interactive-element minimum. */
+.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle {
+  border-inline-end-color: rgba(255, 255, 255, 0.35) !important;
+  transition: border-inline-end-color var(--cn-transition-fast);
+}
+.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle:hover {
+  border-inline-end-color: rgba(255, 255, 255, 0.55) !important;
+}
+.theme-light .workspace-split.mod-root .workspace-leaf-resize-handle {
+  border-inline-end-color: rgba(55, 53, 47, 0.28) !important;
+  transition: border-inline-end-color var(--cn-transition-fast);
+}
+.theme-light .workspace-split.mod-root .workspace-leaf-resize-handle:hover {
+  border-inline-end-color: rgba(55, 53, 47, 0.50) !important;
 }
 
 /* ============================================================
