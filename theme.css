@@ -1154,10 +1154,13 @@ settings:
   border-left: 1px solid var(--cn-border-subtle);
 }
 
-.theme-dark.cn-sidebar-lifted { --background-secondary: #1b1b1b; }
-.theme-dark.cn-sidebar-lifted.cn-bg-black { --background-secondary: #0a0a0a; }
-.theme-dark.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #1f1d1c; }
-.theme-dark.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #110f0d; }
+/* Lifted sets both --background-secondary (panel) and --cn-bg-note-tray (workspace-split
+   tray, which bypasses --background-secondary in opaque mode -- see section 4b). */
+.theme-dark.cn-sidebar-lifted              { --background-secondary: #1b1b1b; --cn-bg-note-tray: #0d0d0d; }
+/* Pure Black tray (#000000): one stop darker than default (#050505). */
+.theme-dark.cn-sidebar-lifted.cn-bg-black  { --background-secondary: #0a0a0a; --cn-bg-note-tray: #000000; }
+.theme-dark.cn-sidebar-lifted.cn-bg-warm   { --background-secondary: #1f1d1c; --cn-bg-note-tray: #131110; }
+.theme-dark.cn-sidebar-lifted.cn-bg-zen    { --background-secondary: #110f0d; --cn-bg-note-tray: #0a0908; }
 
 /* Sidebar contrast variants — light */
 /* Same inner-edge-only rule for light mode. */
@@ -1168,37 +1171,12 @@ settings:
   border-left: 1px solid var(--cn-border-subtle);
 }
 
-.theme-light.cn-sidebar-lifted { --background-secondary: #f1f0ed; }
-.theme-light.cn-sidebar-lifted.cn-bg-black { --background-secondary: #f0f0f0; }
-.theme-light.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #ebe5d9; }
-.theme-light.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #e6e3de; }
+.theme-light.cn-sidebar-lifted             { --background-secondary: #f1f0ed; --cn-bg-note-tray: #cdcbc6; }
+.theme-light.cn-sidebar-lifted.cn-bg-black { --background-secondary: #f0f0f0; --cn-bg-note-tray: #e2e2e2; }
+.theme-light.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #ebe5d9; --cn-bg-note-tray: #ddd6c8; }
+/* Zen tray: one stop darker than default (#d8d6d1), with warm undertone to match Zen surfaces. */
+.theme-light.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }
 
-/* Sidebar-lifted in opaque mode: section 4b force-paints
-   .workspace-split.{root,left,right} with var(--cn-bg-note-tray)
-   directly, bypassing --background-secondary. Without overriding the
-   tray token too, the Lifted setting is invisible whenever Translucent
-   Window is OFF. Each value is one stop darker than the matching
-   variant's default tray so Lifted reads as "sidebar deepens further
-   away from the note card." Applies in both opaque and translucent
-   contexts (translucent dark already keeps tab-containers transparent
-   in section 4b, so the tray override only takes effect on
-   workspace-splits where it doesn't conflict). */
-.theme-dark.cn-sidebar-lifted              { --cn-bg-note-tray: #0d0d0d; }
-/* #000000: one stop darker than the Pure Black default tray (#050505).
-   The BUG-1 fix in v1.10.16 set the default tray to #050505, making this
-   override identical to it. Updated so Lifted still deepens the sidebar. */
-.theme-dark.cn-sidebar-lifted.cn-bg-black  { --cn-bg-note-tray: #000000; }
-.theme-dark.cn-sidebar-lifted.cn-bg-warm   { --cn-bg-note-tray: #131110; }
-.theme-dark.cn-sidebar-lifted.cn-bg-zen    { --cn-bg-note-tray: #0a0908; }
-
-.theme-light.cn-sidebar-lifted             { --cn-bg-note-tray: #cdcbc6; }
-.theme-light.cn-sidebar-lifted.cn-bg-black { --cn-bg-note-tray: #e2e2e2; }
-.theme-light.cn-sidebar-lifted.cn-bg-warm  { --cn-bg-note-tray: #ddd6c8; }
-/* Zen lifted tray: one stop darker than Zen's default tray (#d8d6d1),
-   with Zen's warm red/orange undertone, so lifted reads as "deeper"
-   on Zen's slightly off-white surfaces (primary #f5f3ef vs #ffffff).
-   Previously copied Charcoal's value (#cdcbc6) which lacks the hue. */
-.theme-light.cn-sidebar-lifted.cn-bg-zen   { --cn-bg-note-tray: #c8c5c0; }
 
 /* Sidebar-lifted in dark translucent mode: outer-shell containers are
    forced transparent, so paint a subtle dark tint to give Lifted a
@@ -1250,12 +1228,9 @@ body {
 
 /* UI font variants — selected via Style Settings */
 body.cn-ui-inter      { --font-interface-theme: "Inter", -apple-system, system-ui, sans-serif; }
-body.cn-ui-avenir     { --font-interface-theme: "Avenir Next", "Avenir", -apple-system, system-ui, sans-serif; }
-body.cn-ui-system     { --font-interface-theme: -apple-system, "SF Pro Text", system-ui, BlinkMacSystemFont, sans-serif; }
-
-/* Avenir is a touch wider — bump letter-spacing back to 0 */
-body.cn-ui-avenir { letter-spacing: 0; font-feature-settings: "kern", "liga"; }
-body.cn-ui-system { font-feature-settings: "ss01", "ss02", "kern", "liga"; }
+/* Avenir is a touch wider -- bump letter-spacing back to 0 */
+body.cn-ui-avenir     { --font-interface-theme: "Avenir Next", "Avenir", -apple-system, system-ui, sans-serif; letter-spacing: 0; font-feature-settings: "kern", "liga"; }
+body.cn-ui-system     { --font-interface-theme: -apple-system, "SF Pro Text", system-ui, BlinkMacSystemFont, sans-serif; font-feature-settings: "ss01", "ss02", "kern", "liga"; }
 
 /* Note font variants — selected via Style Settings */
 body.cn-note-sfpro   { --font-text-theme: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif; }
