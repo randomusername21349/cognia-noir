@@ -90,6 +90,23 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.20 (docs cleanup of v1.10.19. Rewrote the rationale
+            comment on the vault-profile border-top rule so it
+            describes the current no-!important state instead of
+            the pre-cleanup state, and added retroactive version-
+            log entries for 1.10.19 and 1.10.20. No CSS behavior
+            change.)
+   v1.10.19 (Obsidian community theme lint cleanup. Dropped 5
+            redundant !important flags whose selector specificity
+            already outranks Obsidian core: vault profile
+            border-top, and the four resize-handle
+            border-inline-end-color declarations (dark/light at
+            rest and on :hover). Visually verified in both
+            themes; divider remains visible at the documented
+            rgba values and hover still brightens. Declaration
+            count drops from 33 to 28. Remaining 28 are each
+            paired with a rationale comment explaining the
+            Obsidian-core override they counter.)
    v1.10.18 (mobile drawer fix + audit cleanup. (1) MOBILE BUG:
             on iPhone, tapping the bottom-of-drawer view-picker
             chevron (Files / Search / Tags / Bookmarks / All
@@ -2820,14 +2837,14 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
    not appear in the current DOM; if it returns, scope by a more
    specific selector that excludes the boundary handle. */
 
-/* Defensive: zero any top border on the vault profile. !important
-   is here because Obsidian has historically set a 1px top border
-   on this element via internal CSS, and removing it without
-   !important left a thin line above the vault box in some builds.
-   If a future audit confirms current Obsidian no longer paints
-   that border, the !important (and the rule itself) can be
-   dropped — verify by toggling display:none on this rule and
-   inspecting for a stray top border in DevTools. */
+/* Defensive: zero any top border on the vault profile. Obsidian
+   has historically painted a 1px top border on this element via
+   internal CSS; the rule is kept as a harmless no-op safeguard
+   against that returning. v1.10.19 audit confirmed current
+   Obsidian no longer paints it, and the selector specificity
+   already outranks core, so !important was dropped. If a future
+   audit confirms the rule itself is unnecessary, the whole
+   block can be deleted. */
 .workspace-split.mod-left-split > .workspace-sidedock-vault-profile {
   border-top: none;
 }
