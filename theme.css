@@ -2829,7 +2829,7 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
    dropped — verify by toggling display:none on this rule and
    inspecting for a stray top border in DevTools. */
 .workspace-split.mod-left-split > .workspace-sidedock-vault-profile {
-  border-top: none !important;
+  border-top: none;
 }
 
 /* v1.10.15  Split-pane resize divider visibility.
@@ -2843,18 +2843,18 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
    (0.22 opacity) was a v1.10.16 regression: on Pure Black it rendered
    at ~2:1 contrast, below the 3:1 interactive-element minimum. */
 .theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle {
-  border-inline-end-color: rgba(255, 255, 255, 0.35) !important;
+  border-inline-end-color: rgba(255, 255, 255, 0.35);
   transition: border-inline-end-color var(--cn-transition-fast);
 }
 .theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle:hover {
-  border-inline-end-color: rgba(255, 255, 255, 0.55) !important;
+  border-inline-end-color: rgba(255, 255, 255, 0.55);
 }
 .theme-light .workspace-split.mod-root .workspace-leaf-resize-handle {
-  border-inline-end-color: rgba(55, 53, 47, 0.28) !important;
+  border-inline-end-color: rgba(55, 53, 47, 0.28);
   transition: border-inline-end-color var(--cn-transition-fast);
 }
 .theme-light .workspace-split.mod-root .workspace-leaf-resize-handle:hover {
-  border-inline-end-color: rgba(55, 53, 47, 0.50) !important;
+  border-inline-end-color: rgba(55, 53, 47, 0.50);
 }
 
 /* ============================================================
