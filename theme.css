@@ -90,6 +90,13 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.22 (Republish of 1.10.21 -- no CSS changes; theme.css is
+            byte-identical. The developer-portal CSS scan for 1.10.21
+            ran before the release file assets were attached and
+            linted stale (pre-fix) content; the portal scans once per
+            version, so a new version is needed to trigger a fresh
+            scan. The 1.10.22 release carries theme.css + manifest.json
+            as assets from creation.)
    v1.10.21 (Obsidian community theme lint cleanup. Removed all 28
             !important declarations flagged by the linter. Approach
             verified against Obsidian 1.12.7 app.css: rather than
