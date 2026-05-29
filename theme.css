@@ -90,6 +90,26 @@
             workspace-tabs) both work. Tab-container trays opt out of
             opaque paint in dark translucent mode so vibrancy still
             shows through.)
+   v1.10.23 (Obsidian 1.12.x desktop appearance fixes, verified
+            against the shipped 1.12.7 app.css. (1) Vault profile:
+            core reintroduced a top border via
+            --tab-outline-width/-color with a (0,4,1) selector that
+            outranked the old low-specificity safeguard once 1.10.21
+            dropped its !important, producing a white line over the
+            vault box. Suppression moved into the (0,4,1) box rule
+            (border-top: none) where it wins on specificity + source
+            order, no !important. (2) Settings buttons: the broad
+            .modal button transparent rule stripped core's fill, so
+            Browse / Check for updates / Turn on and reload read as
+            plain text on desktop; the non-CTA settings-button fill
+            is now unscoped from .is-phone and excludes .clickable-icon
+            to match core's own fill boundary. (3) Collapsed left
+            ribbon: balanced the cramped 4px right margin to 8px in
+            the .is-collapsed state only. (4) Squircle corners:
+            core 1.12 dropped -electron-corner-smoothing for the
+            standard corner-shape; added corner-shape: squircle
+            alongside the legacy property so squircles render on both
+            old and new Obsidian.)
    v1.10.22 (Republish of 1.10.21 -- no CSS changes; theme.css is
             byte-identical. The developer-portal CSS scan for 1.10.21
             ran before the release file assets were attached and
@@ -2510,8 +2530,13 @@ body:not(.is-mobile) .clickable-icon:active > .svg-icon {
      - All radii are literal pixel values so they don't bleed
        into editor content via the global --radius-* tokens
        (which Cognia Noir keeps at the small Notion scale).
-     - -electron-corner-smoothing gives Apple-style continuous
-       corners on rounded surfaces.
+     - Continuous (squircle) corners on rounded surfaces are set
+       with two properties paired together: the standard CSS
+       `corner-shape: squircle` (Obsidian 1.12+, which dropped the
+       non-standard property and adopted corner-shape) and the
+       legacy `-electron-corner-smoothing: 60%` (pre-1.12 Electron).
+       Each era ignores the other's property, so both ship together
+       to keep squircles on old and new Obsidian alike.
      - Translucency-aware: shape changes only — no background
        paint that would fight section 4's transparent chrome.
    ============================================================ */
@@ -2543,6 +2568,7 @@ body:not(.is-phone) :is(
   .workspace-tab-header-tab-list .clickable-icon,
   .view-header .clickable-icon) {
   -electron-corner-smoothing: 60%;
+  corner-shape: squircle;
 }
 
 /* --- Pill-shaped clickable icons in chrome ---
@@ -2754,6 +2780,7 @@ body:not(.is-phone) .workspace-ribbon.mod-left {
      rather than tweaking this default. */
   margin: 36px 4px 8px 8px;
   -electron-corner-smoothing: 60%;
+  corner-shape: squircle;
   /* Load-bearing per v1.8.6: without these the ribbon container
      sizes to its icon list, which leaves the bottom of the box
      clipped above the vault profile. Confirmed still needed on
@@ -2761,6 +2788,15 @@ body:not(.is-phone) .workspace-ribbon.mod-left {
      intrinsic content height by default. */
   align-self: stretch;
   height: auto;
+}
+
+/* When the left sidebar is collapsed only the ribbon box shows,
+   sitting against the workspace. The base rule's right margin (4px)
+   reads as cramped there, so balance it to match the 8px left margin
+   in the collapsed state only — expanded layout keeps 4px because the
+   file-explorer panel box already supplies the gap on that side. */
+body:not(.is-phone) .workspace-ribbon.mod-left.is-collapsed {
+  margin-right: 8px;
 }
 
 /* macOS frameless: bump the ribbon top so the box clears the
@@ -2803,6 +2839,7 @@ body:not(.is-phone) .mod-left-split .workspace-leaf-content[data-type="file-expl
   margin: 4px var(--cn-panel-side-inset) 8px;
   padding: 6px 4px;
   -electron-corner-smoothing: 60%;
+  corner-shape: squircle;
 }
 
 /* Vault profile (bottom-left strip with vault switcher,
@@ -2828,6 +2865,12 @@ body:not(.is-phone) .mod-left-split .workspace-leaf-content[data-type="file-expl
 body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-profile {
   position: relative;
   margin-block: 4px 8px;
+  /* Suppress the top border core reintroduced in Obsidian 1.12
+     (border-top via --tab-outline-width/--tab-outline-color on
+     .workspace-sidedock-vault-profile). That core rule is
+     specificity (0,4,1); this rule matches it and, loading after
+     core, wins by source order — so no !important is needed. */
+  border-top: none;
 }
 
 body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-profile::after {
@@ -2841,6 +2884,7 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
   border-radius: 12px;
   pointer-events: none;
   -electron-corner-smoothing: 60%;
+  corner-shape: squircle;
 }
 
 /* v1.10.10  Removed the rule that hid hr.workspace-leaf-resize-handle
@@ -2852,17 +2896,14 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
    not appear in the current DOM; if it returns, scope by a more
    specific selector that excludes the boundary handle. */
 
-/* Defensive: zero any top border on the vault profile. Obsidian
-   has historically painted a 1px top border on this element via
-   internal CSS; the rule is kept as a harmless no-op safeguard
-   against that returning. v1.10.19 audit confirmed current
-   Obsidian no longer paints it, and the selector specificity
-   already outranks core, so !important was dropped. If a future
-   audit confirms the rule itself is unnecessary, the whole
-   block can be deleted. */
-.workspace-split.mod-left-split > .workspace-sidedock-vault-profile {
-  border-top: none;
-}
+/* v1.10.23  Vault-profile top-border suppression moved into the
+   (0,4,1) box rule above (border-top: none). Obsidian 1.12
+   reintroduced this border via --tab-outline-width/-color with a
+   (0,4,1) selector, which outranked the old low-specificity
+   safeguard here once v1.10.21 dropped its !important — that is
+   what produced the visible white line. The standalone block is
+   removed; the suppression now lives where it can win on
+   specificity + source order without !important. */
 
 /* v1.10.15  Split-pane resize divider visibility.
    DevTools confirmed: the element is hr.workspace-leaf-resize-handle
@@ -2928,11 +2969,20 @@ body.is-phone.theme-dark .modal.mod-settings .modal-content {
 }
 
 /* Non-CTA settings buttons (Open, Manage, Log out, Upgrade,
-   Purchase) are bare text without this. Give them a tertiary
-   fill + subtle border so they read as buttons, not floating
-   labels. The blue Activate button (.mod-cta) keeps its accent
-   paint from section 10. Applies to both dark and light mode. */
-body.is-phone .modal.mod-settings button:not(.mod-cta) {
+   Purchase, plus Turn on and reload / Browse / Check for updates)
+   are bare text without this — section 10's broad
+   `.modal button { background: transparent }` strips the fill core
+   gives `button:not(.clickable-icon)`. Give them a tertiary fill +
+   subtle border so they read as buttons, not floating labels. The
+   blue Activate button (.mod-cta) keeps its accent paint from
+   section 10. v1.10.23: unscoped from .is-phone so it applies on
+   desktop too — Obsidian 1.12's settings layout surfaced these as
+   plain text on desktop. .modal.mod-settings (0,3,1) outranks the
+   broad .modal button (0,1,1). :not(.clickable-icon) mirrors core's
+   own fill boundary (button:not(.clickable-icon)) so settings icon
+   buttons — hotkey edit/delete, extra-option gears — stay bare and
+   are not boxed. Dark and light mode both. */
+.modal.mod-settings button:not(.mod-cta):not(.clickable-icon) {
   background-color: var(--cn-bg-tertiary);
   border: 1px solid var(--cn-border-subtle);
 }
