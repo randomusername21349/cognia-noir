@@ -7,6 +7,25 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.25
+
+Mobile (iPhone) fix for the left-drawer view-picker popup (the list of
+Files / Search / Tags / Bookmarks / All properties / Recent files that
+opens from the bottom-of-drawer chevron). The popup previously inherited
+only a flat fill matching the drawer background, so it did not read as a
+distinct surface: the file tree behind it bled through and the rows looked
+like loose items floating over the folders. The popup list
+(.workspace-drawer-tab-options-list) now gets opaque floating-menu chrome
+(elevated fill, subtle border, radius, and the shared menu shadow) placed
+on the floating list itself rather than the wrapping container, so it no
+longer frames the whole bottom of the drawer. Stock padding is left intact
+so core's reserved strip for the always-on-top select bar is preserved
+(an earlier padding shorthand had pushed a row under the select bar). The
+redundant active highlight on the select bar is dropped while the picker
+is open, so the current view no longer appears highlighted twice. Desktop
+and iPad are unaffected (their sidebar-tab styling is guarded
+:not(.is-phone)).
+
 ## v1.10.24
 
 Obsidian 1.12.x desktop appearance fixes (vault-profile white line,
