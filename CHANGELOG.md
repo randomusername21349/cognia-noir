@@ -7,6 +7,32 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.26
+
+Readability and cohesion pass on note content (dark mode).
+
+- Callouts: tip/warning/info now render as boxed cards in translucent dark mode.
+  They previously kept only their colored icon and lost the background/border,
+  because core's `mix-blend-mode: lighten` over macOS vibrancy washed the
+  low-alpha tint out. Callouts now paint an opaque tinted surface with
+  `mix-blend-mode: normal`, so every type reads as a solid card while keeping its
+  semantic color.
+- Live Preview headings: heading sizes were being flattened to the editor font
+  size because the editor's `.cm-line` font-size rule out-specified the heading
+  rules. Header lines are now excluded, so H1-H6 size correctly in Live Preview
+  as well as reading view.
+- Headings restyled: tighter, Notion-like scale (H1 is no longer larger than the
+  note title), a single uniform weight and one uniform color (white in dark /
+  near-black in light) across H1-H6 so hierarchy comes from size, set in SF Pro
+  Text to match the body. Heading letter-spacing relaxed for the smaller scale.
+- Highlight: brighter `==highlight==` yellow in dark mode.
+- Translucency: in dark translucent mode the sidebar and note now share one
+  cohesive subtle-glass surface instead of a solid note card against glassy
+  chrome. The Translucency tint knob now sets that glass opacity (Pure = most
+  vibrancy, Heavy = nearly solid).
+- Default note font size is now 14px (was 16px); still adjustable via Style
+  Settings.
+
 ## v1.10.25
 
 Mobile (iPhone) fix for the left-drawer view-picker popup (the list of

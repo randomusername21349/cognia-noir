@@ -10,11 +10,12 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.25 (Mobile: the iPhone left-drawer view-picker popup now reads as
-            an opaque floating menu instead of letting the file tree bleed
-            through, with no select-bar overlap or double highlight. Full
-            version history lives in CHANGELOG.md and on the GitHub
-            releases page.)
+   v1.10.26 (Headings retuned to a tight Notion-like scale in one uniform white
+            and weight, SF Pro Text to match body; Live Preview heading sizes
+            fixed; tip/warning/info callouts box correctly over translucency;
+            sidebar and note unified into one subtle-glass surface; brighter
+            highlight; default note size 14px. Full version history lives in
+            CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
       0   Shared constants (theme-independent vars: radius, transition)
@@ -143,7 +144,7 @@ settings:
     id: cn-editor-font-size
     title: Editor font size
     type: variable-number-slider
-    default: 16
+    default: 14
     min: 12
     max: 20
     step: 1
@@ -192,7 +193,7 @@ settings:
     options:
       -
         value: cn-heading-sfpro
-        label: SF Pro Display (default)
+        label: SF Pro (default)
       -
         value: cn-heading-newyork
         label: New York (Apple serif)
@@ -248,28 +249,35 @@ settings:
   --inline-title-line-height: 1.2;
   /* Editor font size and line height — driven by Style Settings sliders.
      Previously duplicated identically in both .theme-dark and .theme-light. */
-  --cn-editor-font-size: 16px;
+  --cn-editor-font-size: 14px;
   --cn-note-line-height: 1.65;
-  /* Heading font default — overridden by body.cn-heading-* class rules from
-     Style Settings. Previously duplicated in both themed blocks. */
-  --cn-heading-font: "SF Pro Display", -apple-system, system-ui, sans-serif;
-  /* Heading sizes, weights, line-heights — mode-independent (same in dark and
-     light). Colors stay in each themed block (--h1-color through --h6-color).
-     Compressed scale: H1-H4 as linear hierarchy; H5/H6 as eyebrow labels. */
-  --h1-size: 2.1em;
-  --h2-size: 1.6em;
-  --h3-size: 1.3em;
-  --h4-size: 1.1em;
-  --h5-size: 1.0em;
-  --h6-size: 0.9em;
-  --h1-weight: 800;
-  --h2-weight: 700;
-  --h3-weight: 700;
+  /* Heading font default — SF Pro Text to match body text (tight scale headers
+     read below ~20px, where Text is the size-appropriate Apple face and shares
+     the body's family for cohesion). Overridden by body.cn-heading-* Style
+     Settings classes (New York / Georgia serif alternatives). */
+  --cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+  /* Heading sizes/weights/line-heights — mode-independent. Colors stay in each
+     themed block (--h1-color..--h6-color). The --h1..--h6 token names are read
+     by both the theme's heading rules (reading view + Live Preview); keep these
+     names (do NOT rename to --h*-size).
+     Design: tight, Notion-like scale. The inline title (1.6em/700) is the single
+     largest, heaviest anchor; H1 sits AT OR BELOW it so headings read as quiet
+     structure cohesive with body, not competing display type. Hierarchy comes
+     from size + a subtle color step; weight is UNIFORM (600) across H1-H6. */
+  --h1: 1.4em;
+  --h2: 1.25em;
+  --h3: 1.12em;
+  --h4: 1.02em;
+  --h5: 0.92em;
+  --h6: 0.85em;
+  --h1-weight: 600;
+  --h2-weight: 600;
+  --h3-weight: 600;
   --h4-weight: 600;
-  --h5-weight: 700;
-  --h6-weight: 700;
-  --h1-line-height: 1.2;
-  --h2-line-height: 1.25;
+  --h5-weight: 600;
+  --h6-weight: 600;
+  --h1-line-height: 1.3;
+  --h2-line-height: 1.3;
   --h3-line-height: 1.3;
   --h4-line-height: 1.35;
   --h5-line-height: 1.4;
@@ -339,14 +347,16 @@ settings:
      pattern instead. */
   --cn-amber-warning: #ffd54f;
 
-  /* Translucency tint over macOS vibrancy. The vibrancy itself comes from
-     Obsidian's Translucent Window setting (Electron NSVisualEffectView at
-     the window level). The theme's job is purely to make every workspace
-     layer transparent so the vibrancy can show through, and optionally
-     overlay a faint tint via --workspace-background-translucent. The Style
-     Settings "Translucency intensity" knob adjusts that tint's alpha. */
+  /* Translucent surface over macOS vibrancy. Vibrancy comes from Obsidian's
+     Translucent Window setting (Electron NSVisualEffectView). Rather than a thin
+     dark WASH over mostly-vibrancy chrome (which made the glassy sidebar clash
+     with the more-opaque note), the workspace base is a HIGH-OPACITY wash of the
+     panel color. Every region (sidebar, note, chrome) shows this one base, so
+     the whole window reads as a single cohesive subtle-glass surface with a faint
+     vibrancy bleed and legible text. The Translucency tint knob swaps the opacity
+     (section 1c). --cn-tint-alpha kept for the light-mode no-op path. */
   --cn-tint-alpha: 0.18;
-  --workspace-background-translucent: rgba(0, 0, 0, var(--cn-tint-alpha));
+  --workspace-background-translucent: color-mix(in srgb, var(--cn-bg-primary) 80%, transparent);
 
   /* Default mapping (Translucent Window OFF or fullscreen): solid surfaces.
      Under .is-translucent the workspace layers are forced transparent in
@@ -377,19 +387,21 @@ settings:
   --text-accent: var(--cn-accent);
   --text-accent-hover: var(--cn-accent-hover);
   --text-selection: color-mix(in srgb, var(--cn-accent) 30%, transparent);
-  --text-highlight-bg: rgba(255, 213, 79, 0.28);
-  --text-highlight-bg-active: rgba(255, 213, 79, 0.45);
+  --text-highlight-bg: rgba(255, 221, 92, 0.38);
+  --text-highlight-bg-active: rgba(255, 221, 92, 0.52);
 
   --interactive-accent: var(--cn-accent);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root. */
+  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root.
+     ALL headings share one color (full white). Hierarchy is carried by size
+     alone; no color ramp. */
   --h1-color: #ffffff;
   --h2-color: #ffffff;
   --h3-color: #ffffff;
   --h4-color: #ffffff;
-  --h5-color: var(--cn-text-secondary);
-  --h6-color: var(--cn-text-faint);
+  --h5-color: #ffffff;
+  --h6-color: #ffffff;
 
   /* size / weight / line-height are in :root (mode-independent) */
   --inline-title-color: var(--h1-color);
@@ -498,13 +510,15 @@ settings:
   --interactive-accent: var(--cn-accent);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root. */
+  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root.
+     ALL headings share one color (near-black). Hierarchy is carried by size
+     alone; no color ramp. */
   --h1-color: #37352f;
   --h2-color: #37352f;
   --h3-color: #37352f;
   --h4-color: #37352f;
-  --h5-color: var(--cn-text-secondary);
-  --h6-color: var(--cn-text-faint);
+  --h5-color: #37352f;
+  --h6-color: #37352f;
 
   /* size / weight / line-height are in :root (mode-independent) */
   --inline-title-color: var(--h1-color);
@@ -579,13 +593,15 @@ settings:
   --cn-bg-elevated: #e9e6e1;
 }
 
-/* Translucency tint intensity (alpha of the dark wash over macOS vibrancy).
-   Off = 0 (pure vibrancy). Heavy = 0.32 (more dimmed). Only takes effect
-   when Obsidian's "Translucent window" toggle is on. */
-.theme-dark.cn-translucent-off    { --cn-tint-alpha: 0.0; }
-.theme-dark.cn-translucent-light  { --cn-tint-alpha: 0.10; }
-.theme-dark.cn-translucent-medium { --cn-tint-alpha: 0.18; }
-.theme-dark.cn-translucent-heavy  { --cn-tint-alpha: 0.32; }
+/* Translucency tint intensity = opacity of the unified subtle-glass surface
+   over macOS vibrancy. Pure = glassiest (most vibrancy shows), Heavy = nearly
+   solid. Medium (default) is the cohesive subtle-glass level. Only takes effect
+   when Obsidian's "Translucent window" toggle is on. Literal percentages (not a
+   var) so color-mix resolves reliably. */
+.theme-dark.cn-translucent-off    { --workspace-background-translucent: color-mix(in srgb, var(--cn-bg-primary) 45%, transparent); }
+.theme-dark.cn-translucent-light  { --workspace-background-translucent: color-mix(in srgb, var(--cn-bg-primary) 68%, transparent); }
+.theme-dark.cn-translucent-medium { --workspace-background-translucent: color-mix(in srgb, var(--cn-bg-primary) 80%, transparent); }
+.theme-dark.cn-translucent-heavy  { --workspace-background-translucent: color-mix(in srgb, var(--cn-bg-primary) 95%, transparent); }
 
 /* Light mode is opaque (Notion-style) so the Translucency tint knob has
    no effect there. The .theme-light.cn-translucent-* class rules were
@@ -692,7 +708,7 @@ body.cn-note-georgia { --font-text-theme: Georgia, serif; }
 body.cn-note-avenir  { --font-text-theme: "Avenir Next", "Avenir", -apple-system, system-ui, sans-serif; }
 
 /* Heading font variants — selected via Style Settings */
-body.cn-heading-sfpro   { --cn-heading-font: "SF Pro Display", -apple-system, system-ui, sans-serif; }
+body.cn-heading-sfpro   { --cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif; }
 body.cn-heading-newyork { --cn-heading-font: "New York", Georgia, serif; }
 body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 
@@ -705,8 +721,15 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
   letter-spacing: -0.003em;
 }
 
+/* Editor base font size. Header lines are EXCLUDED: a header line is a
+   `.cm-line.HyperMD-header-N`, so `.cm-line` here (specificity 0,3,0) otherwise
+   beat BOTH the theme's and Obsidian core's heading-size rules (`.HyperMD-header-N`,
+   0,1,0) and flattened every Live Preview heading to the editor font size. The
+   `:not(.HyperMD-header)` guard lets the heading rules size header lines while
+   normal lines still get the editor base size (which they also inherit from
+   .cm-content). Confirmed against the running build via DevTools. */
 .markdown-source-view.mod-cm6 .cm-content,
-.markdown-source-view.mod-cm6 .cm-line {
+.markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-header) {
   font-size: var(--cn-editor-font-size);
 }
 
@@ -717,9 +740,10 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
    Both apply in reading mode and Live Preview.
    ============================================================ */
 
-/* Negative tracking belongs only on display-size headers (H1/H2). Applying
-   it to H3–H6 makes them look cramped without buying any visual benefit
-   at those sizes — small text wants normal or slightly open tracking. */
+/* Tracking stays at 0 for the whole tight scale. The previous negative
+   display-tracking on H1/H2 was for a 2.1em display face; on SF Pro Text at
+   1.4em and below it reads cramped, so headers inherit the shared 0 tracking
+   (H5/H6 open slightly below). */
 .markdown-rendered h1, .markdown-rendered h2, .markdown-rendered h3,
 .markdown-rendered h4, .markdown-rendered h5, .markdown-rendered h6,
 .cm-header, .HyperMD-header {
@@ -728,44 +752,47 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 }
 
 .markdown-rendered h1, .HyperMD-header-1 {
-  font-size: var(--h1-size); font-weight: var(--h1-weight); color: var(--h1-color);
-  line-height: var(--h1-line-height); letter-spacing: -0.018em;
+  font-size: var(--h1); font-weight: var(--h1-weight); color: var(--h1-color);
+  line-height: var(--h1-line-height);
   margin-top: 1.6em; margin-bottom: 0.5em;
 }
 .markdown-rendered h2, .HyperMD-header-2 {
-  font-size: var(--h2-size); font-weight: var(--h2-weight); color: var(--h2-color);
-  line-height: var(--h2-line-height); letter-spacing: -0.012em;
+  font-size: var(--h2); font-weight: var(--h2-weight); color: var(--h2-color);
+  line-height: var(--h2-line-height);
   margin-top: 1.5em; margin-bottom: 0.4em;
 }
 .markdown-rendered h3, .HyperMD-header-3 {
-  font-size: var(--h3-size); font-weight: var(--h3-weight); color: var(--h3-color);
+  font-size: var(--h3); font-weight: var(--h3-weight); color: var(--h3-color);
   line-height: var(--h3-line-height);
   margin-top: 1.2em;
 }
 .markdown-rendered h4, .HyperMD-header-4 {
-  font-size: var(--h4-size); font-weight: var(--h4-weight); color: var(--h4-color);
+  font-size: var(--h4); font-weight: var(--h4-weight); color: var(--h4-color);
   line-height: var(--h4-line-height);
 }
+/* H5/H6 are quiet section labels: at/below body size, muted color, slightly
+   open tracking. Weight matches H4 (600) so the ramp never inverts. */
 .markdown-rendered h5, .HyperMD-header-5 {
-  font-size: var(--h5-size); font-weight: var(--h5-weight); color: var(--h5-color);
-  line-height: var(--h5-line-height);
+  font-size: var(--h5); font-weight: var(--h5-weight); color: var(--h5-color);
+  line-height: var(--h5-line-height); letter-spacing: 0.02em;
 }
 .markdown-rendered h6, .HyperMD-header-6 {
-  font-size: var(--h6-size); font-weight: var(--h6-weight); color: var(--h6-color);
-  line-height: var(--h6-line-height);
-  font-style: italic;
+  font-size: var(--h6); font-weight: var(--h6-weight); color: var(--h6-color);
+  line-height: var(--h6-line-height); letter-spacing: 0.02em;
 }
 
-/* Heading scale variants — keep the same modular step ratio across themes */
+/* Heading scale variants — relative to the tight comfortable default.
+   Compact pulls headers nearly flush with body; Large is the opt-in that may
+   exceed the title. */
 .theme-dark.cn-headings-compact,
 .theme-light.cn-headings-compact {
-  --h1-size: 2.0em; --h2-size: 1.65em; --h3-size: 1.35em;
-  --h4-size: 1.15em; --h5-size: 1.05em; --h6-size: 1.0em;
+  --h1: 1.25em; --h2: 1.15em; --h3: 1.06em;
+  --h4: 1.0em; --h5: 0.9em; --h6: 0.85em;
 }
 .theme-dark.cn-headings-large,
 .theme-light.cn-headings-large {
-  --h1-size: 2.9em; --h2-size: 2.3em; --h3-size: 1.8em;
-  --h4-size: 1.4em; --h5-size: 1.2em; --h6-size: 1.05em;
+  --h1: 1.7em; --h2: 1.45em; --h3: 1.26em;
+  --h4: 1.12em; --h5: 1.0em; --h6: 0.92em;
 }
 
 .markdown-source-view .inline-title,
@@ -980,11 +1007,13 @@ body:not(.is-mobile) .workspace-split.mod-right-split .workspace-tabs {
   overflow: hidden;
 }
 
-/* Translucent dark: section 4 already forces workspace-splits
-   transparent so vibrancy shows through. Force the note leaf body
-   solid so the rounded card still reads against the vibrancy. */
+/* Translucent dark: the note leaf body stays TRANSPARENT so it shows the single
+   unified subtle-glass workspace base (set in section 1 / the tint knob) — the
+   SAME surface the sidebar shows. Painting the note its own opaque layer here
+   would compound with the workspace base (~0.98) and re-create the tonal seam
+   against the sidebar. Keeping it transparent makes note and sidebar identical. */
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .workspace-leaf-content:not([data-type="terminal"]):not([data-type="canvas"]):not([data-type="excalidraw"]):not([data-type="kanban"]):not([data-type="smart-connections-view"]) {
-  background-color: var(--cn-bg-primary);
+  background-color: transparent;
 }
 
 /* ============================================================
@@ -1104,13 +1133,27 @@ em, .cm-em { color: var(--cn-text-primary); }
   --callout-color: 234, 179, 8;
 }
 
+/* Box every callout as an opaque, theme-tinted card.
+   Non-default callouts (tip/warning/info) previously kept their colored icon but
+   lost the box. Two things caused it under this theme's translucent dark mode:
+   (1) core sets `mix-blend-mode: lighten` on `.callout`, which over the macOS
+   vibrancy backdrop washes a low-alpha tint out; (2) per-type `--callout-color`
+   is delivered as a NESTED var (`var(--callout-tip)` -> `var(--color-cyan-rgb)`),
+   and `color-mix(... rgb(var(--callout-color)) ...)` collapses to transparent for
+   those nested values in the running build (only the literal amber default
+   survived). Fix: force `mix-blend-mode: normal`, paint an OPAQUE base
+   (--cn-bg-elevated), then layer the per-type tint with `rgba(var(--callout-color))`
+   — the exact form Obsidian core uses, which resolves reliably for nested vars.
+   No color-mix. Per-type colors and Callout Manager customizations flow through. */
 .callout {
-  background-color: rgba(var(--callout-color, 234, 179, 8), 0.10);
-  border: 1px solid rgba(var(--callout-color, 234, 179, 8), 0.28);
-  border-left: 3px solid rgba(var(--callout-color, 234, 179, 8), 0.75);
+  background-color: var(--cn-bg-elevated);
+  background-image: linear-gradient(rgba(var(--callout-color, 234, 179, 8), 0.13), rgba(var(--callout-color, 234, 179, 8), 0.13));
+  border: 1px solid rgba(var(--callout-color, 234, 179, 8), 0.32);
+  border-left: 3px solid rgb(var(--callout-color, 234, 179, 8));
   border-radius: var(--cn-radius);
   padding: 12px 16px;
   margin: 1.2em 0;
+  mix-blend-mode: normal;
 }
 
 .callout-title {
@@ -1386,10 +1429,15 @@ hr {
    ============================================================ */
 
 .markdown-rendered table {
+  /* Kept on border-collapse: collapse. Obsidian core borders every cell on all
+     four sides (app.css: `.markdown-rendered td/th { border: ... }`) and merges
+     them via collapse into one faint hairline grid. border-radius is ignored by
+     collapsed-border tables, so corners stay square — but switching to
+     `separate` un-merges that grid into doubled lines and cleaning it up means
+     out-specifying core's :first-child/:last-child rules, which is fragile
+     across Obsidian updates. Square corners are the safe trade. */
   border-collapse: collapse;
   border: 1px solid var(--cn-border-subtle);
-  border-radius: var(--cn-radius);
-  overflow: hidden;
 }
 
 .markdown-rendered th {
