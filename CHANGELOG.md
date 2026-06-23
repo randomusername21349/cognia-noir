@@ -7,6 +7,21 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.30
+
+Housekeeping: lint and file size.
+
+- Removed the theme's last `!important` declaration. It hid the Smart Connections
+  settings-tab icons so the community-plugins list reads uniformly. SC re-shows
+  its own icons via a stylesheet rule it injects at runtime (specificity 0,5,0),
+  which previously needed `!important` to beat. It is now beaten on specificity
+  alone (0,6,0), so the override flag is gone and the CSS lint warning clears.
+- Moved the verbose in-file design rationale out of `theme.css` into a new
+  `DESIGN-NOTES.md`, mirroring the v1.10.24 CHANGELOG split. The stylesheet keeps
+  one-line breadcrumbs and the Style Settings (`@settings`) block; this drops
+  theme.css from ~105 KB to ~65 KB, back under Obsidian's recommended size.
+- No visual or behavioral changes to the theme itself.
+
 ## v1.10.29
 
 Separate dark / light background pickers.
