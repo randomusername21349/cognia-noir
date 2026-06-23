@@ -7,6 +7,17 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.28
+
+Settings window polish for Obsidian 1.13.
+
+- Community plugins list: re-assert core 1.13's hide-community-plugin-icons behavior
+  (Smart Connections forces its icon back via an injected stylesheet) and collapse the
+  leading spaces Smart Connections prepends to its tab names ("  Smart Environment",
+  " Connections"), which core's `white-space: pre` was preserving as an indent. The
+  section now reads flush and uniform. Tab ordering is set by the plugins/Obsidian and
+  is left untouched.
+
 ## v1.10.27
 
 Obsidian 1.13 compatibility, new black-and-white appearance options, plus a

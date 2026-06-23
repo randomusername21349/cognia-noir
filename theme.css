@@ -10,13 +10,11 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.27 (Obsidian 1.13 compatibility: --callout-color migrated from the old
-            RGB triplet to the 1.13 valid-color contract, consumed directly with
-            color-mix tints so tip/warning/info and Callout Manager colors render
-            again on 1.13+. New Background tones: Slate, Graphite, True black.
-            New Grayscale UI toggle. README and comment cleanup; non-ASCII
-            removed. Full version history lives in CHANGELOG.md and on the GitHub
-            releases page.)
+   v1.10.28 (Settings window: re-assert Obsidian 1.13's hide-community-plugin-icons
+            behavior against Smart Connections' override, and collapse the leading
+            spaces it prepends to its tab names, so the community plugins list reads
+            flush and uniform. Full version history lives in CHANGELOG.md and on the
+            GitHub releases page.)
 
    SECTIONS
       0   Shared constants (theme-independent vars: radius, transition)
@@ -2448,6 +2446,30 @@ body.is-phone.theme-dark .modal.mod-settings .modal-content {
 .modal.mod-settings button:not(.mod-cta):not(.clickable-icon) {
   background-color: var(--cn-bg-tertiary);
   border: 1px solid var(--cn-border-subtle);
+}
+
+/* Obsidian 1.13 core hides community-plugin settings-tab icons
+   (`[data-section="community-plugins"] .vertical-tab-nav-item-icon { display:none }`),
+   and that icon carries margin-inline-end. Smart Connections forces its own icon
+   back via an inline style (set by its JS), which an inline style lets it win over
+   core's non-!important rule - reintroducing the icon + its margin as an indent on
+   the Smart Environment / Connections rows while every other community plugin stays
+   icon-less and flush. Re-assert core's behavior so the section reads uniformly.
+   !important is required to beat the plugin's inline style; it is the theme's only
+   runtime !important, scoped tightly to the community-plugins settings section. */
+.vertical-tab-header-group-items[data-section="community-plugins"] .vertical-tab-nav-item-icon {
+  display: none !important;
+}
+
+/* Smart Connections also prepends literal leading spaces to its tab names
+   ("  Smart Environment" with two spaces, " Connections" with one), and core's
+   `.vertical-tab-nav-item-title { white-space: pre }` preserves them - which is why
+   those two rows indented by different amounts even with the icon hidden. Collapse
+   leading whitespace on community-plugin titles. nowrap (not normal) keeps core's
+   single-line + text-overflow: ellipsis behavior intact. No !important needed: this
+   outranks core's plain `.vertical-tab-nav-item-title` rule on specificity. */
+.vertical-tab-header-group-items[data-section="community-plugins"] .vertical-tab-nav-item-title {
+  white-space: nowrap;
 }
 
 /* ----------------------------------------------------------------
