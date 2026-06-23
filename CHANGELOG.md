@@ -7,6 +7,22 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.29
+
+Separate dark / light background pickers.
+
+- Background tone is now two Style Settings controls instead of one: "Dark mode
+  background" (Charcoal default, Slate, Graphite, Pure black, True black, Warm, Zen)
+  and "Light mode background" (Paper default, Pure white, Mist, Stone, Warm, Zen).
+  Each affects only its own mode, so changing the dark surface no longer touches light
+  and vice versa. The names are now mode-appropriate rather than dark-centric. (Setting
+  IDs changed, so the tone choice resets to the defaults once on update.)
+- Verified the scrollbar is consistent across all tones (it uses mode-level overlay
+  vars, untouched by tones or the grayscale toggle), and audited plugin compatibility:
+  the variable-based theming means all tones and both modes propagate to plugins via
+  core surfaces; custom-UI plugins (Excalidraw, Smart Connections, Terminal, Canvas)
+  stay opted out of the translucency force-paint and own their surfaces.
+
 ## v1.10.28
 
 Settings window polish for Obsidian 1.13.

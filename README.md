@@ -13,7 +13,7 @@ Cognia Noir is a Notion and Zen-inspired Obsidian theme tuned to feel calm. Dark
 - Rounded sidebars; the note panel lifts off a contrasting tray tone underneath.
 - Native macOS vibrancy: enable Settings > Appearance > Translucent Window. The theme paints sidebars and chrome over `NSVisualEffectView` so the desktop wallpaper shows through.
 - Plugin-safe vibrancy: Excalidraw and Smart Connections leaves are opted out of the translucent leaf-content force-paint so they render correctly. Core Canvas is also opted out as a defensive measure.
-- WCAG AA contrast on primary text, accent, and inline code in all default Background tone variants.
+- WCAG AA contrast on primary text, accent, and inline code across all background options, dark and light.
 - Honors `prefers-reduced-motion: reduce` (all transitions and animations disabled).
 - Snappy hover and focus feedback (`100ms ease-out`) on nav titles, tab headers, links, inputs, buttons, and tags. State-change and layout transitions stay on a slower symmetric curve.
 
@@ -80,7 +80,8 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 
 - **Accent color**: used for links, focus rings, and selection. Defaults clear WCAG AA against each theme's canvas. Separate light and dark defaults.
 - **Inline code color**: color of `inline code` text. Defaults clear WCAG AA against each theme's code background. Separate light and dark defaults.
-- **Background tone**: Charcoal (default), Slate (neutral gray), Graphite (deep neutral), Pure Black (OLED-friendly), True black (pure #000, max contrast), Warm charcoal (slight warmth), or Zen.
+- **Dark mode background**: Charcoal (default), Slate (neutral gray), Graphite (deep neutral), Pure black (OLED-friendly), True black (pure #000), Warm charcoal, or Zen. Applies only in dark mode.
+- **Light mode background**: Paper (default, warm white), Pure white, Mist (light gray), Stone (deeper gray), Warm paper, or Zen. Applies only in light mode, independent of the dark setting.
 - **Sidebar contrast**: how the sidebars separate from the main editor. Flat (default), Subtle border, or Lifted (slightly darker).
 - **Translucency tint**: strength of the dark wash layered over macOS vibrancy. Pure vibrancy, Light, Medium (default), or Heavy. Pure shows raw vibrancy; Heavy dims it for legibility on bright wallpapers. Requires Settings > Appearance > Translucent Window enabled.
 - **Heading scale**: Compact, Comfortable (default), or Large.

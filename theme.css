@@ -10,11 +10,11 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.28 (Settings window: re-assert Obsidian 1.13's hide-community-plugin-icons
-            behavior against Smart Connections' override, and collapse the leading
-            spaces it prepends to its tab names, so the community plugins list reads
-            flush and uniform. Full version history lives in CHANGELOG.md and on the
-            GitHub releases page.)
+   v1.10.29 (Background tone split into separate Dark mode and Light mode pickers
+            in Style Settings, each affecting only its own mode. Dark: Charcoal,
+            Slate, Graphite, Pure black, True black, Warm, Zen. Light: Paper, Pure
+            white, Mist, Stone, Warm, Zen. Full version history lives in CHANGELOG.md
+            and on the GitHub releases page.)
 
    SECTIONS
       0   Shared constants (theme-independent vars: radius, transition)
@@ -71,33 +71,58 @@ settings:
     default-dark: '#ee6666'
     default-light: '#a8201a'
   -
-    id: cn-bg-tone
-    title: Background tone
-    description: Charcoal is the default. Slate and Graphite are neutral grays. Pure black and True black are OLED-friendly (True black is pure #000). Warm charcoal and Zen add warmth.
+    id: cn-bg-tone-dark
+    title: Dark mode background
+    description: Background surfaces in dark mode (no effect in light mode). Charcoal is the default; Slate and Graphite are neutral grays; Pure black and True black are OLED-friendly; Warm and Zen add warmth.
     type: class-select
-    default: cn-bg-charcoal
+    default: cn-bgd-charcoal
     options:
       -
-        value: cn-bg-charcoal
+        value: cn-bgd-charcoal
         label: Charcoal (default)
       -
-        value: cn-bg-black
-        label: Pure black
-      -
-        value: cn-bg-warm
-        label: Warm charcoal
-      -
-        value: cn-bg-zen
-        label: Zen (soft warm gray)
-      -
-        value: cn-bg-slate
+        value: cn-bgd-slate
         label: Slate (neutral gray)
       -
-        value: cn-bg-graphite
+        value: cn-bgd-graphite
         label: Graphite (deep neutral)
       -
-        value: cn-bg-trueblack
-        label: True black (max contrast)
+        value: cn-bgd-black
+        label: Pure black (OLED)
+      -
+        value: cn-bgd-trueblack
+        label: True black (#000)
+      -
+        value: cn-bgd-warm
+        label: Warm charcoal
+      -
+        value: cn-bgd-zen
+        label: Zen (soft warm gray)
+  -
+    id: cn-bg-tone-light
+    title: Light mode background
+    description: Background surfaces in light mode (no effect in dark mode). Paper (warm white) is the default; Pure white is crisp neutral; Mist and Stone are neutral grays; Warm and Zen add warmth.
+    type: class-select
+    default: cn-bgl-paper
+    options:
+      -
+        value: cn-bgl-paper
+        label: Paper (default)
+      -
+        value: cn-bgl-white
+        label: Pure white
+      -
+        value: cn-bgl-mist
+        label: Mist (light gray)
+      -
+        value: cn-bgl-stone
+        label: Stone (deeper gray)
+      -
+        value: cn-bgl-warm
+        label: Warm paper
+      -
+        value: cn-bgl-zen
+        label: Zen (soft warm)
   -
     id: cn-sidebar-style
     title: Sidebar contrast
@@ -544,35 +569,33 @@ settings:
   --titlebar-background-focused: var(--cn-bg-secondary);
 }
 
-/* Background tone variants */
-.theme-dark.cn-bg-black {
+/* ============================================================
+   Background tone variants - DARK MODE (Style Settings: cn-bg-tone-dark).
+   Charcoal is the default and lives in the base .theme-dark block above
+   (no class rule). Only applies in dark mode; the light picker is separate. */
+.theme-dark.cn-bgd-black {
   --cn-bg-primary: #0d0d0d;
   --cn-bg-secondary: #141414;
   --cn-bg-tertiary: #1c1c1c;
   --cn-bg-elevated: #222222;
-  /* Tray must be darker than bg-primary so the note card reads as lifted
-     on a base. The .theme-dark default tray (#131313) is lighter than
-     #0d0d0d, inverting the hierarchy. Setting to #050505 restores it.
-     (The cn-sidebar-lifted override correctly had #050505 already; this
-     fixes the default Flat sidebar setting.) */
+  /* Tray must be darker than bg-primary so the note card reads as lifted on a
+     base. The .theme-dark default tray (#131313) is lighter than #0d0d0d,
+     inverting the hierarchy; #050505 restores it for the default Flat sidebar. */
   --cn-bg-note-tray: #050505;
 }
 
-.theme-dark.cn-bg-warm {
+.theme-dark.cn-bgd-warm {
   --cn-bg-primary: #1c1a18;
   --cn-bg-secondary: #232120;
   --cn-bg-tertiary: #2a2725;
   --cn-bg-elevated: #2b2826;
 }
 
-/* Zen: warm-gray identity carried via hue (red/orange undertone) rather
-   than mid-gray lightness. v1.10.12 pulled the surfaces toward charcoal-
-   warm so the default accent and inline code clear WCAG AA on every
-   surface (full ratio table in the v1.10.12 entry). Sidebar slightly
-   darker than canvas to mirror Zen browser's layout. Borders and
-   overlays already use rgba so they adapt to the new surface tones
-   without explicit overrides. */
-.theme-dark.cn-bg-zen {
+/* Zen: warm-gray identity carried via hue (red/orange undertone) rather than
+   mid-gray lightness. Surfaces pulled toward charcoal-warm so the default accent
+   and inline code clear WCAG AA on every surface. Sidebar slightly darker than
+   canvas to mirror Zen browser's layout. Borders/overlays use rgba so they adapt. */
+.theme-dark.cn-bgd-zen {
   --cn-bg-primary: #1f1c19;
   --cn-bg-secondary: #181613;
   --cn-bg-tertiary: #25221f;
@@ -580,10 +603,10 @@ settings:
 }
 
 /* Neutral gray tones - no warm or Zen hue, pure grayscale surfaces.
-   Slate is a lighter, airier neutral; Graphite is a deeper neutral that
-   sits between Charcoal and Pure black. The default Flat tray (#131313)
-   stays darker than both canvases, so the note card still reads as lifted. */
-.theme-dark.cn-bg-slate {
+   Slate is a lighter, airier neutral; Graphite is a deeper neutral that sits
+   between Charcoal and Pure black. The default Flat tray (#131313) stays darker
+   than both canvases, so the note card still reads as lifted. */
+.theme-dark.cn-bgd-slate {
   /* Lighter neutral than Charcoal, but the code surface (--cn-bg-tertiary) is
      held at #2a2a2a so the default inline code (#ee6666) keeps WCAG AA (4.6:1);
      a lighter tertiary drops it below 4.5:1. */
@@ -592,16 +615,16 @@ settings:
   --cn-bg-tertiary: #2a2a2a;
   --cn-bg-elevated: #2f2f2f;
 }
-.theme-dark.cn-bg-graphite {
+.theme-dark.cn-bgd-graphite {
   --cn-bg-primary: #161616;
   --cn-bg-secondary: #1c1c1c;
   --cn-bg-tertiary: #222222;
   --cn-bg-elevated: #272727;
 }
-/* True black: pure #000000 canvas for maximum OLED contrast. The tray
-   cannot go darker than the canvas, so it matches at #000000 (seamless);
-   the note card separates via --cn-bg-elevated and its border instead. */
-.theme-dark.cn-bg-trueblack {
+/* True black: pure #000000 canvas for maximum OLED contrast. The tray cannot go
+   darker than the canvas, so it matches at #000000 (seamless); the note card
+   separates via --cn-bg-elevated and its border instead. */
+.theme-dark.cn-bgd-trueblack {
   --cn-bg-primary: #000000;
   --cn-bg-secondary: #080808;
   --cn-bg-tertiary: #101010;
@@ -609,53 +632,47 @@ settings:
   --cn-bg-note-tray: #000000;
 }
 
-/* Background tone variants - light mode. The "Pure black" knob inverts
-   to pure white (clean, no warm tint) since the OLED rationale doesn't
-   apply in light mode but the contrast preference still does. */
-.theme-light.cn-bg-black {
+/* ============================================================
+   Background tone variants - LIGHT MODE (Style Settings: cn-bg-tone-light).
+   Paper (warm-ish white) is the default and lives in the base .theme-light block
+   (no class rule). Only applies in light mode; the dark picker is separate. */
+.theme-light.cn-bgl-white {
   --cn-bg-primary: #ffffff;
-  --cn-bg-secondary: #f7f7f7;
-  --cn-bg-tertiary: #efefef;
-  --cn-bg-elevated: #e6e6e6;
+  --cn-bg-secondary: #fafafa;
+  --cn-bg-tertiary: #f3f3f3;
+  --cn-bg-elevated: #ededed;
 }
 
-.theme-light.cn-bg-warm {
+.theme-light.cn-bgl-warm {
   --cn-bg-primary: #f7f3ec;
   --cn-bg-secondary: #f0ebe1;
   --cn-bg-tertiary: #ece6d9;
   --cn-bg-elevated: #e9e3d5;
 }
 
-/* Zen light parity. v1.10.12 raised the surfaces toward near-white-warm
-   so the default light accent (#3a5fc7) and inline code (#a8201a) clear
-   AA on every surface, including bg-elevated. Sidebar slightly darker
-   than canvas to mirror Zen browser's layout. */
-.theme-light.cn-bg-zen {
+/* Zen light parity. Surfaces raised toward near-white-warm so the default light
+   accent (#3a5fc7) and inline code (#a8201a) clear AA on every surface, including
+   bg-elevated. Sidebar slightly darker than canvas. */
+.theme-light.cn-bgl-zen {
   --cn-bg-primary: #f5f3ef;
   --cn-bg-secondary: #eeece8;
   --cn-bg-tertiary: #ece9e4;
   --cn-bg-elevated: #e9e6e1;
 }
 
-/* Neutral gray tones - light parity (clean grays, no warm tint). */
-.theme-light.cn-bg-slate {
+/* Neutral gray tones - light parity (clean grays, no warm tint). Mist is the
+   lighter gray; Stone is the deeper. */
+.theme-light.cn-bgl-mist {
   --cn-bg-primary: #f4f4f4;
   --cn-bg-secondary: #ededed;
   --cn-bg-tertiary: #e6e6e6;
   --cn-bg-elevated: #e0e0e0;
 }
-.theme-light.cn-bg-graphite {
+.theme-light.cn-bgl-stone {
   --cn-bg-primary: #ededed;
   --cn-bg-secondary: #e6e6e6;
   --cn-bg-tertiary: #dfdfdf;
   --cn-bg-elevated: #d9d9d9;
-}
-/* True black inverts to a crisp pure white in light mode (max contrast). */
-.theme-light.cn-bg-trueblack {
-  --cn-bg-primary: #ffffff;
-  --cn-bg-secondary: #fafafa;
-  --cn-bg-tertiary: #f3f3f3;
-  --cn-bg-elevated: #ededed;
 }
 
 /* ============================================================
@@ -723,14 +740,14 @@ body:not(.is-mobile).theme-dark.cn-sidebar-border .workspace-split.mod-right-spl
    tray, which bypasses --background-secondary in opaque mode -- see section 4b). */
 .theme-dark.cn-sidebar-lifted              { --background-secondary: #1b1b1b; --cn-bg-note-tray: #0d0d0d; }
 /* Pure Black tray (#000000): one stop darker than default (#050505). */
-.theme-dark.cn-sidebar-lifted.cn-bg-black  { --background-secondary: #0a0a0a; --cn-bg-note-tray: #000000; }
-.theme-dark.cn-sidebar-lifted.cn-bg-warm   { --background-secondary: #1f1d1c; --cn-bg-note-tray: #131110; }
-.theme-dark.cn-sidebar-lifted.cn-bg-zen    { --background-secondary: #110f0d; --cn-bg-note-tray: #0a0908; }
-.theme-dark.cn-sidebar-lifted.cn-bg-slate     { --background-secondary: #1c1c1c; --cn-bg-note-tray: #121212; }
-.theme-dark.cn-sidebar-lifted.cn-bg-graphite  { --background-secondary: #101010; --cn-bg-note-tray: #080808; }
+.theme-dark.cn-sidebar-lifted.cn-bgd-black  { --background-secondary: #0a0a0a; --cn-bg-note-tray: #000000; }
+.theme-dark.cn-sidebar-lifted.cn-bgd-warm   { --background-secondary: #1f1d1c; --cn-bg-note-tray: #131110; }
+.theme-dark.cn-sidebar-lifted.cn-bgd-zen    { --background-secondary: #110f0d; --cn-bg-note-tray: #0a0908; }
+.theme-dark.cn-sidebar-lifted.cn-bgd-slate     { --background-secondary: #1c1c1c; --cn-bg-note-tray: #121212; }
+.theme-dark.cn-sidebar-lifted.cn-bgd-graphite  { --background-secondary: #101010; --cn-bg-note-tray: #080808; }
 /* True black lifted: canvas is already #000, so sidebar/tray stay #000;
    the note card still separates via --cn-bg-elevated and its border. */
-.theme-dark.cn-sidebar-lifted.cn-bg-trueblack { --background-secondary: #000000; --cn-bg-note-tray: #000000; }
+.theme-dark.cn-sidebar-lifted.cn-bgd-trueblack { --background-secondary: #000000; --cn-bg-note-tray: #000000; }
 
 /* Sidebar contrast variants - light */
 /* Same inner-edge-only rule for light mode. */
@@ -742,13 +759,12 @@ body:not(.is-mobile).theme-light.cn-sidebar-border .workspace-split.mod-right-sp
 }
 
 .theme-light.cn-sidebar-lifted             { --background-secondary: #f1f0ed; --cn-bg-note-tray: #cdcbc6; }
-.theme-light.cn-sidebar-lifted.cn-bg-black { --background-secondary: #f0f0f0; --cn-bg-note-tray: #e2e2e2; }
-.theme-light.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #ebe5d9; --cn-bg-note-tray: #ddd6c8; }
+.theme-light.cn-sidebar-lifted.cn-bgl-white { --background-secondary: #f4f4f4; --cn-bg-note-tray: #e6e6e6; }
+.theme-light.cn-sidebar-lifted.cn-bgl-warm  { --background-secondary: #ebe5d9; --cn-bg-note-tray: #ddd6c8; }
 /* Zen tray: one stop darker than default (#d8d6d1), with warm undertone to match Zen surfaces. */
-.theme-light.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }
-.theme-light.cn-sidebar-lifted.cn-bg-slate     { --background-secondary: #e9e9e9; --cn-bg-note-tray: #d6d6d6; }
-.theme-light.cn-sidebar-lifted.cn-bg-graphite  { --background-secondary: #e2e2e2; --cn-bg-note-tray: #cfcfcf; }
-.theme-light.cn-sidebar-lifted.cn-bg-trueblack { --background-secondary: #f4f4f4; --cn-bg-note-tray: #e6e6e6; }
+.theme-light.cn-sidebar-lifted.cn-bgl-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }
+.theme-light.cn-sidebar-lifted.cn-bgl-mist  { --background-secondary: #e9e9e9; --cn-bg-note-tray: #d6d6d6; }
+.theme-light.cn-sidebar-lifted.cn-bgl-stone { --background-secondary: #e2e2e2; --cn-bg-note-tray: #cfcfcf; }
 
 
 /* Sidebar-lifted in dark translucent mode: outer-shell containers are
