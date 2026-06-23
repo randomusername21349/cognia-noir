@@ -10,12 +10,13 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.26 (Headings retuned to a tight Notion-like scale in one uniform white
-            and weight, SF Pro Text to match body; Live Preview heading sizes
-            fixed; tip/warning/info callouts box correctly over translucency;
-            sidebar and note unified into one subtle-glass surface; brighter
-            highlight; default note size 14px. Full version history lives in
-            CHANGELOG.md and on the GitHub releases page.)
+   v1.10.27 (Obsidian 1.13 compatibility: --callout-color migrated from the old
+            RGB triplet to the 1.13 valid-color contract, consumed directly with
+            color-mix tints so tip/warning/info and Callout Manager colors render
+            again on 1.13+. New Background tones: Slate, Graphite, True black.
+            New Grayscale UI toggle. README and comment cleanup; non-ASCII
+            removed. Full version history lives in CHANGELOG.md and on the GitHub
+            releases page.)
 
    SECTIONS
       0   Shared constants (theme-independent vars: radius, transition)
@@ -74,7 +75,7 @@ settings:
   -
     id: cn-bg-tone
     title: Background tone
-    description: Charcoal is default. Pure black is OLED-friendly. Warm charcoal adds a touch of warmth.
+    description: Charcoal is the default. Slate and Graphite are neutral grays. Pure black and True black are OLED-friendly (True black is pure #000). Warm charcoal and Zen add warmth.
     type: class-select
     default: cn-bg-charcoal
     options:
@@ -90,6 +91,15 @@ settings:
       -
         value: cn-bg-zen
         label: Zen (soft warm gray)
+      -
+        value: cn-bg-slate
+        label: Slate (neutral gray)
+      -
+        value: cn-bg-graphite
+        label: Graphite (deep neutral)
+      -
+        value: cn-bg-trueblack
+        label: True black (max contrast)
   -
     id: cn-sidebar-style
     title: Sidebar contrast
@@ -226,10 +236,16 @@ settings:
     description: Collapses the file explorer / bookmarks action row (new note, new folder, sort, expand) into a small pill that expands on hover. Inspired by Velocity.
     type: class-toggle
     default: true
+  -
+    id: cn-grayscale
+    title: Grayscale UI
+    description: Desaturate the theme's colors (accent, links, callouts, tags, highlight, inline code, status) so the interface reads as pure black and white. Note images and code syntax highlighting keep their color.
+    type: class-toggle
+    default: false
 */
 
 /* ============================================================
-   0. SHARED CONSTANTS — theme-independent values referenced in
+   0. SHARED CONSTANTS - theme-independent values referenced in
    both .theme-dark and .theme-light. Defined once here; do not
    duplicate in either themed block.
    ============================================================ */
@@ -242,21 +258,21 @@ settings:
   --radius-s: 4px;
   --radius-m: var(--cn-radius);
   --radius-l: var(--cn-radius-lg);
-  /* Inline title — size/weight/line-height are mode-independent.
+  /* Inline title - size/weight/line-height are mode-independent.
      --inline-title-color stays in each themed block (references --h1-color). */
   --inline-title-size: 1.6em;
   --inline-title-weight: 700;
   --inline-title-line-height: 1.2;
-  /* Editor font size and line height — driven by Style Settings sliders.
+  /* Editor font size and line height - driven by Style Settings sliders.
      Previously duplicated identically in both .theme-dark and .theme-light. */
   --cn-editor-font-size: 14px;
   --cn-note-line-height: 1.65;
-  /* Heading font default — SF Pro Text to match body text (tight scale headers
+  /* Heading font default - SF Pro Text to match body text (tight scale headers
      read below ~20px, where Text is the size-appropriate Apple face and shares
      the body's family for cohesion). Overridden by body.cn-heading-* Style
      Settings classes (New York / Georgia serif alternatives). */
   --cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
-  /* Heading sizes/weights/line-heights — mode-independent. Colors stay in each
+  /* Heading sizes/weights/line-heights - mode-independent. Colors stay in each
      themed block (--h1-color..--h6-color). The --h1..--h6 token names are read
      by both the theme's heading rules (reading view + Live Preview); keep these
      names (do NOT rename to --h*-size).
@@ -290,7 +306,7 @@ settings:
 }
 
 /* ============================================================
-   1. CSS VARIABLES — DARK THEME
+   1. CSS VARIABLES - DARK THEME
    ============================================================ */
 
 .theme-dark {
@@ -321,7 +337,7 @@ settings:
      under WCAG AA) to #ee6666 (~4.6:1) for body-text contrast. */
   --cn-inline-code: #ee6666;
 
-  /* Theme-aware tokens — flipped in .theme-light so shared rules below
+  /* Theme-aware tokens - flipped in .theme-light so shared rules below
      (bold text, dividers, hover overlays, scrollbar, checkboxes, sidebar
      lifted tint) work correctly in both modes. */
   --cn-strong-color: #ffffff;
@@ -333,7 +349,7 @@ settings:
   --cn-checkbox-check: #1a1a1a;
   --cn-lifted-tint: rgba(0, 0, 0, 0.18);
 
-  /* Modal chrome — backdrop dim behind dialogs and shadow under the dialog
+  /* Modal chrome - backdrop dim behind dialogs and shadow under the dialog
      itself. Heavy in dark (matches the moody aesthetic), much lighter in
      light (a 0.65 black overlay in light mode darkens the whole UI to
      near-unreadable when Cmd-K or Settings open). */
@@ -393,7 +409,7 @@ settings:
   --interactive-accent: var(--cn-accent);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root.
+  /* Heading colors - mode-specific. Sizes/weights/line-heights are in :root.
      ALL headings share one color (full white). Hierarchy is carried by size
      alone; no color ramp. */
   --h1-color: #ffffff;
@@ -414,14 +430,14 @@ settings:
 }
 
 /* ============================================================
-   1b. CSS VARIABLES — LIGHT THEME (Notion-warm off-white)
+   1b. CSS VARIABLES - LIGHT THEME (Notion-warm off-white)
    Mirrors the dark block: same tokens, flipped values. Heading scale,
    weight cascade, inline-title sizing, and Style Settings knobs all
    carry over so the two modes feel like one design.
    ============================================================ */
 
 .theme-light {
-  /* Notion light-mode palette — pure white canvas, warm near-black text,
+  /* Notion light-mode palette - pure white canvas, warm near-black text,
      subtle off-white sidebar. Fully opaque (Notion does not use macOS
      vibrancy in light mode). High contrast, no decoration. */
   --cn-bg-primary: #ffffff;
@@ -453,7 +469,7 @@ settings:
      5.5:1+ across both default and warm code backgrounds. */
   --cn-inline-code: #a8201a;
 
-  /* Theme-aware tokens — Notion light values. Bold text uses the same
+  /* Theme-aware tokens - Notion light values. Bold text uses the same
      color as body and lets font-weight do the work (Notion convention). */
   --cn-strong-color: #37352f;
   --cn-divider: rgba(55, 53, 47, 0.16);
@@ -464,7 +480,7 @@ settings:
   --cn-checkbox-check: #ffffff;
   --cn-lifted-tint: rgba(55, 53, 47, 0.04);
 
-  /* Modal chrome — Notion-style: ~30% backdrop dim, soft 10% shadow. */
+  /* Modal chrome - Notion-style: ~30% backdrop dim, soft 10% shadow. */
   --cn-modal-backdrop: rgba(15, 15, 15, 0.30);
   --cn-modal-shadow: rgba(15, 15, 15, 0.10);
 
@@ -472,7 +488,7 @@ settings:
      indicators should be brand-consistent across modes. */
   --cn-amber-warning: #ffd54f;
 
-  /* Translucency vars set as no-ops — light mode is opaque. The wash on
+  /* Translucency vars set as no-ops - light mode is opaque. The wash on
      .workspace still exists but doesn't show through opaque surfaces.
      Style Settings translucency tint knob has no effect in light mode. */
   --cn-tint-alpha: 0.0;
@@ -510,7 +526,7 @@ settings:
   --interactive-accent: var(--cn-accent);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading colors — mode-specific. Sizes/weights/line-heights are in :root.
+  /* Heading colors - mode-specific. Sizes/weights/line-heights are in :root.
      ALL headings share one color (near-black). Hierarchy is carried by size
      alone; no color ramp. */
   --h1-color: #37352f;
@@ -565,7 +581,37 @@ settings:
   --cn-bg-elevated: #2a2724;
 }
 
-/* Background tone variants — light mode. The "Pure black" knob inverts
+/* Neutral gray tones - no warm or Zen hue, pure grayscale surfaces.
+   Slate is a lighter, airier neutral; Graphite is a deeper neutral that
+   sits between Charcoal and Pure black. The default Flat tray (#131313)
+   stays darker than both canvases, so the note card still reads as lifted. */
+.theme-dark.cn-bg-slate {
+  /* Lighter neutral than Charcoal, but the code surface (--cn-bg-tertiary) is
+     held at #2a2a2a so the default inline code (#ee6666) keeps WCAG AA (4.6:1);
+     a lighter tertiary drops it below 4.5:1. */
+  --cn-bg-primary: #232323;
+  --cn-bg-secondary: #272727;
+  --cn-bg-tertiary: #2a2a2a;
+  --cn-bg-elevated: #2f2f2f;
+}
+.theme-dark.cn-bg-graphite {
+  --cn-bg-primary: #161616;
+  --cn-bg-secondary: #1c1c1c;
+  --cn-bg-tertiary: #222222;
+  --cn-bg-elevated: #272727;
+}
+/* True black: pure #000000 canvas for maximum OLED contrast. The tray
+   cannot go darker than the canvas, so it matches at #000000 (seamless);
+   the note card separates via --cn-bg-elevated and its border instead. */
+.theme-dark.cn-bg-trueblack {
+  --cn-bg-primary: #000000;
+  --cn-bg-secondary: #080808;
+  --cn-bg-tertiary: #101010;
+  --cn-bg-elevated: #171717;
+  --cn-bg-note-tray: #000000;
+}
+
+/* Background tone variants - light mode. The "Pure black" knob inverts
    to pure white (clean, no warm tint) since the OLED rationale doesn't
    apply in light mode but the contrast preference still does. */
 .theme-light.cn-bg-black {
@@ -593,6 +639,58 @@ settings:
   --cn-bg-elevated: #e9e6e1;
 }
 
+/* Neutral gray tones - light parity (clean grays, no warm tint). */
+.theme-light.cn-bg-slate {
+  --cn-bg-primary: #f4f4f4;
+  --cn-bg-secondary: #ededed;
+  --cn-bg-tertiary: #e6e6e6;
+  --cn-bg-elevated: #e0e0e0;
+}
+.theme-light.cn-bg-graphite {
+  --cn-bg-primary: #ededed;
+  --cn-bg-secondary: #e6e6e6;
+  --cn-bg-tertiary: #dfdfdf;
+  --cn-bg-elevated: #d9d9d9;
+}
+/* True black inverts to a crisp pure white in light mode (max contrast). */
+.theme-light.cn-bg-trueblack {
+  --cn-bg-primary: #ffffff;
+  --cn-bg-secondary: #fafafa;
+  --cn-bg-tertiary: #f3f3f3;
+  --cn-bg-elevated: #ededed;
+}
+
+/* ============================================================
+   Grayscale UI toggle (Style Settings: cn-grayscale)
+   Desaturate the theme's semantic colors so the interface reads as pure
+   black and white. Implemented as a token remap rather than a CSS filter
+   so (a) note images and code syntax highlighting keep their color and
+   (b) the translucency/backdrop-filter system is left untouched. Most UI
+   color flows from --cn-accent (links, tags, selection, buttons, focus
+   rings via --text-accent/--interactive-accent), so remapping it plus the
+   few standalone color tokens covers the theme. Higher specificity
+   (body.cn-grayscale.theme-*) outranks the base .theme-* token blocks. */
+body.cn-grayscale.theme-dark {
+  --cn-accent: #c3c3c3;
+  --cn-accent-hover: #e2e2e2;
+  --cn-inline-code: #c9c9c9;
+  --cn-amber-warning: #cccccc;
+  --text-highlight-bg: rgba(200, 200, 200, 0.30);
+  --text-highlight-bg-active: rgba(222, 222, 222, 0.46);
+}
+body.cn-grayscale.theme-light {
+  --cn-accent: #4d4d4d;
+  --cn-accent-hover: #2b2b2b;
+  --cn-inline-code: #444444;
+  --cn-amber-warning: #5a5a5a;
+  --text-highlight-bg: rgba(120, 120, 120, 0.30);
+  --text-highlight-bg-active: rgba(90, 90, 90, 0.42);
+}
+/* Callouts: drive every type's color from the grayed accent so tip/warning/
+   info and Callout Manager colors all read monochrome too. Outranks the
+   per-type and default --callout-color rules in section 8. */
+body.cn-grayscale .callout { --callout-color: var(--cn-accent); }
+
 /* Translucency tint intensity = opacity of the unified subtle-glass surface
    over macOS vibrancy. Pure = glassiest (most vibrancy shows), Heavy = nearly
    solid. Medium (default) is the cohesive subtle-glass level. Only takes effect
@@ -607,7 +705,7 @@ settings:
    no effect there. The .theme-light.cn-translucent-* class rules were
    removed; --cn-tint-alpha stays at the .theme-light block default (0.0). */
 
-/* Sidebar contrast variants — dark */
+/* Sidebar contrast variants - dark */
 /* Sidebar border on the inner edge only -- the edge that faces the note.
    Left sidebar's left edge and right sidebar's right edge sit against
    the window frame (no adjacent content), so a border there is noise.
@@ -630,8 +728,13 @@ body:not(.is-mobile).theme-dark.cn-sidebar-border .workspace-split.mod-right-spl
 .theme-dark.cn-sidebar-lifted.cn-bg-black  { --background-secondary: #0a0a0a; --cn-bg-note-tray: #000000; }
 .theme-dark.cn-sidebar-lifted.cn-bg-warm   { --background-secondary: #1f1d1c; --cn-bg-note-tray: #131110; }
 .theme-dark.cn-sidebar-lifted.cn-bg-zen    { --background-secondary: #110f0d; --cn-bg-note-tray: #0a0908; }
+.theme-dark.cn-sidebar-lifted.cn-bg-slate     { --background-secondary: #1c1c1c; --cn-bg-note-tray: #121212; }
+.theme-dark.cn-sidebar-lifted.cn-bg-graphite  { --background-secondary: #101010; --cn-bg-note-tray: #080808; }
+/* True black lifted: canvas is already #000, so sidebar/tray stay #000;
+   the note card still separates via --cn-bg-elevated and its border. */
+.theme-dark.cn-sidebar-lifted.cn-bg-trueblack { --background-secondary: #000000; --cn-bg-note-tray: #000000; }
 
-/* Sidebar contrast variants — light */
+/* Sidebar contrast variants - light */
 /* Same inner-edge-only rule for light mode. */
 body:not(.is-mobile).theme-light.cn-sidebar-border .workspace-split.mod-left-split {
   border-right: 1px solid var(--cn-border-subtle);
@@ -645,6 +748,9 @@ body:not(.is-mobile).theme-light.cn-sidebar-border .workspace-split.mod-right-sp
 .theme-light.cn-sidebar-lifted.cn-bg-warm  { --background-secondary: #ebe5d9; --cn-bg-note-tray: #ddd6c8; }
 /* Zen tray: one stop darker than default (#d8d6d1), with warm undertone to match Zen surfaces. */
 .theme-light.cn-sidebar-lifted.cn-bg-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }
+.theme-light.cn-sidebar-lifted.cn-bg-slate     { --background-secondary: #e9e9e9; --cn-bg-note-tray: #d6d6d6; }
+.theme-light.cn-sidebar-lifted.cn-bg-graphite  { --background-secondary: #e2e2e2; --cn-bg-note-tray: #cfcfcf; }
+.theme-light.cn-sidebar-lifted.cn-bg-trueblack { --background-secondary: #f4f4f4; --cn-bg-note-tray: #e6e6e6; }
 
 
 /* Sidebar-lifted in dark translucent mode: outer-shell containers are
@@ -695,19 +801,19 @@ body {
   letter-spacing: -0.005em;
 }
 
-/* UI font variants — selected via Style Settings */
+/* UI font variants - selected via Style Settings */
 body.cn-ui-inter      { --font-interface-theme: "Inter", -apple-system, system-ui, sans-serif; }
 /* Avenir is a touch wider -- bump letter-spacing back to 0 */
 body.cn-ui-avenir     { --font-interface-theme: "Avenir Next", "Avenir", -apple-system, system-ui, sans-serif; letter-spacing: 0; font-feature-settings: "kern", "liga"; }
 body.cn-ui-system     { --font-interface-theme: -apple-system, "SF Pro Text", system-ui, BlinkMacSystemFont, sans-serif; font-feature-settings: "ss01", "ss02", "kern", "liga"; }
 
-/* Note font variants — selected via Style Settings */
+/* Note font variants - selected via Style Settings */
 body.cn-note-sfpro   { --font-text-theme: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif; }
 body.cn-note-newyork { --font-text-theme: "New York", Georgia, serif; }
 body.cn-note-georgia { --font-text-theme: Georgia, serif; }
 body.cn-note-avenir  { --font-text-theme: "Avenir Next", "Avenir", -apple-system, system-ui, sans-serif; }
 
-/* Heading font variants — selected via Style Settings */
+/* Heading font variants - selected via Style Settings */
 body.cn-heading-sfpro   { --cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif; }
 body.cn-heading-newyork { --cn-heading-font: "New York", Georgia, serif; }
 body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
@@ -734,7 +840,7 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 }
 
 /* ============================================================
-   3. HEADINGS — tight tracking, dramatic scale
+   3. HEADINGS - tight tracking, dramatic scale
    Font driven by --cn-heading-font (Style Settings knob, default SF Pro
    Display). Sizes driven by --h{n}-size variables (set in section 1).
    Both apply in reading mode and Live Preview.
@@ -781,7 +887,7 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
   line-height: var(--h6-line-height); letter-spacing: 0.02em;
 }
 
-/* Heading scale variants — relative to the tight comfortable default.
+/* Heading scale variants - relative to the tight comfortable default.
    Compact pulls headers nearly flush with body; Large is the opt-in that may
    exceed the title. */
 .theme-dark.cn-headings-compact,
@@ -836,7 +942,7 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 /* --- Translucent mode --- */
 
 /* All translucent-mode rules are scoped to .theme-dark. Light mode is
-   opaque (Notion-style) and ignores the Translucent Window setting —
+   opaque (Notion-style) and ignores the Translucent Window setting -
    keeping outer-shell containers transparent in light mode would let
    raw macOS vibrancy show through and look gray over dark wallpapers.
 
@@ -876,13 +982,13 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .titlebar {
   background-color: transparent;
 }
 
-/* Workspace wash on top of macOS vibrancy — dark mode only. Controlled
+/* Workspace wash on top of macOS vibrancy - dark mode only. Controlled
    by Style Settings Translucency tint knob via --cn-tint-alpha. */
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace {
   background-color: var(--workspace-background-translucent);
 }
 
-} /* end @media screen — translucency transparency */
+} /* end @media screen - translucency transparency */
 
 /* Stacked tabs need an opaque fallback so text stays readable */
 body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-tabs.mod-stacked .workspace-leaf,
@@ -929,7 +1035,7 @@ body.is-translucent.theme-light {
 }
 
 /* ============================================================
-   4b. NOTE PANEL — soft card edge against the sidebar
+   4b. NOTE PANEL - soft card edge against the sidebar
    The note pane in the main split rounds its top-left and
    bottom-left corners (where it meets the sidebar) so the
    boundary reads as a soft transition rather than a sharp
@@ -977,7 +1083,7 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-right-sp
 }
 
 /* Note panel: previously rounded the left edge facing the sidebar.
-   Removed — the corner clipping interfered with editor padding and read
+   Removed - the corner clipping interfered with editor padding and read
    as visual noise more than chrome. The sidebar pane already has its
    own rounded inside edge (below) which is enough separation. Keep
    overflow:hidden so any decoratively positioned children still clip
@@ -991,7 +1097,7 @@ body:not(.is-mobile) .workspace-split.mod-root .workspace-leaf-content {
 /* Left sidebar: round the entire pane on the inside edge (right side
    facing the note). Targets workspace-tabs (one level up from the
    leaf) so the action-icons row at top and the vault switcher at
-   bottom also clip to the rounded shape. Non-mobile only — mobile
+   bottom also clip to the rounded shape. Non-mobile only - mobile
    sidebars are drawer overlays where rounding clips the drawer
    header. */
 body:not(.is-mobile) .workspace-split.mod-left-split .workspace-tabs {
@@ -1000,7 +1106,7 @@ body:not(.is-mobile) .workspace-split.mod-left-split .workspace-tabs {
   overflow: hidden;
 }
 
-/* Right sidebar (when open): mirror — round the inside edge (left). */
+/* Right sidebar (when open): mirror - round the inside edge (left). */
 body:not(.is-mobile) .workspace-split.mod-right-split .workspace-tabs {
   border-top-left-radius: var(--cn-radius-lg);
   border-bottom-left-radius: var(--cn-radius-lg);
@@ -1008,7 +1114,7 @@ body:not(.is-mobile) .workspace-split.mod-right-split .workspace-tabs {
 }
 
 /* Translucent dark: the note leaf body stays TRANSPARENT so it shows the single
-   unified subtle-glass workspace base (set in section 1 / the tint knob) — the
+   unified subtle-glass workspace base (set in section 1 / the tint knob) - the
    SAME surface the sidebar shows. Painting the note its own opaque layer here
    would compound with the workspace base (~0.98) and re-create the tonal seam
    against the sidebar. Keeping it transparent makes note and sidebar identical. */
@@ -1068,14 +1174,14 @@ a.internal-link:hover, a.external-link:hover, .cm-link:hover {
   border-bottom-color: var(--cn-accent-hover);
 }
 
-/* Bold — color only; let font-weight cascade so bold inside an H1 (weight
+/* Bold - color only; let font-weight cascade so bold inside an H1 (weight
    900) renders heavier than the surrounding heading rather than capping
    at 700. Body bold gets weight 700 from the user-agent default for <strong>.
    Color flips per theme via --cn-strong-color (#ffffff dark, #000 light). */
 strong, .cm-strong { color: var(--cn-strong-color); }
 em, .cm-em { color: var(--cn-text-primary); }
 
-/* Native ==highlight== — soft amber, readable on dark */
+/* Native ==highlight== - soft amber, readable on dark */
 .markdown-rendered mark,
 .markdown-preview-view mark,
 .cm-highlight {
@@ -1086,7 +1192,7 @@ em, .cm-em { color: var(--cn-text-primary); }
 }
 
 /* ============================================================
-   7. CODE — scoped to markdown content (not plugin UIs)
+   7. CODE - scoped to markdown content (not plugin UIs)
    ============================================================ */
 
 .markdown-rendered code,
@@ -1121,35 +1227,39 @@ em, .cm-em { color: var(--cn-text-primary); }
 .HyperMD-codeblock-end-bg   { border-bottom-left-radius: var(--cn-radius); border-bottom-right-radius: var(--cn-radius); }
 
 /* ============================================================
-   8. CALLOUTS — boxed, highlight-style, amber default
-   Each callout type sets its own --callout-color (RGB triplet);
-   we override [!note] and the unspecified default to amber so the
+   8. CALLOUTS - boxed, highlight-style, amber default
+   Obsidian 1.13.0 changed --callout-color from an RGB triplet to a
+   valid CSS color (breaking change). Each callout type now sets its
+   own --callout-color as a color (a hex, rgb(), or color var), so we
+   consume it directly and use color-mix for the translucent tints.
+   We override [!note] and the unspecified default to amber so the
    default callout reads as a yellow highlight, not a blue note.
    ============================================================ */
 
-/* Override default note callout color from Obsidian's blue to amber */
+/* Override default note callout color from Obsidian's blue to amber.
+   Valid CSS color per the 1.13 contract (#eab308 == old triplet 234, 179, 8). */
 .callout[data-callout="note"],
 .callout:not([data-callout]) {
-  --callout-color: 234, 179, 8;
+  --callout-color: #eab308;
 }
 
 /* Box every callout as an opaque, theme-tinted card.
-   Non-default callouts (tip/warning/info) previously kept their colored icon but
-   lost the box. Two things caused it under this theme's translucent dark mode:
-   (1) core sets `mix-blend-mode: lighten` on `.callout`, which over the macOS
-   vibrancy backdrop washes a low-alpha tint out; (2) per-type `--callout-color`
-   is delivered as a NESTED var (`var(--callout-tip)` -> `var(--color-cyan-rgb)`),
-   and `color-mix(... rgb(var(--callout-color)) ...)` collapses to transparent for
-   those nested values in the running build (only the literal amber default
-   survived). Fix: force `mix-blend-mode: normal`, paint an OPAQUE base
-   (--cn-bg-elevated), then layer the per-type tint with `rgba(var(--callout-color))`
-   — the exact form Obsidian core uses, which resolves reliably for nested vars.
-   No color-mix. Per-type colors and Callout Manager customizations flow through. */
+   Non-default callouts (tip/warning/info) lost their box under this theme's
+   translucent dark mode because core sets `mix-blend-mode: lighten` on
+   `.callout`, which over the macOS vibrancy backdrop washes a low-alpha tint
+   out. Fix: force `mix-blend-mode: normal`, paint an OPAQUE base
+   (--cn-bg-elevated), then layer the per-type tint with color-mix against the
+   per-type --callout-color. On Obsidian 1.13+ --callout-color is a valid CSS
+   color, so color-mix resolves reliably (the earlier collapse-to-transparent
+   was the pre-1.13 RGB-triplet form nested inside color-mix, not color-mix
+   itself). Per-type colors and Callout Manager customizations flow through. */
 .callout {
   background-color: var(--cn-bg-elevated);
-  background-image: linear-gradient(rgba(var(--callout-color, 234, 179, 8), 0.13), rgba(var(--callout-color, 234, 179, 8), 0.13));
-  border: 1px solid rgba(var(--callout-color, 234, 179, 8), 0.32);
-  border-left: 3px solid rgb(var(--callout-color, 234, 179, 8));
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--callout-color, #eab308) 13%, transparent),
+    color-mix(in srgb, var(--callout-color, #eab308) 13%, transparent));
+  border: 1px solid color-mix(in srgb, var(--callout-color, #eab308) 32%, transparent);
+  border-left: 3px solid var(--callout-color, #eab308);
   border-radius: var(--cn-radius);
   padding: 12px 16px;
   margin: 1.2em 0;
@@ -1174,12 +1284,12 @@ em, .cm-em { color: var(--cn-text-primary); }
 }
 
 .callout-icon {
-  color: rgb(var(--callout-color, 234, 179, 8));
+  color: var(--callout-color, #eab308);
   display: inline-flex;
   align-items: center;
 }
 
-.callout-icon svg { color: rgb(var(--callout-color, 234, 179, 8)); }
+.callout-icon svg { color: var(--callout-color, #eab308); }
 
 /* ============================================================
    9. BLOCKQUOTES & DIVIDERS
@@ -1230,7 +1340,7 @@ hr {
 }
 
 /* ============================================================
-   10. INPUTS, BUTTONS — scoped to Obsidian containers only
+   10. INPUTS, BUTTONS - scoped to Obsidian containers only
    ============================================================ */
 
 .modal input[type="text"],
@@ -1249,7 +1359,7 @@ hr {
   transition: border-color var(--cn-transition-fast), background-color var(--cn-transition-fast);
 }
 
-/* Dropdowns — preserve Obsidian's native chevron icon. Use background-color
+/* Dropdowns - preserve Obsidian's native chevron icon. Use background-color
    only; the `background` shorthand would reset background-repeat to `repeat`
    and tile the chevron across the select. */
 .modal select,
@@ -1303,7 +1413,7 @@ hr {
 
 .modal button.mod-cta:hover { background: var(--cn-accent-hover); }
 
-/* Modals — restore opaque variables inside dialogs so any internal
+/* Modals - restore opaque variables inside dialogs so any internal
    Obsidian rule that paints with --background-primary/-secondary gets a
    solid surface. Wins over the .theme-dark/.theme-light variable blocks
    by equal specificity + later source order. */
@@ -1377,7 +1487,7 @@ hr {
 .menu-item:hover { background: var(--cn-bg-tertiary); }
 
 /* ============================================================
-   11. CHECKBOXES — scoped to markdown task lists only
+   11. CHECKBOXES - scoped to markdown task lists only
    ============================================================ */
 
 .markdown-source-view input[type="checkbox"],
@@ -1432,7 +1542,7 @@ hr {
   /* Kept on border-collapse: collapse. Obsidian core borders every cell on all
      four sides (app.css: `.markdown-rendered td/th { border: ... }`) and merges
      them via collapse into one faint hairline grid. border-radius is ignored by
-     collapsed-border tables, so corners stay square — but switching to
+     collapsed-border tables, so corners stay square - but switching to
      `separate` un-merges that grid into doubled lines and cleaning it up means
      out-specifying core's :first-child/:last-child rules, which is fragile
      across Obsidian updates. Square corners are the safe trade. */
@@ -1453,7 +1563,7 @@ hr {
 }
 
 /* ============================================================
-   13. SCROLLBARS — minimal, scroll-triggered on workspace panels
+   13. SCROLLBARS - minimal, scroll-triggered on workspace panels
    Default thumb stays visible (modals, settings, code blocks etc.).
    Inside .workspace-leaf-content (file explorer, outline, note view,
    side panels) the thumb is transparent and only fades in while the
@@ -1486,7 +1596,7 @@ hr {
 }
 
 /* ============================================================
-   14. STATUS BAR — floating pill, bottom-right
+   14. STATUS BAR - floating pill, bottom-right
    Detached from the bottom edge so it reads as a free-floating
    chip in the same idiom as the file-explorer action-icon row.
    Sizes to fit its contents.
@@ -1517,14 +1627,14 @@ body:not(.is-mobile) .status-bar {
 /* (Removed the status-bar visibility force: Obsidian no longer dims
    status-bar items, so the rule was a no-op.) */
 
-/* Obsidian Sync — paint the working/in-progress state amber so it reads
+/* Obsidian Sync - paint the working/in-progress state amber so it reads
    distinct from the synced (.mod-success) and error (.mod-error) states,
    which keep their defaults. Core colors .sync-status-icon.mod-working
    via a class rule of equal specificity, so the theme wins on source
    order with no !important. The icon SVG inherits this color through
    currentColor, so no separate svg rule is needed. --cn-amber-warning is
    a dedicated solid status token, intentionally a different shade from
-   the callout amber (--callout-color RGB triplet). */
+   the callout amber (the --callout-color default). */
 .sync-status-icon.mod-working {
   color: var(--cn-amber-warning);
 }
@@ -1570,7 +1680,7 @@ body:not(.is-mobile) .status-bar {
 .smart-connections-view canvas { background: revert; }
 
 /* ============================================================
-   16. TAGS — pill style, accent-tinted
+   16. TAGS - pill style, accent-tinted
    ============================================================ */
 
 /* Pill styling for tags rendered inline in markdown content (a.tag, .tag,
@@ -1600,7 +1710,7 @@ a.tag:hover, .tag:hover {
   color: var(--cn-accent-hover);
 }
 
-/* Live Preview hashtag — keep it inline (no pill) so writing flow isn't disrupted;
+/* Live Preview hashtag - keep it inline (no pill) so writing flow isn't disrupted;
    accent color only. */
 .cm-hashtag-begin, .cm-hashtag-end {
   background-color: transparent;
@@ -1612,7 +1722,7 @@ a.tag:hover, .tag:hover {
 
 /* ============================================================
    17. PROPERTIES / FRONTMATTER PANEL
-   The metadata editor at the top of notes — used for frontmatter keys
+   The metadata editor at the top of notes - used for frontmatter keys
    like tags, aliases, dates. Minimal, blends into the translucent surface.
    ============================================================ */
 
@@ -1707,7 +1817,7 @@ a.tag:hover, .tag:hover {
 .multi-select-pill:hover { background-color: var(--cn-bg-elevated); }
 
 /* ============================================================
-   18. FOCUS INDICATORS — keyboard accessibility
+   18. FOCUS INDICATORS - keyboard accessibility
    :focus-visible only fires on keyboard focus, not mouse click,
    so we don't pollute the visual when clicking around.
    ============================================================ */
@@ -1728,7 +1838,7 @@ a.external-link:focus-visible,
 }
 
 /* ============================================================
-   19. QUALITY-OF-LIFE — Velocity-inspired refinements
+   19. QUALITY-OF-LIFE - Velocity-inspired refinements
 
    19a. Functional extras (always-on or toggleable)
         - Centered sidebar tab icons
@@ -1831,13 +1941,13 @@ body.cn-bubble-nav:not(.is-mobile) .nav-header:focus-within .nav-buttons-contain
 }
 
 /* Search input below the bubble shouldn't slide as the bubble
-   expands — give it a stable margin */
+   expands - give it a stable margin */
 body.cn-bubble-nav:not(.is-mobile) .nav-header > .search-input-container {
   margin-block-start: 8px;
 }
 
 /* --- Click feedback on clickable icons ---
-   Subtle scale-down on press for tactile feedback. Desktop only —
+   Subtle scale-down on press for tactile feedback. Desktop only -
    on mobile the OS provides its own tap-highlight, and stacking
    our scale animation on top reads as laggy. */
 body:not(.is-mobile) .clickable-icon > .svg-icon {
@@ -1873,7 +1983,7 @@ body:not(.is-mobile) .clickable-icon:active > .svg-icon {
 .style-margin-top.markdown-preview-view { padding-top: 56px; }
 
 /* ============================================================
-   19b. CHROME SHAPES — Velocity-inspired
+   19b. CHROME SHAPES - Velocity-inspired
    Brings Velocity's button/tab/icon geometry to Cognia Noir
    without changing colors, transparency behavior, or
    typography. Targets: top tab bar, ribbon icons, sidebar
@@ -1890,7 +2000,7 @@ body:not(.is-mobile) .clickable-icon:active > .svg-icon {
        legacy `-electron-corner-smoothing: 60%` (pre-1.12 Electron).
        Each era ignores the other's property, so both ship together
        to keep squircles on old and new Obsidian alike.
-     - Translucency-aware: shape changes only — no background
+     - Translucency-aware: shape changes only - no background
        paint that would fight section 4's transparent chrome.
    ============================================================ */
 
@@ -1971,7 +2081,7 @@ body:not(.is-phone) :is(.workspace-ribbon,
    :not(.is-phone) guard is applied to every other section
    19b chrome rule (sidebar tab pills, view-action FAB,
    ribbon box, panel boxes, vault-profile pseudo) for
-   consistency — flip them together if this decision is
+   consistency - flip them together if this decision is
    ever revisited. */
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header {
   border-radius: 10px;
@@ -2045,7 +2155,7 @@ body:not(.is-phone) .mod-sidedock .workspace-tab-header {
    In the reference, the "+" and reading-mode toggle (the
    round "60"/glasses icon) are circular FAB-style buttons
    with a faint border. Apply to non-bookmark view-actions
-   icons in markdown leaves only — the bookmark star stays a
+   icons in markdown leaves only - the bookmark star stays a
    regular pill so it doesn't visually compete. */
 body:not(.is-phone) .view-actions .clickable-icon:not(.mod-bookmark) {
   border-radius: 999px;
@@ -2094,7 +2204,7 @@ body:not(.is-phone) .mod-root .view-header-title-container .view-header-title {
   visibility: hidden;
 }
 
-/* --- Status bar items —
+/* --- Status bar items -
    Section 14 handles the parent pill (position, radius, body).
    This block only styles the clickable items inside. */
 .status-bar-item.mod-clickable {
@@ -2117,7 +2227,7 @@ body:not(.is-phone) .mod-root .view-header-title-container .view-header-title {
    with matching margin and radius so they read as sibling
    panels stacked in the left column. Border-only fill so
    they work in both opaque and translucent modes without
-   fighting section 4 paint logic. All scoped to non-mobile —
+   fighting section 4 paint logic. All scoped to non-mobile -
    on mobile (phone or tablet) Obsidian uses drawer layouts
    where these box rules would interfere with the native UI. */
 body:not(.is-phone) .workspace-ribbon.mod-left {
@@ -2137,7 +2247,7 @@ body:not(.is-phone) .workspace-ribbon.mod-left {
   /* Load-bearing per v1.8.6: without these the ribbon container
      sizes to its icon list, which leaves the bottom of the box
      clipped above the vault profile. Confirmed still needed on
-     Obsidian 1.5+ — Obsidian's flex layout assigns the ribbon
+     Obsidian 1.5+ - Obsidian's flex layout assigns the ribbon
      intrinsic content height by default. */
   align-self: stretch;
   height: auto;
@@ -2161,7 +2271,7 @@ body.mod-macos.is-hidden-frameless:not(.is-phone) .workspace-ribbon.mod-left {
   margin-top: 60px;
 }
 
-/* Sidebar leaf "panel boxes" — bordered rounded panels around
+/* Sidebar leaf "panel boxes" - bordered rounded panels around
    the content area of every sidebar leaf, so plugin views (Smart
    Connections related-notes, Dataview, Periodic Notes, Outliner,
    etc.) pick up the same chrome as the core leaves without
@@ -2175,7 +2285,7 @@ body.mod-macos.is-hidden-frameless:not(.is-phone) .workspace-ribbon.mod-left {
        bordered margin would crop the prompt.
      - excalidraw: full-canvas drawing surface, same reason.
    Any other plugin leaf gets the box. Don't reflexively copy
-   section 4's translucent-force-paint exclusion list here —
+   section 4's translucent-force-paint exclusion list here -
    that list exists to avoid bg-primary collisions over vibrancy
    and includes views (e.g. smart-connections-view) that are
    normal scrollable lists and benefit from the panel box. The
@@ -2198,7 +2308,7 @@ body:not(.is-phone) .mod-left-split .workspace-leaf-content[data-type="file-expl
 /* Vault profile (bottom-left strip with vault switcher,
    help, settings gear). The vault-profile is a flex child
    whose width is forced to the full sidebar width by the
-   parent's flex stretch — margins on the element itself
+   parent's flex stretch - margins on the element itself
    don't change its rendered width or position reliably.
    Solution: leave the element at its natural full-sidebar
    width and draw the visual box via a pseudo-element with
@@ -2297,7 +2407,7 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
 }
 
 /* ============================================================
-   21. MOBILE — settings card contrast, button visibility,
+   21. MOBILE - settings card contrast, button visibility,
        and drawer view-picker chrome
    ============================================================
    On iPhone, Obsidian groups the Settings screen content into

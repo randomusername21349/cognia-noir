@@ -7,6 +7,36 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.27
+
+Obsidian 1.13 compatibility, new black-and-white appearance options, plus a
+documentation and cleanup pass.
+
+- Background tone: three new options in Style Settings. Slate (neutral gray) and
+  Graphite (deep neutral) are pure grayscale surfaces with no warm or Zen hue;
+  True black is a pure #000000 canvas for maximum OLED contrast (inverts to crisp
+  pure white in light mode). All ship with dark, light, and sidebar-lifted values.
+- Grayscale UI: new Style Settings toggle (off by default) that desaturates the
+  theme's semantic colors (accent, links, callouts, tags, highlight, inline code,
+  status) so the interface reads as pure black and white. Implemented as a token
+  remap, not a CSS filter, so note images and code syntax highlighting keep their
+  color and the translucency/backdrop system is untouched.
+- Callouts: migrated `--callout-color` handling to the Obsidian 1.13 contract.
+  1.13.0 changed `--callout-color` from an RGB triplet to a valid CSS color (a
+  breaking change), so non-note callout types (tip/warning/info and others) and
+  Callout Manager custom colors stopped painting their box, border, and icon on
+  1.13+. The theme now consumes `--callout-color` directly and uses `color-mix`
+  for the translucent tints, the same pattern used elsewhere in the theme.
+  Verified rendering with hex, `rgb()`, and `oklch()` colors in dark and light.
+- Settings: 1.13.0 moved Settings into a separate window. Verified its root still
+  carries `.modal.mod-settings`, so the existing settings selectors still match
+  the redesigned window; no selector change was made.
+- README: corrected the editor font default (14, not 16), pointed the changelog
+  reference to CHANGELOG.md (was "top of theme.css"), and removed a stale
+  bubble-nav highlight that no longer matched the code.
+- Housekeeping: replaced non-ASCII em dashes (and an arrow in this changelog)
+  with ASCII equivalents in comments and docs.
+
 ## v1.10.26
 
 Readability and cohesion pass on note content (dark mode).
@@ -83,7 +113,7 @@ v1.7.4 (perf audit: verified no backdrop-filter on scrolling containers,
         no transition: all, no will-change, no :has(), no @keyframes,
         no brightness/contrast filters, no universal-selector traps.
         Theme is perf-clean. Corrected header comment that misdescribed
-        Highlightr as an opted-out leaf — it has no leaf to opt out of.
+        Highlightr as an opted-out leaf - it has no leaf to opt out of.
         When adding a plugin opt-out: update the translucent-dark
         :not() chain (section 4, dark block), the translucent-light
         :not() chain (section 4, light block), and the .mod-root
@@ -495,7 +525,7 @@ v1.10.3 (three regression fixes from user spot-check.
          book/reading-mode toggle, ... overflow) had drifted
          flush left on desktop. v1.10.2 hid the redundant
          centered title via display:none on .view-header-
-         title-container — but that container carries flex:1
+         title-container - but that container carries flex:1
          in Obsidian's stock layout and was the spacer pushing
          .view-actions to the right. Now the inner .view-
          header-title gets visibility:hidden instead, so the
@@ -503,7 +533,7 @@ v1.10.3 (three regression fixes from user spot-check.
          stick to the right. Belt-and-suspenders rule pins
          .view-actions with margin-left:auto.
          (2) Mobile + new-note action icon was not visible on
-         iPhone — only the ... overflow rendered. Cause: the
+         iPhone - only the ... overflow rendered. Cause: the
          section 19b -electron-corner-smoothing chain and pill-
          shaped clickable-icon rule were missing the :not(.is-
          phone) guard that every other section 19b rule
@@ -544,12 +574,12 @@ v1.10.2 (two visual cleanups surfaced by user spot-check on
          .view-header-title-container, scoped to .mod-root
          so sidebar leaf headers (search, outline, etc.)
          keep their titles. The view-header itself stays in
-         the layout — only the title text is suppressed —
+         the layout - only the title text is suppressed -
          so right-side action icons keep their container.)
 v1.10.1 (regression fix on v1.10.0 panel-box selector.
          v1.10.0's broadened sidebar panel-box rule reused
          section 4's translucent-force-paint exclusion list
-         verbatim — terminal, excalidraw, smart-connections-
+         verbatim - terminal, excalidraw, smart-connections-
          view. That mechanical reuse was wrong: the two
          exclusion lists serve different purposes. Section 4
          opts out views whose internal styling collides with
@@ -600,7 +630,7 @@ v1.10.0 (hardening pass on top of v1.9.9 audit. (1) Ribbon
          load-bearing per v1.8.6 with a clearer comment.
          Visual regression sweep for light mode, dark
          translucent, multi-pane right sidebar, and print
-         preview is the user's responsibility — not testable
+         preview is the user's responsibility - not testable
          from the editor side.
          CORRECTION (see v1.10.1 entry above): item (2)'s
          exclusion list mechanically copied section 4's
@@ -626,7 +656,7 @@ v1.9.9  (desktop+mobile audit fixes: cn-sidebar-lifted
          :not(.is-mobile) so it no longer stacks on top
          of iOS/Android tap-highlight.)
 v1.9.8  (audit pass: scoped resize-handle hide to mod-
-         left-split only — the v1.9.7 universal selector
+         left-split only - the v1.9.7 universal selector
          would have hidden inter-pane resize handles in
          the right sidebar too, breaking that feature
          silently for anyone with multiple panes stacked
@@ -648,7 +678,7 @@ v1.9.5  (hide the workspace-leaf-resize-handle <hr> that
          sits between the file explorer column and the
          vault profile. With the new bordered boxes around
          both, the hr's default border-top showed up as an
-         awkward horizontal divider. Now transparent — the
+         awkward horizontal divider. Now transparent - the
          element stays in place so resize drag still works,
          but no visible line.)
 v1.9.4  (vault box rebuilt around DevTools data: the
@@ -664,14 +694,14 @@ v1.9.4  (vault box rebuilt around DevTools data: the
          and both elements live in 234.5px-wide parents, so
          the boxes end up at identical x-coordinates.)
 v1.9.3  (vault box: shifted left edge right by +15px
-         (margin-left -3 → 12) and right edge right by
-         +11px (margin-right -14 → -25) to bring both
+         (margin-left -3 -> 12) and right edge right by
+         +11px (margin-right -14 -> -25) to bring both
          edges in line with the folder box.)
 v1.9.2  (vault box left margin nudged from -18 to -3
          after the right edge aligned but the left edge
          extended ~15px past the folder box's left.)
 v1.9.1  (vault box uses negative margins on BOTH sides
-         (-18px left, -14px right) — its parent container
+         (-18px left, -14px right) - its parent container
          is narrower than the folder-list column, so to
          reach the folder box's left/right x-coordinates
          the box has to extend past its parent's bounds.
@@ -683,7 +713,7 @@ v1.9.0  (vault box uses negative left margin (-18px) to
          38px right margin to bring the right edge in to
          match the folder box. Net effect: box left/right
          edges now align with the folder box.)
-v1.8.9  (vault box reverted to margin-based sizing — the
+v1.8.9  (vault box reverted to margin-based sizing - the
          width: calc approach truncated "Master Vault" to
          "Master V..." because Obsidian's internal layout
          on the vault-profile constrained the inner content
@@ -720,7 +750,7 @@ v1.8.6  (ribbon and vault box tuning. Ribbon: stronger
          since the vault-profile has different parent
          padding than .view-content.)
 v1.8.5  (ribbon-box vertical alignment: top now starts at
-         88px (matches folder-box top — below the sidebar
+         88px (matches folder-box top - below the sidebar
          tab-pills + nav-header on macOS frameless). Bottom
          margin reduced to 8px so the ribbon box ends at
          the same y as the vault-profile box. Vault-profile
@@ -734,7 +764,7 @@ v1.8.4  (ribbon-box layout polish: bumped macOS frameless
          with a gap between, mirroring the folder side);
          widened vault profile horizontal margin to 16px
          so its box visually matches the folder-box width.)
-v1.8.3  (fixed traffic-light overlap on macOS frameless —
+v1.8.3  (fixed traffic-light overlap on macOS frameless -
          ribbon box now starts below the traffic lights via
          scoped margin-top. Added matching panel box around
          the bottom-left vault profile (vault switcher,
@@ -750,9 +780,9 @@ v1.8.2  (ribbon now wears its own bordered rounded box so
 v1.8.1  (added ribbon-to-sidebar separator + bordered box
          around left/right sidebar leaf content (file
          explorer, bookmarks, recent files, outline,
-         backlinks, etc.) — folder tree now reads as a
+         backlinks, etc.) - folder tree now reads as a
          distinct panel inside the sidebar.)
-v1.8.0  (Velocity-inspired chrome shapes — section 19b. Top-bar
+v1.8.0  (Velocity-inspired chrome shapes - section 19b. Top-bar
          tabs become bordered pill rectangles with min-height 32px
          and radius 10px. Clickable icons in workspace-ribbon, view-
          header, sidebar toggle, vault profile, and tab-list become
@@ -762,5 +792,5 @@ v1.8.0  (Velocity-inspired chrome shapes — section 19b. Top-bar
          rounded on the left edge. Modal/menu/popover radii bumped
          (modal 18px, menu 14px). Electron corner smoothing applied
          to all rounded chrome surfaces. Colors and translucency
-         behaviors are unchanged — shapes only.)
+         behaviors are unchanged - shapes only.)
 

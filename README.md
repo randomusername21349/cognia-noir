@@ -9,8 +9,8 @@ Cognia Noir is a Notion and Zen-inspired Obsidian theme tuned to feel calm. Dark
 ## Features
 
 - Dark and light modes, both designed to feel like Notion's surface palette.
-- SF Pro for UI; SF Pro Text for note bodies; SF Mono for code.
-- Rounded note panel and sidebars with a contrasting tray tone underneath.
+- Inter for UI chrome; SF Pro for note bodies; SF Mono for code.
+- Rounded sidebars; the note panel lifts off a contrasting tray tone underneath.
 - Native macOS vibrancy: enable Settings > Appearance > Translucent Window. The theme paints sidebars and chrome over `NSVisualEffectView` so the desktop wallpaper shows through.
 - Plugin-safe vibrancy: Excalidraw and Smart Connections leaves are opted out of the translucent leaf-content force-paint so they render correctly. Core Canvas is also opted out as a defensive measure.
 - WCAG AA contrast on primary text, accent, and inline code in all default Background tone variants.
@@ -80,7 +80,7 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 
 - **Accent color**: used for links, focus rings, and selection. Defaults clear WCAG AA against each theme's canvas. Separate light and dark defaults.
 - **Inline code color**: color of `inline code` text. Defaults clear WCAG AA against each theme's code background. Separate light and dark defaults.
-- **Background tone**: Charcoal (default), Pure Black (OLED-friendly), Warm charcoal (slight warmth), or Zen.
+- **Background tone**: Charcoal (default), Slate (neutral gray), Graphite (deep neutral), Pure Black (OLED-friendly), True black (pure #000, max contrast), Warm charcoal (slight warmth), or Zen.
 - **Sidebar contrast**: how the sidebars separate from the main editor. Flat (default), Subtle border, or Lifted (slightly darker).
 - **Translucency tint**: strength of the dark wash layered over macOS vibrancy. Pure vibrancy, Light, Medium (default), or Heavy. Pure shows raw vibrancy; Heavy dims it for legibility on bright wallpapers. Requires Settings > Appearance > Translucent Window enabled.
 - **Heading scale**: Compact, Comfortable (default), or Large.
@@ -89,7 +89,7 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 
 ### Typography
 
-- **Editor font size**: slider, 12 to 20 px (default 16).
+- **Editor font size**: slider, 12 to 20 px (default 14).
 - **UI font**: font for UI chrome (sidebars, tabs, buttons, dialogs). Inter (default), Avenir Next, or System (SF Pro).
 - **Note font**: font for note content (editor and reading view). SF Pro (default), New York (Apple serif), Georgia (classic serif), or Avenir Next.
 - **Heading font**: font for H1 through H6. SF Pro Display (default), New York, or Georgia. Pair with the note font for a matched look.
@@ -101,15 +101,16 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 
 - **Line width**: maximum width of the note content area. Slider, 500 to 1400 px (default 700, matching Obsidian's stock default).
 - **Bubble nav buttons**: collapses the file explorer / bookmarks action row (new note, new folder, sort, expand) into a small pill that expands on hover. Inspired by Velocity.
+- **Grayscale UI**: desaturates the theme's colors (accent, links, callouts, tags, highlight, inline code, status) so the interface reads as pure black and white. Note images and code syntax highlighting keep their color. Off by default.
 
 ![Style Settings panel, bottom of scroll](screenshots/05-style-settings-layout.png)
 
 ## Changelog
 
-See the version history at the top of `theme.css` for a full per-version log. Highlights:
+See [CHANGELOG.md](CHANGELOG.md) for the full per-version log. Highlights:
 
 - **1.10.13**: Default accent and inline code now clear WCAG AA on every text-bearing surface in every default Background tone variant, not just Zen. Earlier audits had missed `bg-elevated` (modals, popovers, dropdowns); fixed for dark Charcoal, dark Warm, light Charcoal, and light Warm (full ratio table in `theme.css`). Kanban added to the translucent leaf-content force-paint opt-out chain. Bubble nav comment tightened. Modal-backdrop `!important` cluster documented. Empty `authorUrl` field removed from `manifest.json`.
-- **1.10.12**: Zen Background tone reworked so the default accent and inline code clear WCAG AA on every Zen surface in both modes (full contrast table in `theme.css`). Bubble nav animation moved off layout-triggering `max-height` / `max-width` to compositor-friendly `transform: scale` and opacity. README WCAG note re-broadened to cover all default Background tone variants. Windows/Linux compatibility note clarified as untested.
+- **1.10.12**: Zen Background tone reworked so the default accent and inline code clear WCAG AA on every Zen surface in both modes (full contrast table in `theme.css`). README WCAG note re-broadened to cover all default Background tone variants. Windows/Linux compatibility note clarified as untested. (A bubble nav animation change in this version was later reverted; see CHANGELOG.md for the current approach.)
 - **1.10.11**: Excalidraw control reset narrowed (replaced `all: unset` with targeted overrides). Core Canvas added to the translucent leaf-content opt-out chain. Smart Connections reference comments corrected (data-type is the related-notes view, not a graph canvas). README narrowed the WCAG AA claim to the default Charcoal palette and clarified the Style Settings layout.
 - **1.10.10**: removed a `display:none` rule that was hiding the sidebar resize handle. Added `--cn-transition-fast` (100 ms ease-out) for hover and focus feedback on nav titles, tab headers, links, inputs, buttons, and tags.
 - **1.10.7**: added `prefers-reduced-motion: reduce` block.
