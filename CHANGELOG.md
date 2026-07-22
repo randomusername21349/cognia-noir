@@ -7,6 +7,31 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.31
+
+Obsidian 1.13.3 compatibility: sidebar/ribbon surfaces and corners.
+
+- Fixed the harsh black seams that appeared between the sidebar's floating boxes
+  under Obsidian 1.13.3 (its layout widened the gaps, exposing the old near-black
+  `#131313` note-tray). The tray is now tied to `--cn-bg-secondary` (the box
+  surface itself), so it sits flush with the boxes in every tone -- light and
+  dark, including OLED Black / True Black (their note canvas stays pure black via
+  `--cn-bg-primary`; only the sidebar tray tracks the box). The Sidebar-lifted
+  Style Settings option keeps its intentional raised-box look.
+- Painted the `.workspace` backdrop with the tray color so the left ribbon (which
+  lives outside the sidebar split) matches the sidebar instead of showing a
+  darker grey around its floating box.
+- Softened the ribbon box border to the subtle token used by the sidebar boxes,
+  so its top edge no longer reads as a bright line under the macOS traffic lights.
+- Softened the sidebar-to-editor resize divider (it had inherited the stronger
+  editor-pane divider weight); it now sits near the box-border weight, with a
+  hover boost so it stays grabbable.
+- Corner shape: Obsidian 1.13.3's Chromium now honors the standard `corner-shape`
+  property, and the theme's hardcoded `squircle` rendered as an over-tight pinch.
+  Switched to `corner-shape: var(--corner-shape)` to follow core's per-platform
+  value (`superellipse(1.33)` on macOS, `round` elsewhere), keeping the
+  `-electron-corner-smoothing` fallback for older Obsidian builds.
+
 ## v1.10.30
 
 Housekeeping: lint and file size.

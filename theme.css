@@ -10,11 +10,11 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.30 (Housekeeping: removed the last !important (the Smart Connections
-            settings-icon hide now wins by specificity), and moved the verbose
-            in-file design rationale to DESIGN-NOTES.md to keep this stylesheet
-            under Obsidian's size guidance. Full version history lives in
-            CHANGELOG.md and on the GitHub releases page.)
+   v1.10.31 (Obsidian 1.13.3 fixes: sidebar/ribbon seams now sit flush with the
+            box grey in every tone (light and dark, OLED included), the ribbon
+            border and sidebar resize divider are softened, and corner-shape
+            follows core's per-platform value instead of a hardcoded squircle.
+            Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
       0   Shared constants (theme-independent vars: radius, transition)
@@ -319,8 +319,14 @@ settings:
   --cn-bg-secondary: #202020;
   --cn-bg-tertiary: #252525;
   --cn-bg-elevated: #282828;
-  /* Tray painted behind the note panel in section 4b. Needs to be */
-  --cn-bg-note-tray: #131313;
+  /* Tray painted behind the note panel (4b) and behind the sidebar floating */
+  /* boxes. The boxes ARE painted --background-secondary (= --cn-bg-secondary), */
+  /* so tie the tray to that same variable: the tray then equals the box in */
+  /* EVERY dark tone (hue-preserved), instead of a fixed value that only fit one */
+  /* tone. Keeps the seams flush-grey across charcoal/slate/graphite/warm/zen. */
+  /* (Obsidian 1.13.3 widened the gaps; the old fixed #131313 read as harsh */
+  /* black seams. Black / True Black keep their explicit OLED overrides below.) */
+  --cn-bg-note-tray: var(--cn-bg-secondary);
   --cn-border-subtle: rgba(255, 255, 255, 0.06);
   --cn-border-strong: rgba(255, 255, 255, 0.10);
   --cn-text-primary: #e8e8e8;
@@ -412,8 +418,9 @@ settings:
   --cn-bg-secondary: #f7f6f3;
   --cn-bg-tertiary: #ebebea;
   --cn-bg-elevated: #e8e7e5;
-  /* Tray painted behind the note panel in section 4b. Sits a few stops */
-  --cn-bg-note-tray: #d8d6d1;
+  /* Tray tied to the box surface (--cn-bg-secondary) so the light sidebar is */
+  /* flush too, matching the dark-mode treatment (no grey seams behind boxes). */
+  --cn-bg-note-tray: var(--cn-bg-secondary);
   --cn-border-subtle: rgba(55, 53, 47, 0.09);
   --cn-border-strong: rgba(55, 53, 47, 0.16);
   --cn-text-primary: #37352f;
@@ -504,8 +511,9 @@ settings:
   --cn-bg-secondary: #141414;
   --cn-bg-tertiary: #1c1c1c;
   --cn-bg-elevated: #222222;
-  /* Tray must be darker than bg-primary so the note card reads as lifted on a */
-  --cn-bg-note-tray: #050505;
+  /* Flush tray (tie to box). The pure-black OLED canvas comes from */
+  /* --cn-bg-primary; the sidebar tray tracks the box for a seamless sidebar. */
+  --cn-bg-note-tray: var(--cn-bg-secondary);
 }
 
 .theme-dark.cn-bgd-warm {
@@ -537,13 +545,14 @@ settings:
   --cn-bg-tertiary: #222222;
   --cn-bg-elevated: #272727;
 }
-/* True black: pure #000000 canvas for maximum OLED contrast. The tray cannot go */
+/* True black: pure #000000 canvas for maximum OLED contrast (from bg-primary). */
+/* Tray tied to the box so the sidebar stays flush; the note canvas stays pure black. */
 .theme-dark.cn-bgd-trueblack {
   --cn-bg-primary: #000000;
   --cn-bg-secondary: #080808;
   --cn-bg-tertiary: #101010;
   --cn-bg-elevated: #171717;
-  --cn-bg-note-tray: #000000;
+  --cn-bg-note-tray: var(--cn-bg-secondary);
 }
 
 /* ============================================================
@@ -881,6 +890,16 @@ body:not(.is-mobile) .workspace-split.mod-right-split,
 body:not(.is-mobile) .workspace-split.mod-root .workspace-tab-container,
 body:not(.is-mobile) .workspace-split.mod-left-split .workspace-tab-container,
 body:not(.is-mobile) .workspace-split.mod-right-split .workspace-tab-container {
+  background-color: var(--cn-bg-note-tray);
+}
+
+/* The left ribbon lives OUTSIDE the sidebar split (.side-dock-ribbon under */
+/* .workspace), so the tray rule above does not cover its floating-box */
+/* margins -- they revealed the bare workspace/body backdrop, a darker grey */
+/* than the sidebar tray (surfaced by the Obsidian 1.13.3 layout). Paint the */
+/* workspace backdrop the same tray color so the ribbon surround matches the */
+/* sidebar. Splits/leaves paint over it, so it only shows in the ribbon gaps. */
+body:not(.is-mobile) .workspace {
   background-color: var(--cn-bg-note-tray);
 }
 
@@ -1645,8 +1664,12 @@ body:not(.is-phone) :is(
   .sidebar-toggle-button .clickable-icon,
   .workspace-tab-header-tab-list .clickable-icon,
   .view-header .clickable-icon) {
+  /* Follow core's per-platform corner (round elsewhere, superellipse(1.33) on */
+  /* macOS) instead of the old hardcoded `squircle`, which Obsidian 1.13.3's */
+  /* Chromium now honors as an over-tight pinch. Keep the Electron fallback for */
+  /* older Obsidian that predates standard `corner-shape` (manifest minApp 1.5.0). */
   -electron-corner-smoothing: 60%;
-  corner-shape: squircle;
+  corner-shape: var(--corner-shape);
 }
 
 /* --- Pill-shaped clickable icons in chrome --- */
@@ -1761,12 +1784,14 @@ body:not(.is-phone) .mod-root .view-header-title-container .view-header-title {
 
 /* --- Ribbon, folder, and vault-profile boxes --- */
 body:not(.is-phone) .workspace-ribbon.mod-left {
-  border: 1px solid var(--cn-border-strong);
+  /* Subtle (matches the sidebar nav boxes) so the box top edge does not */
+  /* read as a bright line under the macOS traffic lights (was --cn-border-strong). */
+  border: 1px solid var(--cn-border-subtle);
   border-radius: 12px;
   /* Default top margin (36px) lines the ribbon-box top up with */
   margin: 36px 4px 8px 8px;
   -electron-corner-smoothing: 60%;
-  corner-shape: squircle;
+  corner-shape: var(--corner-shape);
   /* Load-bearing per v1.8.6: without these the ribbon container */
   align-self: stretch;
   height: auto;
@@ -1790,7 +1815,7 @@ body:not(.is-phone) .mod-left-split .workspace-leaf-content[data-type="file-expl
   margin: 4px var(--cn-panel-side-inset) 8px;
   padding: 6px 4px;
   -electron-corner-smoothing: 60%;
-  corner-shape: squircle;
+  corner-shape: var(--corner-shape);
 }
 
 /* Vault profile (bottom-left strip with vault switcher, */
@@ -1812,7 +1837,7 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
   border-radius: 12px;
   pointer-events: none;
   -electron-corner-smoothing: 60%;
-  corner-shape: squircle;
+  corner-shape: var(--corner-shape);
 }
 
 /* v1.10.10 Removed the rule that hid hr.workspace-leaf-resize-handle */
@@ -1833,6 +1858,33 @@ body:not(.is-phone) .workspace-split.mod-left-split > .workspace-sidedock-vault-
 }
 .theme-light .workspace-split.mod-root .workspace-leaf-resize-handle:hover {
   border-inline-end-color: rgba(55, 53, 47, 0.50);
+}
+
+/* Sidebar <-> editor divider: much fainter than the editor-pane dividers above. */
+/* The sidebar handle otherwise inherits --divider-color (0.22), which reads as a */
+/* hard line; keep it near the subtle box-border weight, with a hover boost so the */
+/* resize edge is still grabbable. Covers both left and right sidebars. */
+.theme-dark .workspace-split.mod-left-split .workspace-leaf-resize-handle,
+.theme-dark .workspace-split.mod-right-split .workspace-leaf-resize-handle {
+  border-inline-end-color: rgba(255, 255, 255, 0.09);
+  border-inline-start-color: rgba(255, 255, 255, 0.09);
+  transition: border-color var(--cn-transition-fast);
+}
+.theme-dark .workspace-split.mod-left-split .workspace-leaf-resize-handle:hover,
+.theme-dark .workspace-split.mod-right-split .workspace-leaf-resize-handle:hover {
+  border-inline-end-color: rgba(255, 255, 255, 0.24);
+  border-inline-start-color: rgba(255, 255, 255, 0.24);
+}
+.theme-light .workspace-split.mod-left-split .workspace-leaf-resize-handle,
+.theme-light .workspace-split.mod-right-split .workspace-leaf-resize-handle {
+  border-inline-end-color: rgba(55, 53, 47, 0.11);
+  border-inline-start-color: rgba(55, 53, 47, 0.11);
+  transition: border-color var(--cn-transition-fast);
+}
+.theme-light .workspace-split.mod-left-split .workspace-leaf-resize-handle:hover,
+.theme-light .workspace-split.mod-right-split .workspace-leaf-resize-handle:hover {
+  border-inline-end-color: rgba(55, 53, 47, 0.30);
+  border-inline-start-color: rgba(55, 53, 47, 0.30);
 }
 
 /* ============================================================
