@@ -7,6 +7,30 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.33
+
+Accessibility, editor settings, and Obsidian 1.13.4+ compatibility fixes.
+Includes the local 1.10.32 audit fixes; 1.10.32 was not published separately.
+
+- Improved accent-button labels, checkbox borders, faint text, light-mode sync
+  indicators, keyboard selection, and property focus visibility.
+- Added an Accent button label color control for custom accent colors. Accent
+  hover states now follow the chosen accent, and grayscale overrides remain
+  effective with Style Settings color overrides.
+- Fixed editor line-height and heading controls by mapping them to core tokens;
+  corrected serif fallback, inline formatting, highlights, and inline-code rules.
+- Fixed stacked translucent pane surfaces, Lifted sidebar painting, light-mode
+  translucent leaves, current and legacy sidebar selectors, and logical corners.
+- Preserved destructive-button colors and labels, native header titles, task
+  checkmarks, nested task text, and core ownership of active resize handles.
+- Scoped custom scrollbars to the core styled-scrollbars setting and corrected
+  print colors for a white page with dark text.
+- Raised the minimum Obsidian version to 1.13.4 to match the core contracts used.
+- Verified on macOS with Obsidian 1.14.4: seven dark and six light backgrounds,
+  all three sidebar styles in both modes, color/grayscale appearance, and Pure
+  and Heavy translucency tints. Note rendering, mobile, and PDF export were not
+  visually verified for this release.
+
 ## v1.10.31
 
 Obsidian 1.13.3 compatibility: sidebar/ribbon surfaces and corners.

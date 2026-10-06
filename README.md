@@ -34,9 +34,9 @@ Cognia Noir is a Notion and Zen-inspired Obsidian theme tuned to feel calm. Dark
 
 ## Compatibility
 
-- Minimum Obsidian version: 1.5.0.
+- Minimum Obsidian version: 1.13.4.
 - Designed and tested on macOS only. Not tested on Windows or Linux. The macOS vibrancy effect requires NSVisualEffectView and will not apply on other platforms; other surfaces are unverified there.
-- Mobile (iPad and phone): supported. iPad gets the full desktop chrome; phone scales appropriately.
+- Mobile styles are included; this release has not been visually tested on iPad or phone.
 
 ## Gallery
 
@@ -74,11 +74,12 @@ Internal links with hover underline, tag pills with rounded background, inline L
 
 ## Style Settings
 
-If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin installed, Cognia Noir exposes 14 knobs under one "Look and feel" section. The lists below group them for readability; in the actual Style Settings panel they appear in one continuous scroll.
+If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin installed, Cognia Noir exposes 16 controls under one "Look and feel" section. The lists below group them for readability; in the actual Style Settings panel they appear in one continuous scroll.
 
 ### Look and feel
 
 - **Accent color**: used for links, focus rings, and selection. Defaults clear WCAG AA against each theme's canvas. Separate light and dark defaults.
+- **Accent button label color**: pair with a custom accent to keep button labels readable in normal and hover states. Separate light and dark defaults.
 - **Inline code color**: color of `inline code` text. Defaults clear WCAG AA against each theme's code background. Separate light and dark defaults.
 - **Dark mode background**: Charcoal (default), Slate (neutral gray), Graphite (deep neutral), Pure black (OLED-friendly), True black (pure #000), Warm charcoal, or Zen. Applies only in dark mode.
 - **Light mode background**: Paper (default, warm white), Pure white, Mist (light gray), Stone (deeper gray), Warm paper, or Zen. Applies only in light mode, independent of the dark setting.
@@ -110,6 +111,7 @@ If you have the [Style Settings](https://github.com/mgmeyers/obsidian-style-sett
 
 See [CHANGELOG.md](CHANGELOG.md) for the full per-version log. Highlights:
 
+- **1.10.33**: Accessibility and contrast fixes, reliable editor settings and grayscale overrides, translucent-pane and sidebar compatibility, destructive-button styling, focus and selection visibility, and print colors. Requires Obsidian 1.13.4 or newer.
 - **1.10.13**: Default accent and inline code now clear WCAG AA on every text-bearing surface in every default Background tone variant, not just Zen. Earlier audits had missed `bg-elevated` (modals, popovers, dropdowns); fixed for dark Charcoal, dark Warm, light Charcoal, and light Warm (full ratio table in `theme.css`). Kanban added to the translucent leaf-content force-paint opt-out chain. Bubble nav comment tightened. Modal-backdrop `!important` cluster documented. Empty `authorUrl` field removed from `manifest.json`.
 - **1.10.12**: Zen Background tone reworked so the default accent and inline code clear WCAG AA on every Zen surface in both modes (full contrast table in `theme.css`). README WCAG note re-broadened to cover all default Background tone variants. Windows/Linux compatibility note clarified as untested. (A bubble nav animation change in this version was later reverted; see CHANGELOG.md for the current approach.)
 - **1.10.11**: Excalidraw control reset narrowed (replaced `all: unset` with targeted overrides). Core Canvas added to the translucent leaf-content opt-out chain. Smart Connections reference comments corrected (data-type is the related-notes view, not a graph canvas). README narrowed the WCAG AA claim to the default Charcoal palette and clarified the Style Settings layout.
