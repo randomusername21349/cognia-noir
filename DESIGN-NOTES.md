@@ -18,18 +18,34 @@ both .theme-dark and .theme-light. Defined once here; do not
 duplicate in either themed block.
 
 
-### `--inline-title-size: 1.6em;`
+### `--cn-radius-pill: 999px;`
 
 
-Inline title - size/weight/line-height are mode-independent.
-  --inline-title-color stays in each themed block (references --h1-color).
+Radius scale: 4 (--radius-s), 8 (--cn-radius), 12 (--cn-radius-lg),
+  16 (--cn-radius-xl), pill (--cn-radius-pill). Core's --radius-m and
+  --radius-l map to the 8 and 12 steps. Chrome, dialogs, menus, tags,
+  and the status pill all draw from this scale; dialogs are 16, menus
+  and sidebar boxes 12. Micro radii (2px highlight mark, 6px scrollbar
+  thumb) stay literal.
 
 
-### `--cn-editor-font-size: 14px;`
+### `--cn-editor-font-size: 14;`
 
+
+Inline title tokens and heading line-heights are no longer set here:
+  core defines --inline-title-* and --h1..--h6-line-height on body,
+  which shadows any :root value, so they live in the section 2 body
+  rule. --inline-title-color stays in each themed block (references
+  --h1-color).
 
 Editor font size and line height - driven by Style Settings sliders.
   Previously duplicated identically in both .theme-dark and .theme-light.
+  --cn-editor-font-size is unitless: the slider value is the note text
+  size in pixels at Obsidian's default 16px text size. Section 2 sizes
+  text with calc(var(--font-text-size, 16px) * var(--cn-editor-font-size) / 16),
+  so Obsidian's own font size setting and zoom scale it from there. The
+  earlier px value (14px) was a fixed size that did not follow
+  Obsidian's font size setting.
 
 
 ### `--cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif;`
@@ -41,17 +57,19 @@ Heading font default - SF Pro Text to match body text (tight scale headers
   Settings classes (New York / Georgia serif alternatives).
 
 
-### `--h1: 1.4em;`
+### `--h1: 1.5em;`
 
 
-Heading sizes/weights/line-heights - mode-independent. Colors stay in each
-  themed block (--h1-color..--h6-color). The --h1..--h6 token names are read
+Heading sizes and weights - mode-independent (line-heights moved to the
+  section 2 body rule, see above). Colors stay in each themed block
+  (--h1-color..--h6-color). The --h1..--h6 token names are read
   by both the theme's heading rules (reading view + Live Preview); keep these
   names (do NOT rename to --h*-size).
-  Design: tight, Notion-like scale. The inline title (1.6em/700) is the single
-  largest, heaviest anchor; H1 sits AT OR BELOW it so headings read as quiet
-  structure cohesive with body, not competing display type. Hierarchy comes
-  from size + a subtle color step; weight is UNIFORM (600) across H1-H6.
+  Design: moderate scale, 1.5 / 1.3 / 1.15 / 1.05 / 0.92 / 0.85em. H1 is
+  weight 700 and H2-H6 are 600, so H1 separates from H2 by weight as well
+  as size. H5 and H6 take the secondary text color (section 1) and read as
+  labels. The inline title is 1.2 times --h1 at weight 700, so it stays the
+  single largest anchor at every Heading scale setting.
 
 
 ### `--cn-panel-side-inset: 8px;`
@@ -75,13 +93,18 @@ Base palette. bg-primary lifted slightly off bg-secondary so the
   section 4b.
 
 
-### `--cn-bg-note-tray: #131313;`
+### `--cn-bg-note-tray: var(--cn-bg-primary);`
 
 
-Tray painted behind the note panel in section 4b. Needs to be
-  visibly different from --cn-bg-primary or the rounded corners
-  of the note read as the same color and look square. Sits a few
-  stops below the note so the note feels lifted on a darker base.
+Dark mode is one uniform surface: the tray (section 4b), the sidebar
+  boxes (--background-secondary) and the top bar (--titlebar-background)
+  all take the note color, --cn-bg-primary. The opaque look then matches
+  the translucent one, where every region already shows the same wash,
+  and no seams show in any tone. Floating surfaces (menus, dialogs, the
+  status pill) keep --cn-bg-secondary. The Lifted sidebar style sets its
+  own darker --background-secondary and tray values in the sidebar
+  contrast variants below. Light mode is unchanged (white note,
+  off-white sidebar and tray; section 1b).
 
 
 ### `--cn-inline-code: #ee6666;`
@@ -103,8 +126,32 @@ Inline code red: brightened from #eb5757 (4.40:1 on bg-tertiary, just
 
 
 Theme-aware tokens - flipped in .theme-light so shared rules below
-  (bold text, dividers, hover overlays, scrollbar, checkboxes, sidebar
+  (highlighted text, dividers, hover overlays, scrollbar, checkboxes, sidebar
   lifted tint) work correctly in both modes.
+
+
+### `--cn-hover-fill: rgba(255, 255, 255, 0.07);`
+
+
+State fills: translucent so hover and selected rows read on every tone.
+  --cn-hover-fill (0.07) and --cn-active-fill (0.12) feed
+  --background-modifier-hover and --background-modifier-active-hover in
+  the opaque mapping, the translucent dark mapping, and inside dialogs
+  and menus, so core's own row, tree-item, and menu states pick them up.
+  The theme also uses them directly for tabs, sidebar tab icons, the
+  Settings sidebar, and suggestion rows. Light mode uses the same alphas
+  on the warm near-black (55, 53, 47). Previously dark mode stepped to
+  opaque surfaces (--cn-bg-tertiary for hover, --cn-bg-elevated for
+  active).
+
+Other semantic tokens defined alongside:
+  - --cn-danger: destructive button fill (section 10).
+  - --cn-callout-default: the amber default callout color (section 8),
+    also mapped to core's --callout-default.
+  - --cn-tag-text: tag text, the accent mixed toward white in dark and
+    toward black in light (section 16).
+  - --cn-focus-glow: the 3px, 25%-accent ring shared by focused inputs
+    and properties fields (sections 10 and 17).
 
 
 ### `--cn-modal-backdrop: rgba(0, 0, 0, 0.65);`
@@ -144,7 +191,18 @@ Translucent surface over macOS vibrancy. Vibrancy comes from Obsidian's
 
 Default mapping (Translucent Window OFF or fullscreen): solid surfaces.
   Under .is-translucent the workspace layers are forced transparent in
-  section 4 so vibrancy shows through.
+  section 4 so vibrancy shows through. --background-secondary maps to
+  --cn-bg-primary in dark mode (the uniform surface, see the tray note
+  above).
+
+
+### `--code-tag: #ff6b70;`
+
+
+Core red (#fb464c) is 4.16:1 on the Slate code surface; lifted to
+  #ff6b70 for AA on tag and operator tokens. Core blue (#027aff) is
+  2.95:1 against its callout box on Slate, so info and todo callouts
+  use #1685ff. --callout-default follows --cn-callout-default.
 
 
 ### `--background-modifier-cover: var(--cn-modal-backdrop);`
@@ -157,9 +215,9 @@ Core paints these surfaces from its own variables; setting the
 ### `--h1-color: #ffffff;`
 
 
-Heading colors - mode-specific. Sizes/weights/line-heights are in :root.
-  ALL headings share one color (full white). Hierarchy is carried by size
-  alone; no color ramp.
+Heading colors - mode-specific. Sizes and weights are in :root.
+  H1-H4 share one color (full white). H5 and H6 use --cn-text-secondary
+  so they read as quiet section labels (section 3).
 
 
 ### `--inline-title-color: var(--h1-color);`
@@ -188,28 +246,33 @@ Notion light-mode palette - pure white canvas, warm near-black text,
   vibrancy in light mode). High contrast, no decoration.
 
 
-### `--cn-bg-note-tray: #d8d6d1;`
+### `--cn-bg-note-tray: var(--cn-bg-secondary);`
 
 
-Tray painted behind the note panel in section 4b. Sits a few stops
-  below the white note so the rounded corners of the leaf read against
-  a clearly different tone instead of disappearing into the canvas.
+Tray painted behind the note panel in section 4b. Tied to the box
+  surface (--cn-bg-secondary) so the light sidebar is flush: the white
+  note sits against the off-white sidebar and tray, with no grey seams
+  behind the sidebar boxes. Light mode keeps this two-tone layout; only
+  dark mode is a uniform surface. The Lifted style swaps in a darker
+  tray per tone.
 
 
-### `--cn-text-secondary: #666564;`
+### `--cn-text-secondary: #55544f;`
 
 
 Secondary text: was #787774 (4.48:1 on white, fails AA by 0.02 and drops
-  to 4.05:1 on the warm canvas). #666564 clears 4.5:1 on white, both
-  sidebars (default + warm + lifted), and bg-tertiary default. Borderline
-  4.43:1 on warm bg-tertiary, where text-secondary rarely lands.
+  to 4.05:1 on the warm canvas), then #666564. Retuned darker to #55544f
+  along with the faint tier below; H5/H6 and inactive tab titles now use
+  this tier.
 
 
-### `--cn-text-faint: #7d7c79;`
+### `--cn-text-faint: #656461;`
 
 
 Faint text: was #9b9a97 (2.81:1 on white, 2.54:1 on warm; below 3:1 UI
-  minimum). #7d7c79 clears 4:1 while keeping a "muted" feel.
+  minimum). Retuned to #656461 so small informational text stays
+  readable on every opaque tone. The two gray tones (Mist, Stone) set
+  their own darker faint value (#5b5b5b) in their tone blocks.
 
 
 ### `--cn-accent: #3a5fc7;`
@@ -263,12 +326,31 @@ Core paints these surfaces from its own variables; setting the
   variable is cleaner than overriding the rule with !important.
 
 
+### `--code-function: #795d00;`
+
+
+Core light syntax colors fall to 1.6-3.7:1 on the code surface; these
+  keep each hue and clear AA on every light tone. The callout and graph
+  colors that follow do the same at 3:1 against the callout box, which
+  gives light mode a darker callout palette than dark mode. Section 20
+  repeats both palettes for print.
+
+
+### `--tab-text-color: var(--cn-text-secondary);`
+
+
+Tab titles: faint text drops to 3.95:1 on the Lifted sidebar tray, so
+  light mode draws tab titles in the secondary tier (active titles in
+  the primary tier). .theme-light.cn-sidebar-lifted darkens them further
+  to #4a4945 (sidebar contrast variants below).
+
+
 ### `--h1-color: #37352f;`
 
 
-Heading colors - mode-specific. Sizes/weights/line-heights are in :root.
-  ALL headings share one color (near-black). Hierarchy is carried by size
-  alone; no color ramp.
+Heading colors - mode-specific. Sizes and weights are in :root.
+  H1-H4 share one color (near-black). H5 and H6 use --cn-text-secondary,
+  matching dark mode.
 
 
 ### `--inline-title-color: var(--h1-color);`
@@ -285,12 +367,12 @@ Charcoal is the default and lives in the base .theme-dark block above
 (no class rule). Only applies in dark mode; the light picker is separate.
 
 
-### `--cn-bg-note-tray: #050505;`
+### `--cn-bg-primary: #0d0d0d;`
 
 
-Tray must be darker than bg-primary so the note card reads as lifted on a
-  base. The .theme-dark default tray (#131313) is lighter than #0d0d0d,
-  inverting the hierarchy; #050505 restores it for the default Flat sidebar.
+Pure black no longer sets its own tray. Like every dark tone it inherits
+  the uniform surface from the base .theme-dark block, so the tray and
+  sidebar boxes match the #0d0d0d canvas.
 
 
 ### `.theme-dark.cn-bgd-zen {`
@@ -307,8 +389,8 @@ canvas to mirror Zen browser's layout. Borders/overlays use rgba so they adapt.
 
 Neutral gray tones - no warm or Zen hue, pure grayscale surfaces.
 Slate is a lighter, airier neutral; Graphite is a deeper neutral that sits
-between Charcoal and Pure black. The default Flat tray (#131313) stays darker
-than both canvases, so the note card still reads as lifted.
+between Charcoal and Pure black. As in every dark tone, the default tray
+and sidebar boxes take the canvas color (uniform surface).
 
 
 ### `--cn-bg-primary: #232323;`
@@ -322,9 +404,9 @@ Lighter neutral than Charcoal, but the code surface (--cn-bg-tertiary) is
 ### `.theme-dark.cn-bgd-trueblack {`
 
 
-True black: pure #000000 canvas for maximum OLED contrast. The tray cannot go
-darker than the canvas, so it matches at #000000 (seamless); the note card
-separates via --cn-bg-elevated and its border instead.
+True black: pure #000000 canvas for maximum OLED contrast. Sidebar and tray
+follow the pure-black canvas, as in every dark tone (uniform dark surface);
+the explicit tray override is gone.
 
 
 ### `.theme-light.cn-bgl-white {`
@@ -424,7 +506,9 @@ tray, which bypasses --background-secondary in opaque mode -- see section 4b).
 ### `.theme-dark.cn-sidebar-lifted.cn-bgd-black  { --background-secondary: #0a0a0a; --cn-bg-note-tray: #000000; }`
 
 
-Pure Black tray (#000000): one stop darker than default (#050505).
+Pure Black Lifted tray (#000000) sits below the #0d0d0d canvas, which the
+Flat default tray now matches. (The "#050505" default named in the
+stylesheet comment is out of date.)
 
 
 ### `.theme-dark.cn-sidebar-lifted.cn-bgd-trueblack { --background-secondary: #000000; --cn-bg-note-tray: #000000; }`
@@ -449,7 +533,17 @@ Same inner-edge-only rule for light mode.
 ### `.theme-light.cn-sidebar-lifted.cn-bgl-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }`
 
 
-Zen tray: one stop darker than default (#d8d6d1), with warm undertone to match Zen surfaces.
+Zen Lifted tray (#c8c5c0): darker than the Zen Lifted sidebar (#e6e3de), with
+warm undertone to match Zen surfaces. (The "#d8d6d1" default named in the
+stylesheet comment is out of date; the Flat light tray follows
+--cn-bg-secondary, #eeece8 on Zen.)
+
+
+### `.theme-light.cn-sidebar-lifted { --tab-text-color: #4a4945; }`
+
+
+Tab titles sit on the darker Lifted tray; keep them at the stronger gray
+(see --tab-text-color in section 1b).
 
 
 ### `body.is-translucent.theme-dark:not(.is-fullscreen).cn-sidebar-lifted .workspace-split.mod-left-split,`
@@ -481,15 +575,43 @@ bg-tone variants set that variable to the lifted hex.
 
 2. TYPOGRAPHY
 - UI chrome: Inter (Linear/Notion-style, slick + neutral)
-- Note content: SF Pro Text / Display (Apple's content-optimized stack)
+- Note content: SF Pro Text (Apple's content-optimized stack)
 - Code: SF Mono
 The UI font is overridable via the Style Settings "UI font" knob.
+The theme sets --font-interface-theme and --font-text-theme, but the
+body and note rules read core's --font-interface and --font-text, which
+run core's chain: the user's font setting in Settings > Appearance
+first, then the theme's font. A font chosen there therefore takes
+precedence over the theme's. Inline code reads --font-monospace-theme
+directly.
+
+
+### `--inline-title-size: calc(var(--h1) * 1.2);`
+
+
+Core defines the inline-title tokens and --h1..--h6-line-height on
+  body, so a :root value is shadowed; the theme overrides them here on
+  body. The inline title is 1.2 times --h1 (1.8em at the Comfortable
+  default), so it follows the Heading scale setting and stays larger
+  than H1.
+
+
+### `--link-decoration: none;`
+
+
+Links are underlined by the theme's own border-bottom (section 6).
+  Core's --link-decoration and --link-external-decoration (and their
+  hover forms) are set to none so internal and external links get one
+  underline, not two. --link-unresolved-opacity: 1 replaces core's 70%
+  fade, which fails AA; unresolved links are marked with a dashed
+  underline instead (section 6).
 
 
 ### `font-feature-settings: "calt", "ss01", "kern", "liga";`
 
 
-Inter looks best with calt + ss01 (single-storey 'a'), kern, liga
+Inter: calt, ss01 (open digits), kern, liga. Single-storey 'a' is cv11
+  (not enabled here).
 
 
 ### `body.cn-ui-inter      { --font-interface-theme: "Inter", -apple-system, system-ui, sans-serif; }`
@@ -526,18 +648,22 @@ beat BOTH the theme's and Obsidian core's heading-size rules (`.HyperMD-header-N
 `:not(.HyperMD-header)` guard lets the heading rules size header lines while
 normal lines still get the editor base size (which they also inherit from
 .cm-content). Confirmed against the running build via DevTools.
+Both this rule and the note-content rule above size text with
+calc(var(--font-text-size, 16px) * var(--cn-editor-font-size) / 16)
+(unitless slider, see section 0).
 
 
-## 3. HEADINGS - tight tracking, dramatic scale
+## 3. HEADINGS - moderate scale, H1 heavier, H5/H6 muted labels
 
 
 ### `.markdown-rendered h1, .markdown-rendered h2, .markdown-rendered h3,`
 
 
-3. HEADINGS - tight tracking, dramatic scale
+3. HEADINGS - moderate scale, H1 heavier, H5/H6 muted labels
 Font driven by --cn-heading-font (Style Settings knob, default SF Pro
-Display). Sizes driven by --h{n}-size variables (set in section 1).
-Both apply in reading mode and Live Preview.
+Text). Sizes and weights driven by the --h1..--h6 and --h{n}-weight
+tokens (section 0); line-heights by --h{n}-line-height (section 2 body
+rule). Both apply in reading mode and Live Preview.
 
 
 ### `.markdown-rendered h1, .markdown-rendered h2, .markdown-rendered h3,`
@@ -545,7 +671,7 @@ Both apply in reading mode and Live Preview.
 
 Tracking stays at 0 for the whole tight scale. The previous negative
 display-tracking on H1/H2 was for a 2.1em display face; on SF Pro Text at
-1.4em and below it reads cramped, so headers inherit the shared 0 tracking
+1.5em and below it reads cramped, so headers inherit the shared 0 tracking
 (H5/H6 open slightly below).
 
 
@@ -559,9 +685,17 @@ open tracking. Weight matches H4 (600) so the ramp never inverts.
 ### `.theme-dark.cn-headings-compact,`
 
 
-Heading scale variants - relative to the tight comfortable default.
-Compact pulls headers nearly flush with body; Large is the opt-in that may
-exceed the title.
+Heading scale variants - relative to the comfortable default.
+Compact pulls headers nearly flush with body; Large raises every level.
+The inline title scales with --h1, so it stays above H1 at every setting.
+
+
+### `body.cn-title-left .inline-title {`
+
+
+Style Settings: cn-title-align. The inline title is centered by default
+(text-align: center in the rule above); the Left option sets
+text-align: start.
 
 
 ## 4. WORKSPACE
@@ -578,6 +712,27 @@ exceed the title.
   applied via --workspace-background-translucent for legibility.
 - Reference: AnuPpuccin translucency.scss; Things obsidian.css; Catppuccin
   _app-variables.scss; Obsidian docs CSS variables.
+
+The active tab uses --cn-active-fill, the shared selected state
+(section 1).
+
+
+### `.mod-sidedock .workspace-tab-header-container .workspace-tab-header.is-active {`
+
+
+Sidebar tab icons: core paints the active one at (0,3,0); this rule
+matches it so the --cn-active-fill selected state applies there too,
+and drops core's box-shadow.
+
+
+### `.workspace-tab-header-container,`
+
+
+Tab-row underline: core draws a full-width rule under every tab header
+container and under the ribbon's top spacer
+(.workspace-ribbon.mod-primary::before). The border color goes
+transparent instead of removing the border, so the row height does not
+shift.
 
 
 ### `@media screen {`
@@ -646,9 +801,10 @@ Stacked tabs need an opaque fallback so text stays readable
 ### `body.is-translucent.theme-dark:not(.is-fullscreen) {`
 
 
-Translucent-mode hover/active states use theme-aware overlay tokens
-(rgba whites in dark) so they tint the vibrancy rather than punch
-opaque holes in it. Dark-only since light mode is opaque.
+Translucent-mode hover/active states use the same translucent state
+fills as the opaque mapping (--cn-hover-fill / --cn-active-fill, rgba
+whites in dark) so they tint the vibrancy rather than punch opaque
+holes in it. Dark-only since light mode is opaque.
 
 
 ### `body.is-translucent.theme-light .workspace-split.mod-left-split,`
@@ -677,25 +833,20 @@ bg-primary force-paint can collide with their own backgrounds.
 
 
 4b. NOTE PANEL - soft card edge against the sidebar
-The note pane in the main split rounds its top-left and
-bottom-left corners (where it meets the sidebar) so the
-boundary reads as a soft transition rather than a sharp
-90-degree seam. Right edges stay flat against the window.
+The soft edge between note and sidebar comes from the sidebar
+panes, which round their inside edge (rules below); the note
+leaf itself is square (see the note-panel entry below).
 
-Two requirements for the rounded edge to be visible:
-1. The parent area behind the leaf (workspace-tab-container)
-   must be painted with a contrasting tone so the rounded
-   corners reveal something different from the note. We use
-   --background-secondary (sidebar tone) so the rounded
-   note reads as a card sitting on the sidebar tray.
-2. The leaf-content must clip its children with overflow:
-   hidden, otherwise the .view-header above the note body
-   paints its own background over the rounded corners.
+The tray (--cn-bg-note-tray) paints the area those rounded
+corners reveal. In light mode it is --cn-bg-secondary, so the
+off-white sidebar and tray frame the white note. In dark mode
+it is --cn-bg-primary (section 1): note, sidebar boxes, and
+tray are one surface, and only the Lifted sidebar style sets a
+darker tray.
 
-The note also stays solid in dark translucent mode so the
-color difference reads cleanly. The tray behind it stays
-transparent in translucent mode so macOS vibrancy still
-shows through the chrome.
+In dark translucent mode the tab containers and the note leaf
+stay transparent so macOS vibrancy shows through one shared
+wash (rules below).
 
 
 ### `body:not(.is-mobile) .workspace-split.mod-root,`
@@ -782,21 +933,42 @@ set in the .theme-dark / .theme-light blocks.
 
 
 Links
+One underline for internal and external links: a 1px border-bottom
+at 30% of the accent. Core's text-decoration is switched off through
+the --link-decoration variables in section 2.
 
 
-### `strong, .cm-strong { color: var(--cn-strong-color); }`
+### `a.internal-link.is-unresolved,`
 
 
-Bold - color only; let font-weight cascade so bold inside an H1 (weight
-900) renders heavier than the surrounding heading rather than capping
-at 700. Body bold gets weight 700 from the user-agent default for <strong>.
-Color flips per theme via --cn-strong-color (#ffffff dark, #000 light).
+Unresolved links: dashed underline at full opacity. Core fades them
+to 70%, which fails AA; section 2 sets --link-unresolved-opacity: 1
+and the dashed style marks them instead.
+
+
+### `.callout a.internal-link,`
+
+
+Links inside callouts take the text color: the accent drops to about
+3.5:1 on a tinted callout box. The underline switches to currentColor
+and keeps them identifiable.
+
+
+### `.markdown-rendered strong, .cm-s-obsidian .cm-strong { color: inherit; }`
+
+
+Bold - color only; let font-weight cascade so bold inside an H1 renders
+heavier than the surrounding heading rather than capping at 700. Body
+bold gets weight 700 from the user-agent default for <strong>. Bold and
+italic inherit their color so links, callouts and plugin surfaces
+retain theirs; --cn-strong-color no longer colors bold text.
 
 
 ### `.markdown-rendered mark,`
 
 
-Native ==highlight== - soft amber, readable on dark
+Native ==highlight== - soft amber, readable on dark. Highlighted text
+uses --cn-strong-color (#ffffff dark, #37352f light).
 
 
 ## 7. CODE - scoped to markdown content (not plugin UIs)
@@ -810,13 +982,13 @@ mode and Live Preview both), set in the .theme-dark / .theme-light
 blocks. This rule only adds shape.
 
 
-## 8. CALLOUTS - boxed, highlight-style, amber default
+## 8. CALLOUTS - tinted card with a thin border, amber default
 
 
 ### `.callout[data-callout="note"],`
 
 
-8. CALLOUTS - boxed, highlight-style, amber default
+8. CALLOUTS - tinted card with a thin border, amber default
 Obsidian 1.13.0 changed --callout-color from an RGB triplet to a
 valid CSS color (breaking change). Each callout type now sets its
 own --callout-color as a color (a hex, rgb(), or color var), so we
@@ -829,7 +1001,10 @@ default callout reads as a yellow highlight, not a blue note.
 
 
 Override default note callout color from Obsidian's blue to amber.
-Valid CSS color per the 1.13 contract (#eab308 == old triplet 234, 179, 8).
+Valid CSS color per the 1.13 contract. The color comes from
+--cn-callout-default: #eab308 in dark (== old triplet 234, 179, 8),
+#8a6100 in light and print. Core's --callout-default is mapped to the
+same token in both themed blocks.
 
 
 ### `.callout {`
@@ -845,6 +1020,11 @@ per-type --callout-color. On Obsidian 1.13+ --callout-color is a valid CSS
 color, so color-mix resolves reliably (the earlier collapse-to-transparent
 was the pre-1.13 RGB-triplet form nested inside color-mix, not color-mix
 itself). Per-type colors and Callout Manager customizations flow through.
+The card has a 1px border at 32% of the callout color on all four
+sides and no left bar (the former 3px left border is gone). Light mode
+defines a darker per-type palette (section 1b), and section 20 applies
+the same palette in print. Links inside callouts take the text color
+(section 6).
 
 
 ## 9. BLOCKQUOTES & DIVIDERS
@@ -873,27 +1053,52 @@ only; the `background` shorthand would reset background-repeat to `repeat`
 and tile the chevron across the select.
 
 
+### `.modal input:focus,`
+
+
+Focus: the border turns accent and --cn-focus-glow adds a 3px ring
+at 25% of the accent. Properties fields (section 17) share the same
+glow.
+
+
+### `.modal button.mod-warning,`
+
+
+Destructive buttons paint --cn-danger (#d93a3a dark, #a8201a light)
+with white text; hover mixes it 85% with black.
+
+
 ### `.modal,`
 
 
 Modals - restore opaque variables inside dialogs so any internal
 Obsidian rule that paints with --background-primary/-secondary gets a
 solid surface. Wins over the .theme-dark/.theme-light variable blocks
-by equal specificity + later source order.
+by equal specificity + later source order. This keeps
+--background-secondary on --cn-bg-secondary inside dialogs and menus
+even though dark mode maps it to --cn-bg-primary elsewhere; hover and
+active map to the state fills (section 1).
 
 
-### `border-radius: 18px;`
+### `border-radius: var(--cn-radius-xl);`
 
 
-18px radius: chunkier than --cn-radius-lg (12px) without going
-  full Velocity (22px). Authoritative value -- the section 19b
-  duplicate override has been removed.
+XL radius (16px): one step above --cn-radius-lg (12px) on the radius
+  scale (section 0). Authoritative value; section 19b no longer
+  overrides it.
 
 
 ### `.modal-content,`
 
 
 Inner surfaces of the Settings dialog and other multi-pane modals
+
+
+### `body:not(.is-phone) .vertical-tab-nav-item.is-active,`
+
+
+The selected Settings sidebar item uses --cn-active-fill, the same
+selected state as rows and tabs.
 
 
 ### `.modal-bg {`
@@ -917,11 +1122,11 @@ var(--cn-heading-font) follows the Style Settings heading font knob
 Suggestion menu (cmd-P, file switcher)
 
 
-### `border-radius: 14px;`
+### `border-radius: var(--cn-radius-lg);`
 
 
-14px radius: matches the section 19b chrome model. Authoritative
-  value -- the section 19b duplicate override has been removed.
+LG radius (12px): shared with the section 19b chrome boxes.
+  Authoritative value; section 19b no longer overrides it.
 
 
 ### `box-shadow: 0 8px 32px var(--cn-modal-shadow);`
@@ -930,6 +1135,18 @@ Suggestion menu (cmd-P, file switcher)
 Per-theme shadow alpha (heavy in dark, soft in light) so popovers
   match the rest of the modal chrome and don't drop a heavy black
   shadow over a light canvas.
+
+
+### `.menu { --background-modifier-hover: var(--cn-active-fill); }`
+
+
+Keyboard selection. Core paints menu hover and keyboard selection from
+--background-modifier-hover at (0,4,0), so the theme drives it through
+the variable on .menu (the 12 percent --cn-active-fill) instead of
+fighting the rule. Selected suggestion rows get the same fill, and in
+the command palette and quick switcher (.prompt) a 3px leading accent
+bar marks the selected row. This replaces the earlier 2px gray outline
+and its --cn-selection-border token, both removed.
 
 
 ## 12. TABLES
@@ -971,7 +1188,15 @@ plugin (.obsidian/plugins/scrollbar-on-scroll), which toggles the
 14. STATUS BAR - floating pill, bottom-right
 Detached from the bottom edge so it reads as a free-floating
 chip in the same idiom as the file-explorer action-icon row.
-Sizes to fit its contents.
+Sizes to fit its contents. Kept on --cn-bg-secondary, so in dark
+mode it stays a floating surface above the uniform canvas.
+
+
+### `body:not(.is-mobile) .status-bar .status-bar-item {`
+
+
+Compact pill: 0.72em text with 2px 8px padding on the pill, a 1.2
+line box on each item, and 13px icons keep it about 22px tall.
 
 
 ### `.sync-status-icon.mod-working {`
@@ -1043,13 +1268,16 @@ Pill styling for tags rendered inline in markdown content (a.tag, .tag,
 CodeMirror 5 era class that no longer matches modern Obsidian's tag
 pane, and it collided with the .tree-item-self.is-active rule,
 causing a jarring fill/overlay swap on click.
+.tag:not(.token) keeps Prism's `.token.tag` spans in code blocks out
+of the pill. Tag text uses --cn-tag-text (section 1), and the radius
+is --cn-radius-pill.
 
 
 ### `.cm-hashtag-begin, .cm-hashtag-end {`
 
 
 Live Preview hashtag - keep it inline (no pill) so writing flow isn't disrupted;
-accent color only.
+tag text color (--cn-tag-text) only.
 
 
 ## 17. PROPERTIES / FRONTMATTER PANEL
@@ -1061,6 +1289,8 @@ accent color only.
 17. PROPERTIES / FRONTMATTER PANEL
 The metadata editor at the top of notes - used for frontmatter keys
 like tags, aliases, dates. Minimal, blends into the translucent surface.
+Focused property values use the same --cn-focus-glow ring as inputs
+(section 10) in place of the earlier 2px outline.
 
 
 ## 18. FOCUS INDICATORS - keyboard accessibility
@@ -1077,7 +1307,7 @@ so we don't pollute the visual when clicking around.
 ## 19. QUALITY-OF-LIFE - Velocity-inspired refinements
 
 
-### `.mod-left-split .workspace-tab-header-container-inner,`
+### `:is(.mod-left-split, .mod-primary-split) .workspace-tab-header-container-inner,`
 
 
 19. QUALITY-OF-LIFE - Velocity-inspired refinements
@@ -1092,8 +1322,8 @@ so we don't pollute the visual when clicking around.
      - Apple continuous corners on all rounded surfaces
      - Pill-shaped clickable icons (ribbon, sidebar, FABs)
      - Top-right window controls (chevron + sidebar toggle)
-     - Top-bar tab pills (bordered pill, 32px, radius 10px)
-     - Sidebar tab chips (larger pill, 34px, radius 14px)
+     - Top-bar tab pills (32px, radius 8px; border on the active tab only)
+     - Sidebar tab chips (larger pill, 34px, radius 12px)
      - Vault profile / vault switcher pill
      - View-header right-side action FABs
      - Status bar items
@@ -1101,7 +1331,7 @@ so we don't pollute the visual when clicking around.
      - Ribbon box, folder panel box, vault-profile pseudo box
 
 
-### `.mod-left-split .workspace-tab-header-container-inner,`
+### `:is(.mod-left-split, .mod-primary-split) .workspace-tab-header-container-inner,`
 
 
 --- Centered sidebar tab icons ---
@@ -1190,9 +1420,10 @@ typography. Targets: top tab bar, ribbon icons, sidebar
 toggles, view-header action icons, vault profile, status
 bar, modals/menus.
 Notes:
-  - All radii are literal pixel values so they don't bleed
-    into editor content via the global --radius-* tokens
-    (which Cognia Noir keeps at the small Notion scale).
+  - Radii come from the section 0 scale (--cn-radius 8px,
+    --cn-radius-lg 12px, --cn-radius-pill) rather than
+    literal pixel values; the tab inner uses
+    calc(var(--cn-radius) - 2px).
   - Continuous (squircle) corners on rounded surfaces are set
     with two properties paired together: the standard CSS
     `corner-shape: squircle` (Obsidian 1.12+, which dropped the
@@ -1244,17 +1475,17 @@ the reference design. Round the inner icons consistently.
 
 
 --- Top-bar tab pills ---
-Bordered rounded rectangles, always visible, with min-height
-for body. Active and hover states get a brighter overlay.
-Cognia Noir's existing transparent-until-active behavior is
-replaced with a faint persistent outline so the tabs read as
-discrete pills (matches the reference screenshot).
+Rounded rectangles with min-height for body. Inactive tabs
+have no resting border (a transparent 1px border holds the
+size); hover adds --cn-hover-fill, and the active tab gets
+--cn-active-fill plus a subtle --cn-border-subtle border.
+The earlier faint persistent outline on every tab is gone.
 
 Mobile scope decision (locked v1.9.9, do not relitigate):
 guarded with :not(.is-phone), NOT :not(.is-mobile). iPad
 carries .is-mobile but not .is-phone in Obsidian's body
 classes, so this selector intentionally treats iPad as
-desktop and gives it the bordered pill chrome. Rationale:
+desktop and gives it the pill chrome. Rationale:
 iPad with an external keyboard / Magic Keyboard runs
 Obsidian as a near-desktop experience and the desktop
 chrome reads better than the iOS-native compact tabs.
@@ -1271,7 +1502,7 @@ ever revisited.
 
 Hide Obsidian's default tab "ear" pseudo-elements that paint
 the curved bottom-corner connectors between an active tab and
-the bar below it. With our bordered-pill style the tab is a
+the bar below it. With our pill style the tab is a
 self-contained shape, so those pseudos render as detached
 small circles at the bottom-left/bottom-right of the active
 tab. Scope to the same selector chain as the pill rules so
@@ -1282,7 +1513,8 @@ stock styling stays intact wherever pills don't apply.
 
 
 Inner of the tab keeps its own rounding so the close button
-region clips correctly. Removes the section 4 small radius.
+region clips correctly. Replaces the section 4 small radius with
+calc(var(--cn-radius) - 2px), 6px.
 
 
 ### `body:not(.is-phone) .workspace-tab-header-new-tab {`
@@ -1301,7 +1533,7 @@ sidebar tab strip. iPad gets the desktop look (is-phone guard)
 to match the rest of section 19b.
 
 
-### `.workspace-split.mod-left-split > .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher {`
+### `.workspace-split:is(.mod-left-split, .mod-primary-split) > .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher {`
 
 
 --- Vault profile / vault switcher (bottom-left) ---
@@ -1314,8 +1546,10 @@ as a single pill button.
 
 --- View-header right-side action icons ---
 In the reference, the "+" and reading-mode toggle (the
-round "60"/glasses icon) are circular FAB-style buttons
-with a faint border. Apply to non-bookmark view-actions
+round "60"/glasses icon) are circular FAB-style buttons.
+They have no resting border (a transparent 1px border holds
+the size); --cn-border-subtle appears on hover. Apply to
+non-bookmark view-actions
 icons in markdown leaves only - the bookmark star stays a
 regular pill so it doesn't visually compete.
 
@@ -1333,26 +1567,26 @@ the action icons left again. Scoped to non-phone in line with
 the FAB rule above -- mobile uses native iOS spacing.
 
 
-### `body:not(.is-phone) .mod-root .view-header-title-container .view-header-title {`
+### `body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"] .view-header-title-container {`
 
 
-Hide the centered .view-header-title text. With pill tabs
-(which already show the file name) AND the inline-title at
-the top of the note body (large bold), the view-header's
-small centered title is a third redundant copy of the same
-string. The view-header itself stays in the layout so the
-right-side action icons (the FAB rule above) keep their
-container; only the title text is suppressed. mod-root scope
-keeps sidebar leaf headers (search, outline, etc.) untouched
-in case any of those rely on a title to identify the leaf.
+Native header titles and rename controls are preserved in every
+view by default; the earlier always-on rule that hid the centered
+title is gone.
 
-visibility:hidden (NOT display:none) on the inner title is
-load-bearing: the .view-header-title-container element carries
-flex:1 in Obsidian's stock layout and acts as the spacer that
-pushes .view-actions to the right edge. Collapsing the
-container with display:none lets .view-actions slide flush
-left, which is the bug v1.10.3 fixed. Keep this rule targeting
-the inner .view-header-title only.
+Opt-in exception (Style Settings: cn-hide-header-title, off by
+default): hide the header title next to the back and forward
+arrows in Markdown notes, but only while Obsidian's "Show inline
+title" is on (body.show-inline-title), so the title stays visible
+in the tab and at the top of the note. Core does the same on
+phones.
+
+visibility:hidden (NOT display:none) is load-bearing: the
+.view-header-title-container element carries flex:1 in Obsidian's
+stock layout and acts as the spacer that pushes .view-actions to
+the right edge. Collapsing the container with display:none lets
+.view-actions slide flush left, which is the bug v1.10.3 fixed.
+visibility keeps the header layout in place.
 
 
 ### `.status-bar-item.mod-clickable {`
@@ -1367,12 +1601,13 @@ This block only styles the clickable items inside.
 
 
 --- Popover / tooltip corner radius ---
-Modal (18px) and suggestion-container/menu (14px) radii are set
-directly in section 10 where those elements are first defined.
-Popovers and tooltips aren't in section 10 so they stay here.
+Modal (16px, --cn-radius-xl) and suggestion-container/menu (12px,
+--cn-radius-lg) radii are set directly in section 10 where those
+elements are first defined. Popovers and tooltips aren't in section
+10 so they stay here, at --cn-radius (8px).
 
 
-### `body:not(.is-phone) .workspace-ribbon.mod-left {`
+### `body:not(.is-phone) .workspace-ribbon:is(.mod-left, .mod-primary) {`
 
 
 --- Ribbon, folder, and vault-profile boxes ---
@@ -1409,7 +1644,15 @@ Load-bearing per v1.8.6: without these the ribbon container
   intrinsic content height by default.
 
 
-### `body:not(.is-phone) .workspace-ribbon.mod-left.is-collapsed {`
+### `transition: margin-right var(--cn-transition);`
+
+
+The collapsed variant below changes margin-right by 4px.
+  Animating it with the theme's transition token keeps the note
+  from jumping 4px against the sidebar's own open/close motion.
+
+
+### `body:not(.is-phone) .workspace-ribbon:is(.mod-left, .mod-primary).is-collapsed {`
 
 
 When the left sidebar is collapsed only the ribbon box shows,
@@ -1419,7 +1662,7 @@ in the collapsed state only; expanded layout keeps 4px because the
 file-explorer panel box already supplies the gap on that side.
 
 
-### `body.mod-macos.is-hidden-frameless:not(.is-phone) .workspace-ribbon.mod-left {`
+### `body.mod-macos.is-hidden-frameless:not(.is-phone):not(.is-fullscreen) .workspace-ribbon:is(.mod-left, .mod-primary) {`
 
 
 macOS frameless: bump the ribbon top so the box clears the
@@ -1493,7 +1736,7 @@ Suppress the top border core reintroduced in Obsidian 1.12
   core, wins by source order, so no !important is needed.
 
 
-### `.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle {`
+### `.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle:not(.is-active) {`
 
 
 v1.10.10  Removed the rule that hid hr.workspace-leaf-resize-handle
@@ -1506,7 +1749,7 @@ not appear in the current DOM; if it returns, scope by a more
 specific selector that excludes the boundary handle.
 
 
-### `.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle {`
+### `.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle:not(.is-active) {`
 
 
 v1.10.23  Vault-profile top-border suppression moved into the
@@ -1519,7 +1762,7 @@ removed; the suppression now lives where it can win on
 specificity + source order without !important.
 
 
-### `.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle {`
+### `.theme-dark .workspace-split.mod-root .workspace-leaf-resize-handle:not(.is-active) {`
 
 
 v1.10.15  Split-pane resize divider visibility.
@@ -1534,6 +1777,23 @@ hardcoded #b8b8bb (dark) / #888888 (light). Using pure --cn-divider
 at ~2:1 contrast, below the 3:1 interactive-element minimum.
 
 
+### `.theme-dark .workspace-split:is(.mod-left-split, .mod-primary-split) .workspace-leaf-resize-handle:not(.is-active),`
+
+
+Dividers inside the sidebars stay faint (0.09 white in dark, 0.11
+warm near-black in light) and strengthen on hover (0.24 / 0.30).
+
+
+### `.workspace-split:is(.mod-left-split, .mod-primary-split) > .workspace-leaf-resize-handle:not(.is-active):not(:hover),`
+
+
+The sidebar's own outer edge (the handle that is a direct child of
+the split) is invisible at rest and appears on hover, where the
+sidebar hover rule above colors it. Only the border color goes
+transparent; the handle stays in the layout, because display:none
+killed the drag in v1.9.x (see the v1.10.10 note above).
+
+
 ## 20. PRINT / PDF EXPORT
 
 
@@ -1543,13 +1803,23 @@ at ~2:1 contrast, below the 3:1 interactive-element minimum.
 20. PRINT / PDF EXPORT
 The workspace-transparency rules in section 4 are scoped to
 @media screen, so print/PDF export inherits opaque surfaces with
-no override needed here. This block only strips decorative chrome.
+no override needed here. This block strips decorative chrome and
+sets print colors (below).
 
 
 ### `.modal, .suggestion-container, .menu { box-shadow: none; }`
 
 
 Drop shadows and decorative blur in print
+
+
+### `body.theme-dark.theme-dark.theme-dark,`
+
+
+Out-specify tone presets, grayscale and generated color settings.
+Print repeats the light-mode code syntax, callout, and graph palettes
+from section 1b, and sets print values for --cn-tag-text and
+--cn-callout-default.
 
 
 ## 21. MOBILE - settings card contrast, button visibility,
@@ -1564,8 +1834,7 @@ On iPhone, Obsidian groups the Settings screen content into
 stacked cards (Account, Catalyst license, Help, etc.) that
 paint with --background-secondary. In dark mode our --cn-bg-
 primary (#1d1d1d) and --cn-bg-secondary sit only ~3-8 units
-apart (intentional for desktop note-vs-tab-tray tone), which
-makes the cards nearly indistinguishable from the page. Light
+apart, which makes the cards nearly indistinguishable from the page. Light
 mode is unaffected because the equivalent values are far
 enough apart and stock iOS Obsidian renders them as crisp
 white cards.

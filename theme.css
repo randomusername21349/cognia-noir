@@ -2,17 +2,17 @@
    Notion-inspired, minimal. SF Pro typography. Dark and light modes.
    True macOS vibrancy when Obsidian's "Translucent window" is on, via the
    `body.is-translucent:not(.is-fullscreen)` pattern (workspace layers go
-   transparent so the NSVisualEffectView shows through). Light mode uses a
-   white wash over vibrancy; dark mode uses a black wash.
+   transparent so the NSVisualEffectView shows through). Dark mode paints a
+   wash over the vibrancy; light mode stays opaque.
    Plugin-safe: workspace leaves for Excalidraw and Smart Connections (the
    related-notes view, data-type="smart-connections-view") are opted out of
    the translucent leaf-content force-paint, plus core Canvas as a defensive
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.33 (Independent-review fixes: stacked translucent panes, destructive
-            buttons, keyboard selection, native titles, editor settings, focus,
-            current/legacy sidebar selectors, task ticks, and print colors.
+   v1.10.34 (Design pass: state fills, heading and text hierarchy, radius scale,
+            uniform dark surface, callout and link cleanup, grouped settings,
+            and independent-audit fixes.
             Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
@@ -49,7 +49,7 @@ id: cognia-noir
 settings:
   -
     id: cn-look
-    title: Look and feel
+    title: Color
     type: heading
     level: 2
     collapsed: false
@@ -77,6 +77,18 @@ settings:
     format: hex
     default-dark: '#ee6666'
     default-light: '#a8201a'
+  -
+    id: cn-grayscale
+    title: Grayscale UI
+    description: Desaturate the theme's colors (accent, links, callouts, tags, highlight, inline code, status) so the interface reads as pure black and white. Note images and code syntax highlighting keep their color.
+    type: class-toggle
+    default: false
+  -
+    id: cn-h-surfaces
+    title: Surfaces
+    type: heading
+    level: 2
+    collapsed: false
   -
     id: cn-bg-tone-dark
     title: Dark mode background
@@ -166,6 +178,12 @@ settings:
         value: cn-translucent-heavy
         label: Heavy
   -
+    id: cn-h-typography
+    title: Typography
+    type: heading
+    level: 2
+    collapsed: false
+  -
     id: cn-heading-scale
     title: Heading scale
     type: class-select
@@ -183,12 +201,13 @@ settings:
   -
     id: cn-editor-font-size
     title: Editor font size
+    description: Note text size in pixels when Obsidian's own font size is at its default of 16. Obsidian's font size setting and zoom scale it from there.
     type: variable-number-slider
     default: 14
     min: 12
     max: 20
     step: 1
-    format: 'px'
+    format: ''
   -
     id: cn-ui-font
     title: UI font
@@ -241,6 +260,19 @@ settings:
         value: cn-heading-georgia
         label: Georgia (classic serif)
   -
+    id: cn-title-align
+    title: Note title alignment
+    description: Alignment of the note title shown at the top of each note.
+    type: class-select
+    default: cn-title-center
+    options:
+      -
+        value: cn-title-center
+        label: Centered (default)
+      -
+        value: cn-title-left
+        label: Left
+  -
     id: cn-note-line-height
     title: Note line height
     description: Line spacing for note content. 1.65 is the default comfortable reading density.
@@ -250,6 +282,12 @@ settings:
     max: 2.0
     step: 0.05
     format: ''
+  -
+    id: cn-h-layout
+    title: Layout
+    type: heading
+    level: 2
+    collapsed: false
   -
     id: file-line-width
     title: Line width
@@ -267,9 +305,9 @@ settings:
     type: class-toggle
     default: true
   -
-    id: cn-grayscale
-    title: Grayscale UI
-    description: Desaturate the theme's colors (accent, links, callouts, tags, highlight, inline code, status) so the interface reads as pure black and white. Note images and code syntax highlighting keep their color.
+    id: cn-hide-header-title
+    title: Hide header title
+    description: Hides the note title next to the back and forward arrows in Markdown notes. Applies only while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note.
     type: class-toggle
     default: false
 */
@@ -280,39 +318,36 @@ settings:
 :root {
   --cn-radius: 8px;
   --cn-radius-lg: 12px;
+  --cn-radius-xl: 16px;
+  --cn-radius-pill: 999px;
+  /* Radius scale: 4 (--radius-s), 8, 12, 16, pill. Micro radii (2px mark, */
+  /* 6px scrollbar thumb) stay literal. */
   --cn-transition: 150ms cubic-bezier(0.2, 0, 0.2, 1);
   --cn-transition-fast: 100ms ease-out;
   --radius-s: 4px;
   --radius-m: var(--cn-radius);
   --radius-l: var(--cn-radius-lg);
-  /* Inline title - size/weight/line-height are mode-independent. */
-  --inline-title-size: 1.6em;
-  --inline-title-weight: 700;
-  --inline-title-line-height: 1.2;
-  /* Editor font size and line height - driven by Style Settings sliders. */
-  --cn-editor-font-size: 14px;
+  /* Inline title tokens and heading line-heights are set on body (section 2): */
+  /* core defines them on body, which shadows any :root value. */
+  /* Editor font size (unitless: pixels at Obsidian's default 16px text size) */
+  /* and line height - driven by Style Settings sliders. */
+  --cn-editor-font-size: 14;
   --cn-note-line-height: 1.65;
   /* Heading font default - SF Pro Text to match body text (tight scale headers */
   --cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
-  /* Heading sizes/weights/line-heights - mode-independent. Colors stay in each */
-  --h1: 1.4em;
-  --h2: 1.25em;
-  --h3: 1.12em;
-  --h4: 1.02em;
+  /* Heading sizes and weights - mode-independent. Colors stay in each */
+  --h1: 1.5em;
+  --h2: 1.3em;
+  --h3: 1.15em;
+  --h4: 1.05em;
   --h5: 0.92em;
   --h6: 0.85em;
-  --h1-weight: 600;
+  --h1-weight: 700;
   --h2-weight: 600;
   --h3-weight: 600;
   --h4-weight: 600;
   --h5-weight: 600;
   --h6-weight: 600;
-  --h1-line-height: 1.3;
-  --h2-line-height: 1.3;
-  --h3-line-height: 1.3;
-  --h4-line-height: 1.35;
-  --h5-line-height: 1.4;
-  --h6-line-height: 1.4;
   /* Shared horizontal inset for sidebar panel boxes (folder box, */
   --cn-panel-side-inset: 8px;
 }
@@ -326,18 +361,16 @@ settings:
   --cn-bg-secondary: #202020;
   --cn-bg-tertiary: #252525;
   --cn-bg-elevated: #282828;
-  /* Tray painted behind the note panel (4b) and behind the sidebar floating */
-  /* boxes. The boxes ARE painted --background-secondary (= --cn-bg-secondary), */
-  /* so tie the tray to that same variable: the tray then equals the box in */
-  /* EVERY dark tone (hue-preserved), instead of a fixed value that only fit one */
-  /* tone. Keeps the seams flush-grey across charcoal/slate/graphite/warm/zen. */
-  /* (Obsidian 1.13.3 widened the gaps; the old fixed #131313 read as harsh */
-  /* black seams. Black / True Black keep their explicit OLED overrides below.) */
-  --cn-bg-note-tray: var(--cn-bg-secondary);
+  /* Dark mode is one uniform surface: the tray, the sidebar boxes */
+  /* (--background-secondary) and the top bar all take the note color, so the */
+  /* opaque look matches the translucent one and no seams show in any tone. */
+  /* Floating surfaces (menus, dialogs, status pill) keep --cn-bg-secondary. */
+  /* The Lifted sidebar style sets its own darker values further down. */
+  --cn-bg-note-tray: var(--cn-bg-primary);
   --cn-border-subtle: rgba(255, 255, 255, 0.06);
   --cn-border-strong: rgba(255, 255, 255, 0.10);
   --cn-text-primary: #e8e8e8;
-  --cn-text-secondary: rgba(255, 255, 255, 0.65);
+  --cn-text-secondary: rgba(255, 255, 255, 0.72);
   --cn-text-faint: rgba(255, 255, 255, 0.55);
   --cn-accent: #5b8def;
   --cn-accent-hover: color-mix(in srgb, var(--cn-accent) 80%, white);
@@ -351,6 +384,13 @@ settings:
   --cn-soft-overlay: rgba(255, 255, 255, 0.05);
   --cn-medium-overlay: rgba(255, 255, 255, 0.09);
   --cn-strong-overlay: rgba(255, 255, 255, 0.15);
+  /* State fills: translucent so hover/selected rows read on every tone. */
+  --cn-hover-fill: rgba(255, 255, 255, 0.07);
+  --cn-active-fill: rgba(255, 255, 255, 0.12);
+  --cn-danger: #d93a3a;
+  --cn-callout-default: #eab308;
+  --cn-tag-text: color-mix(in srgb, var(--cn-accent) 85%, white);
+  --cn-focus-glow: 0 0 0 3px color-mix(in srgb, var(--cn-accent) 25%, transparent);
   --cn-checkbox-fill: rgba(255, 255, 255, 0.92);
   --cn-checkbox-check: #1a1a1a;
   --cn-checkbox-border: #858585;
@@ -370,21 +410,28 @@ settings:
   /* Default mapping (Translucent Window OFF or fullscreen): solid surfaces. */
   --background-primary: var(--cn-bg-primary);
   --background-primary-alt: var(--cn-bg-secondary);
-  --background-secondary: var(--cn-bg-secondary);
+  --background-secondary: var(--cn-bg-primary);
   --background-secondary-alt: var(--cn-bg-tertiary);
   --background-modifier-border: var(--cn-border-subtle);
   --background-modifier-border-hover: var(--cn-border-strong);
   --divider-color: var(--cn-divider);
   --divider-color-hover: rgba(255, 255, 255, 0.42);
   --background-modifier-border-focus: var(--cn-accent);
-  --background-modifier-hover: var(--cn-bg-tertiary);
-  --background-modifier-active-hover: var(--cn-bg-elevated);
+  --background-modifier-hover: var(--cn-hover-fill);
+  --background-modifier-active-hover: var(--cn-active-fill);
   --background-modifier-form-field: var(--cn-bg-tertiary);
   /* Core paints these surfaces from its own variables; setting the */
   --background-modifier-cover: var(--cn-modal-backdrop);
   --nav-item-background-active: var(--background-modifier-active-hover);
   --nav-item-color-active: var(--cn-text-primary);
   --code-background: var(--cn-bg-tertiary);
+  /* Core red (#fb464c) is 4.16:1 on the Slate code surface; lifted for AA. */
+  --code-tag: #ff6b70;
+  --code-operator: #ff6b70;
+  /* Core blue (#027aff) is 2.95:1 against its callout box on Slate. */
+  --callout-info: #1685ff;
+  --callout-todo: #1685ff;
+  --callout-default: var(--cn-callout-default);
   --scrollbar-thumb-bg: var(--cn-medium-overlay);
   --scrollbar-active-thumb-bg: var(--cn-strong-overlay);
 
@@ -404,23 +451,22 @@ settings:
   --checklist-done-color: var(--cn-text-faint);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading colors - mode-specific. Sizes/weights/line-heights are in :root. */
+  /* Heading colors - mode-specific. Sizes and weights are in :root; line-heights on body. */
   --h1-color: #ffffff;
   --h2-color: #ffffff;
   --h3-color: #ffffff;
   --h4-color: #ffffff;
-  --h5-color: #ffffff;
-  --h6-color: #ffffff;
+  --h5-color: var(--cn-text-secondary);
+  --h6-color: var(--cn-text-secondary);
 
-  /* size / weight / line-height are in :root (mode-independent) */
+  /* inline-title size, weight and line-height are set on body (section 2) */
   --inline-title-color: var(--h1-color);
 
   --tab-background-active: var(--cn-bg-primary);
   --tab-text-color-focused-active: var(--cn-text-primary);
   --tab-outline-color: var(--cn-border-subtle);
-  --titlebar-background: var(--cn-bg-secondary);
-  --titlebar-background-focused: var(--cn-bg-secondary);
-  --cn-selection-border: #a0a0a0;
+  --titlebar-background: var(--cn-bg-primary);
+  --titlebar-background-focused: var(--cn-bg-primary);
   --h1-size: var(--h1);
   --h1-font: var(--cn-heading-font);
   --h2-size: var(--h2);
@@ -451,9 +497,9 @@ settings:
   --cn-border-strong: rgba(55, 53, 47, 0.16);
   --cn-text-primary: #37352f;
   /* Secondary text: was #787774 (4.48:1 on white, fails AA by 0.02 and drops */
-  --cn-text-secondary: #666564;
+  --cn-text-secondary: #55544f;
   /* Small informational text stays readable on every opaque tone. */
-  --cn-text-faint: #5b5b5b;
+  --cn-text-faint: #656461;
   /* Accent darkened for light mode: #5b8def yields 3.23:1 on white (link */
   --cn-accent: #3a5fc7;
   --cn-accent-hover: color-mix(in srgb, var(--cn-accent) 80%, black);
@@ -466,6 +512,13 @@ settings:
   --cn-soft-overlay: rgba(55, 53, 47, 0.06);
   --cn-medium-overlay: rgba(55, 53, 47, 0.10);
   --cn-strong-overlay: rgba(55, 53, 47, 0.18);
+  /* State fills: translucent so hover/selected rows read on every tone. */
+  --cn-hover-fill: rgba(55, 53, 47, 0.07);
+  --cn-active-fill: rgba(55, 53, 47, 0.12);
+  --cn-danger: #a8201a;
+  --cn-callout-default: #8a6100;
+  --cn-tag-text: color-mix(in srgb, var(--cn-accent) 90%, black);
+  --cn-focus-glow: 0 0 0 3px color-mix(in srgb, var(--cn-accent) 25%, transparent);
   --cn-checkbox-fill: #37352f;
   --cn-checkbox-check: #ffffff;
   --cn-checkbox-border: #707070;
@@ -491,14 +544,45 @@ settings:
   --divider-color: var(--cn-divider);
   --divider-color-hover: rgba(55, 53, 47, 0.38);
   --background-modifier-border-focus: var(--cn-accent);
-  --background-modifier-hover: var(--cn-soft-overlay);
-  --background-modifier-active-hover: var(--cn-medium-overlay);
+  --background-modifier-hover: var(--cn-hover-fill);
+  --background-modifier-active-hover: var(--cn-active-fill);
   --background-modifier-form-field: #ffffff;
   /* Core paints these surfaces from its own variables; setting the */
   --background-modifier-cover: var(--cn-modal-backdrop);
   --nav-item-background-active: var(--background-modifier-active-hover);
   --nav-item-color-active: var(--cn-text-primary);
   --code-background: var(--cn-bg-tertiary);
+  /* Core light syntax colors fall to 1.6-3.7:1 on the code surface; these */
+  /* keep each hue and clear AA on every light tone. */
+  --code-function: #795d00;
+  --code-keyword: #ad2e6b;
+  --code-string: #057130;
+  --code-value: #6847cf;
+  --code-tag: #b82738;
+  --code-operator: #b82738;
+  --code-property: #006d6b;
+  --code-important: #994c00;
+  /* Core callout and graph colors fall below 3:1 on light surfaces; these */
+  /* keep each hue and clear 3:1 against the callout box on every light tone. */
+  --callout-bug: #c82a3d;
+  --callout-error: #c82a3d;
+  --callout-fail: #c82a3d;
+  --callout-warning: #a85300;
+  --callout-question: #a85300;
+  --callout-success: #057c34;
+  --callout-tip: #007876;
+  --callout-important: #007876;
+  --callout-summary: #007876;
+  --callout-info: #0868d2;
+  --callout-todo: #0868d2;
+  --callout-default: var(--cn-callout-default);
+  --callout-example: #734fe4;
+  --callout-quote: #6b6b6b;
+  --graph-node-tag: #057c34;
+  --graph-node-attachment: #866700;
+  /* Tab titles: faint text drops to 3.95:1 on the Lifted sidebar tray. */
+  --tab-text-color: var(--cn-text-secondary);
+  --tab-text-color-active: var(--cn-text-primary);
   --scrollbar-thumb-bg: var(--cn-medium-overlay);
   --scrollbar-active-thumb-bg: var(--cn-strong-overlay);
 
@@ -518,15 +602,15 @@ settings:
   --checklist-done-color: var(--cn-text-faint);
   --interactive-accent-hover: var(--cn-accent-hover);
 
-  /* Heading colors - mode-specific. Sizes/weights/line-heights are in :root. */
+  /* Heading colors - mode-specific. Sizes and weights are in :root; line-heights on body. */
   --h1-color: #37352f;
   --h2-color: #37352f;
   --h3-color: #37352f;
   --h4-color: #37352f;
-  --h5-color: #37352f;
-  --h6-color: #37352f;
+  --h5-color: var(--cn-text-secondary);
+  --h6-color: var(--cn-text-secondary);
 
-  /* size / weight / line-height are in :root (mode-independent) */
+  /* inline-title size, weight and line-height are set on body (section 2) */
   --inline-title-color: var(--h1-color);
 
   --tab-background-active: var(--cn-bg-primary);
@@ -534,7 +618,6 @@ settings:
   --tab-outline-color: var(--cn-border-subtle);
   --titlebar-background: var(--cn-bg-secondary);
   --titlebar-background-focused: var(--cn-bg-secondary);
-  --cn-selection-border: #606060;
   --h1-size: var(--h1);
   --h1-font: var(--cn-heading-font);
   --h2-size: var(--h2);
@@ -556,9 +639,6 @@ settings:
   --cn-bg-secondary: #141414;
   --cn-bg-tertiary: #1c1c1c;
   --cn-bg-elevated: #222222;
-  /* Flush tray (tie to box). The pure-black OLED canvas comes from */
-  /* --cn-bg-primary; the sidebar tray tracks the box for a seamless sidebar. */
-  --cn-bg-note-tray: var(--cn-bg-secondary);
 }
 
 .theme-dark.cn-bgd-warm {
@@ -591,13 +671,12 @@ settings:
   --cn-bg-elevated: #272727;
 }
 /* True black: pure #000000 canvas for maximum OLED contrast (from bg-primary). */
-/* Tray tied to the box so the sidebar stays flush; the note canvas stays pure black. */
+/* Sidebar and tray follow the pure-black canvas (uniform dark surface). */
 .theme-dark.cn-bgd-trueblack {
   --cn-bg-primary: #000000;
   --cn-bg-secondary: #080808;
   --cn-bg-tertiary: #101010;
   --cn-bg-elevated: #171717;
-  --cn-bg-note-tray: var(--cn-bg-secondary);
 }
 
 /* ============================================================
@@ -630,12 +709,14 @@ settings:
   --cn-bg-secondary: #ededed;
   --cn-bg-tertiary: #e6e6e6;
   --cn-bg-elevated: #e0e0e0;
+  --cn-text-faint: #5b5b5b;
 }
 .theme-light.cn-bgl-stone {
   --cn-bg-primary: #ededed;
   --cn-bg-secondary: #e6e6e6;
   --cn-bg-tertiary: #dfdfdf;
   --cn-bg-elevated: #d9d9d9;
+  --cn-text-faint: #5b5b5b;
 }
 
 /* ============================================================
@@ -679,7 +760,7 @@ body:not(.is-mobile).theme-dark.cn-sidebar-border .workspace-split:is(.mod-right
 
 /* Lifted sets both --background-secondary (panel) and --cn-bg-note-tray (workspace-split */
 .theme-dark.cn-sidebar-lifted              { --background-secondary: #1b1b1b; --cn-bg-note-tray: #0d0d0d; }
-/* Pure Black tray (#000000): one stop darker than default (#050505). */
+/* Pure Black tray (#000000): one stop darker than its Lifted sidebar (#0a0a0a). */
 .theme-dark.cn-sidebar-lifted.cn-bgd-black  { --background-secondary: #0a0a0a; --cn-bg-note-tray: #000000; }
 .theme-dark.cn-sidebar-lifted.cn-bgd-warm   { --background-secondary: #1f1d1c; --cn-bg-note-tray: #131110; }
 .theme-dark.cn-sidebar-lifted.cn-bgd-zen    { --background-secondary: #110f0d; --cn-bg-note-tray: #0a0908; }
@@ -700,10 +781,12 @@ body:not(.is-mobile).theme-light.cn-sidebar-border .workspace-split:is(.mod-righ
 .theme-light.cn-sidebar-lifted             { --background-secondary: #f1f0ed; --cn-bg-note-tray: #cdcbc6; }
 .theme-light.cn-sidebar-lifted.cn-bgl-white { --background-secondary: #f4f4f4; --cn-bg-note-tray: #e6e6e6; }
 .theme-light.cn-sidebar-lifted.cn-bgl-warm  { --background-secondary: #ebe5d9; --cn-bg-note-tray: #ddd6c8; }
-/* Zen tray: one stop darker than default (#d8d6d1), with warm undertone to match Zen surfaces. */
+/* Zen tray: darker than its Lifted sidebar, with a warm undertone to match Zen surfaces. */
 .theme-light.cn-sidebar-lifted.cn-bgl-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }
 .theme-light.cn-sidebar-lifted.cn-bgl-mist  { --background-secondary: #e9e9e9; --cn-bg-note-tray: #d6d6d6; }
 .theme-light.cn-sidebar-lifted.cn-bgl-stone { --background-secondary: #e2e2e2; --cn-bg-note-tray: #cfcfcf; }
+/* Tab titles sit on the darker Lifted tray; keep them at the stronger gray. */
+.theme-light.cn-sidebar-lifted { --tab-text-color: #4a4945; }
 
 
 /* Lifted translucency paints sidebar content, since core keeps split shells
@@ -721,10 +804,30 @@ body {
   --font-text-theme: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
   --font-monospace-theme: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 
-  font-family: var(--font-interface-theme);
+  /* Core defines the tokens below on body, so they are overridden here. */
+  --inline-title-size: calc(var(--h1) * 1.2);
+  --inline-title-weight: 700;
+  --inline-title-line-height: 1.2;
+  --h1-line-height: 1.3;
+  --h2-line-height: 1.3;
+  --h3-line-height: 1.3;
+  --h4-line-height: 1.35;
+  --h5-line-height: 1.4;
+  --h6-line-height: 1.4;
+  /* Links are underlined by the theme's own border-bottom (section 6); switch */
+  /* off core's text-decoration so internal links are not underlined twice. */
+  --link-decoration: none;
+  --link-decoration-hover: none;
+  --link-external-decoration: none;
+  --link-external-decoration-hover: none;
+  /* Core fades unresolved links to 70% opacity, which fails AA. */
+  --link-unresolved-opacity: 1;
+
+  /* --font-interface runs core's chain: the user's font setting, then the theme. */
+  font-family: var(--font-interface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Inter looks best with calt + ss01 (single-storey 'a'), kern, liga */
+  /* Inter: calt, ss01 (open digits), kern, liga. Single-storey 'a' is cv11. */
   font-feature-settings: "calt", "ss01", "kern", "liga";
   letter-spacing: -0.005em;
 }
@@ -749,8 +852,8 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 .markdown-source-view,
 .markdown-preview-view,
 .markdown-rendered {
-  font-family: var(--font-text-theme);
-  font-size: var(--cn-editor-font-size);
+  font-family: var(--font-text);
+  font-size: calc(var(--font-text-size, 16px) * var(--cn-editor-font-size) / 16);
   /* Core's inner editor scroller reads this inherited variable. */
   --line-height-normal: var(--cn-note-line-height);
   line-height: var(--line-height-normal);
@@ -760,11 +863,11 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 /* Editor base font size. Header lines are EXCLUDED: a header line is a */
 .markdown-source-view.mod-cm6 .cm-content,
 .markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-header) {
-  font-size: var(--cn-editor-font-size);
+  font-size: calc(var(--font-text-size, 16px) * var(--cn-editor-font-size) / 16);
 }
 
 /* ============================================================
-   3. HEADINGS - tight tracking, dramatic scale */
+   3. HEADINGS - moderate scale, H1 heavier, H5/H6 muted labels */
 
 /* Tracking stays at 0 for the whole tight scale. The previous negative */
 .markdown-rendered h1, .markdown-rendered h2, .markdown-rendered h3,
@@ -828,6 +931,11 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
   margin-bottom: 1.2em;
 }
 
+/* Style Settings: cn-title-align. Centered is the default (rule above). */
+body.cn-title-left .inline-title {
+  text-align: start;
+}
+
 /* ============================================================
    4. WORKSPACE */
 
@@ -840,9 +948,24 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
 .workspace-tab-header-inner { border-radius: var(--radius-s); }
 
 .workspace-tab-header.is-active {
-  background-color: var(--cn-soft-overlay);
+  background-color: var(--cn-active-fill);
   border-bottom: none;
   border-radius: var(--radius-s);
+}
+
+/* Sidebar tab icons: core paints the active one at (0,3,0); match it so the */
+/* selected fill applies there too. */
+.mod-sidedock .workspace-tab-header-container .workspace-tab-header.is-active {
+  background-color: var(--cn-active-fill);
+  box-shadow: none;
+}
+
+/* Tab-row underline: core draws a full-width rule under every tab header */
+/* container and the ribbon's top spacer. Hidden here; the border width is */
+/* kept so the row height does not shift. */
+.workspace-tab-header-container,
+.workspace-ribbon.mod-primary::before {
+  border-bottom-color: transparent;
 }
 
 /* --- Translucent mode --- */
@@ -889,8 +1012,8 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-tabs.mod-stacked .
 
 /* Translucent-mode hover/active states use theme-aware overlay tokens */
 body.is-translucent.theme-dark:not(.is-fullscreen) {
-  --background-modifier-hover: var(--cn-soft-overlay);
-  --background-modifier-active-hover: var(--cn-medium-overlay);
+  --background-modifier-hover: var(--cn-hover-fill);
+  --background-modifier-active-hover: var(--cn-active-fill);
 }
 
 /* Light translucency keeps note and sidebar content opaque. Core intentionally
@@ -1007,6 +1130,21 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .wo
   transition: color var(--cn-transition-fast), border-color var(--cn-transition-fast);
 }
 
+/* Unresolved links: dashed underline at full opacity. */
+a.internal-link.is-unresolved,
+.cm-hmd-internal-link.is-unresolved,
+.is-unresolved .cm-hmd-internal-link {
+  border-bottom-style: dashed;
+}
+
+/* Links inside callouts take the text color: the accent drops to about 3.5:1 */
+/* on a tinted callout box. The underline keeps them identifiable. */
+.callout a.internal-link,
+.callout a.external-link {
+  color: inherit;
+  border-bottom-color: currentColor;
+}
+
 a.internal-link:hover, a.external-link:hover, .cm-link:hover {
   color: var(--cn-accent-hover);
   border-bottom-color: var(--cn-accent-hover);
@@ -1022,7 +1160,7 @@ a.internal-link:hover, a.external-link:hover, .cm-link:hover {
 .markdown-preview-view mark,
 .cm-highlight {
   background: var(--highlight-background, var(--text-highlight-bg));
-  color: var(--cn-text-primary);
+  color: var(--cn-strong-color);
   border-radius: 2px;
   padding: 0 2px;
 }
@@ -1035,7 +1173,7 @@ a.internal-link:hover, a.external-link:hover, .cm-link:hover {
 .cm-inline-code {
   background-color: var(--cn-bg-tertiary);
   color: var(--cn-inline-code);
-  border-radius: 4px;
+  border-radius: var(--radius-s);
   padding: 1px 6px;
   font-family: var(--font-monospace-theme);
   font-size: 0.88em;
@@ -1071,22 +1209,21 @@ body.cn-grayscale :is(mark, .cm-highlight) {
 .HyperMD-codeblock-end-bg   { border-bottom-left-radius: var(--cn-radius); border-bottom-right-radius: var(--cn-radius); }
 
 /* ============================================================
-   8. CALLOUTS - boxed, highlight-style, amber default */
+   8. CALLOUTS - tinted card with a thin border, amber default */
 
 /* Override default note callout color from Obsidian's blue to amber. */
 .callout[data-callout="note"],
 .callout:not([data-callout]) {
-  --callout-color: #eab308;
+  --callout-color: var(--cn-callout-default);
 }
 
 /* Box every callout as an opaque, theme-tinted card. */
 .callout {
   background-color: var(--cn-bg-elevated);
   background-image: linear-gradient(
-    color-mix(in srgb, var(--callout-color, #eab308) 13%, transparent),
-    color-mix(in srgb, var(--callout-color, #eab308) 13%, transparent));
-  border: 1px solid color-mix(in srgb, var(--callout-color, #eab308) 32%, transparent);
-  border-left: 3px solid var(--callout-color, #eab308);
+    color-mix(in srgb, var(--callout-color, var(--cn-callout-default)) 13%, transparent),
+    color-mix(in srgb, var(--callout-color, var(--cn-callout-default)) 13%, transparent));
+  border: 1px solid color-mix(in srgb, var(--callout-color, var(--cn-callout-default)) 32%, transparent);
   border-radius: var(--cn-radius);
   padding: 12px 16px;
   margin: 1.2em 0;
@@ -1111,12 +1248,12 @@ body.cn-grayscale :is(mark, .cm-highlight) {
 }
 
 .callout-icon {
-  color: var(--callout-color, #eab308);
+  color: var(--callout-color, var(--cn-callout-default));
   display: inline-flex;
   align-items: center;
 }
 
-.callout-icon svg { color: var(--callout-color, #eab308); }
+.callout-icon svg { color: var(--callout-color, var(--cn-callout-default)); }
 
 /* ============================================================
    9. BLOCKQUOTES & DIVIDERS */
@@ -1196,7 +1333,7 @@ hr {
 .search-input-container input:focus {
   border-color: var(--cn-accent);
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cn-accent) 15%, transparent);
+  box-shadow: var(--cn-focus-glow);
 }
 
 .modal button:not(.mod-warning):not(.mod-destructive),
@@ -1231,13 +1368,13 @@ hr {
 .modal button.mod-cta:not(.mod-warning):not(.mod-destructive):hover { background: var(--cn-accent-hover); }
 .modal button.mod-warning,
 .modal button.mod-destructive.mod-cta {
-  background: #a8201a;
+  background: var(--cn-danger);
   color: #ffffff;
   --text-color: #ffffff;
 }
 .modal button.mod-warning:hover,
 .modal button.mod-destructive.mod-cta:hover {
-  background: #8b1914;
+  background: color-mix(in srgb, var(--cn-danger) 85%, black);
 }
 
 /* Modals - restore opaque variables inside dialogs so any internal */
@@ -1249,13 +1386,13 @@ hr {
   --background-primary-alt: var(--cn-bg-secondary);
   --background-secondary: var(--cn-bg-secondary);
   --background-secondary-alt: var(--cn-bg-tertiary);
-  --background-modifier-hover: var(--cn-bg-tertiary);
-  --background-modifier-active-hover: var(--cn-bg-elevated);
+  --background-modifier-hover: var(--cn-hover-fill);
+  --background-modifier-active-hover: var(--cn-active-fill);
 }
 
 .modal {
-  /* 18px radius: chunkier than --cn-radius-lg (12px) without going */
-  border-radius: 18px;
+  /* XL radius (16px): one step above --cn-radius-lg on the radius scale. */
+  border-radius: var(--cn-radius-xl);
   background-color: var(--cn-bg-secondary);
   border: 1px solid var(--cn-border-subtle);
   box-shadow: 0 12px 48px var(--cn-modal-shadow);
@@ -1271,8 +1408,9 @@ hr {
   background-color: var(--cn-bg-secondary);
 }
 
+body:not(.is-phone) .vertical-tab-nav-item.is-active,
 .vertical-tab-nav-item.is-active {
-  background-color: var(--cn-bg-elevated);
+  background-color: var(--cn-active-fill);
 }
 
 /* Modal backdrop dim is painted by core from --background-modifier-cover */
@@ -1292,20 +1430,18 @@ hr {
 .suggestion-container, .menu {
   background-color: var(--cn-bg-secondary);
   border: 1px solid var(--cn-border-subtle);
-  /* 14px radius: matches the section 19b chrome model. Authoritative */
-  border-radius: 14px;
+  /* LG radius (12px): shared with the section 19b chrome boxes. */
+  border-radius: var(--cn-radius-lg);
   /* Per-theme shadow alpha (heavy in dark, soft in light) so popovers */
   box-shadow: 0 8px 32px var(--cn-modal-shadow);
 }
 
-.menu-item:hover { background: var(--cn-bg-tertiary); }
-.suggestion-item.is-selected,
-.menu-item.selected,
-.menu-item.is-selected {
-  background: var(--cn-soft-overlay);
-  outline: 2px solid var(--cn-selection-border);
-  outline-offset: -2px;
-}
+/* Menus: core paints hover and keyboard selection from */
+/* --background-modifier-hover at (0,4,0), so drive it through the variable. */
+.menu { --background-modifier-hover: var(--cn-active-fill); }
+.suggestion-item.is-selected { background: var(--cn-active-fill); }
+/* Command palette and quick switcher: a leading bar marks the selected row. */
+.prompt .suggestion-item.is-selected { box-shadow: inset 3px 0 0 var(--cn-accent); }
 
 /* ============================================================
    11. CHECKBOXES - scoped to markdown task lists only */
@@ -1319,7 +1455,7 @@ hr {
   width: 16px;
   height: 16px;
   border: 1.5px solid var(--cn-checkbox-border);
-  border-radius: 4px;
+  border-radius: var(--radius-s);
   background: transparent;
   cursor: pointer;
   position: relative;
@@ -1413,15 +1549,24 @@ body:not(.is-mobile) .status-bar {
   height: auto;
   background-color: var(--cn-bg-secondary);
   border: 1px solid var(--cn-border-subtle);
-  border-radius: 999px;
+  border-radius: var(--cn-radius-pill);
   color: var(--cn-text-faint);
-  font-size: 0.78em;
-  padding: 3px 10px;
+  font-size: 0.72em;
+  padding: 2px 8px;
   gap: 2px;
   z-index: 10;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
   white-space: nowrap;
   overflow-x: auto;
+}
+
+/* Compact pill: 13px icons and a tight line box keep it about 22px tall. */
+body:not(.is-mobile) .status-bar .status-bar-item {
+  line-height: 1.2;
+}
+body:not(.is-mobile) .status-bar .status-bar-item .svg-icon {
+  width: 13px;
+  height: 13px;
 }
 
 /* (Removed the status-bar visibility force: Obsidian no longer dims */
@@ -1458,13 +1603,14 @@ body:not(.is-mobile) .status-bar {
    16. TAGS - pill style, accent-tinted */
 
 /* Pill styling for tags rendered inline in markdown content (a.tag, .tag, */
+/* :not(.token) keeps Prism's `.token.tag` spans in code blocks out of the pill. */
 a.tag,
-.tag,
+.tag:not(.token),
 .cm-hashtag {
   background-color: color-mix(in srgb, var(--cn-accent) 12%, transparent);
-  color: var(--cn-accent);
+  color: var(--cn-tag-text);
   border: 1px solid color-mix(in srgb, var(--cn-accent) 22%, transparent);
-  border-radius: 12px;
+  border-radius: var(--cn-radius-pill);
   padding: 1px 8px;
   font-size: 0.82em;
   font-weight: 500;
@@ -1473,7 +1619,7 @@ a.tag,
   transition: background-color var(--cn-transition-fast), border-color var(--cn-transition-fast);
 }
 
-a.tag:hover, .tag:hover {
+a.tag:hover, .tag:not(.token):hover {
   background-color: color-mix(in srgb, var(--cn-accent) 22%, transparent);
   border-color: color-mix(in srgb, var(--cn-accent) 38%, transparent);
   color: var(--cn-accent-hover);
@@ -1485,7 +1631,7 @@ a.tag:hover, .tag:hover {
   border: none;
   border-radius: 0;
   padding: 0;
-  color: var(--cn-accent);
+  color: var(--cn-tag-text);
 }
 
 /* ============================================================
@@ -1557,8 +1703,8 @@ a.tag:hover, .tag:hover {
 .metadata-property-value textarea:focus {
   background-color: var(--cn-bg-tertiary);
   border-color: var(--cn-accent);
-  outline: 2px solid var(--cn-checkbox-border);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--cn-focus-glow);
 }
 
 .metadata-add-button {
@@ -1628,7 +1774,7 @@ body.cn-bubble-nav:not(.is-mobile) .nav-header::after {
   transform: translateX(-50%);
   width: 28px;
   height: 3px;
-  border-radius: 999px;
+  border-radius: var(--cn-radius-pill);
   background-color: var(--cn-text-faint);
   opacity: 1;
   pointer-events: none;
@@ -1645,7 +1791,7 @@ body.cn-bubble-nav:not(.is-mobile) .nav-buttons-container {
   justify-content: center;
   background-color: var(--cn-soft-overlay);
   border: 1px solid var(--cn-border-subtle);
-  border-radius: 999px;
+  border-radius: var(--cn-radius-pill);
   padding: 3px 6px;
   max-height: 0;
   overflow: hidden;
@@ -1734,7 +1880,7 @@ body:not(.is-phone) :is(.workspace-ribbon,
     .workspace-tab-header-tab-list,
     .sidebar-toggle-button,
     .view-header) .clickable-icon {
-  border-radius: 10px;
+  border-radius: var(--cn-radius);
   min-height: 32px;
   padding: 6px 10px;
 }
@@ -1742,26 +1888,27 @@ body:not(.is-phone) :is(.workspace-ribbon,
 /* --- Top-right window controls (dropdown chevron + sidebar */
 .workspace-tabs.mod-top .workspace-tab-header-tab-list,
 .workspace-tabs.mod-top .sidebar-toggle-button {
-  border-radius: 12px;
+  border-radius: var(--cn-radius-lg);
 }
 
 /* --- Top-bar tab pills --- */
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header {
-  border-radius: 10px;
+  border-radius: var(--cn-radius);
   min-height: 32px;
   padding: 0 2px;
   margin-inline: 2px;
   background-color: transparent;
-  border: 1px solid var(--cn-border-subtle);
+  border: 1px solid transparent;
 }
 
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header:hover {
-  border-color: var(--cn-border-strong);
+  background-color: var(--cn-hover-fill);
 }
 
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header.is-active {
-  background-color: var(--cn-soft-overlay);
-  border-color: var(--cn-border-strong);
+  background-color: var(--cn-active-fill);
+  border-color: var(--cn-border-subtle);
+  box-shadow: none;
 }
 
 /* Hide Obsidian's default tab "ear" pseudo-elements that paint */
@@ -1772,46 +1919,46 @@ body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-h
 
 /* Inner of the tab keeps its own rounding so the close button */
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header-inner {
-  border-radius: 8px;
+  border-radius: calc(var(--cn-radius) - 2px);
   min-height: 28px;
   padding-inline: 8px;
 }
 
 /* New-tab "+" button matches the tab pill height so the row */
 body:not(.is-phone) .workspace-tab-header-new-tab {
-  border-radius: 10px;
+  border-radius: var(--cn-radius);
   min-height: 32px;
 }
 
 body:not(.is-phone) .workspace-tab-header-new-tab > .clickable-icon {
-  border-radius: 10px;
+  border-radius: var(--cn-radius);
   min-height: 28px;
   min-width: 28px;
 }
 
 /* --- Sidebar tab headers (file explorer / bookmarks tabs) --- */
 body:not(.is-phone) .mod-sidedock .workspace-tab-header {
-  border-radius: 14px;
+  border-radius: var(--cn-radius-lg);
   min-height: 34px;
   min-width: 34px;
 }
 
 /* --- Vault profile / vault switcher (bottom-left) --- */
 .workspace-split:is(.mod-left-split, .mod-primary-split) > .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher {
-  border-radius: 14px;
+  border-radius: var(--cn-radius-lg);
 }
 
 /* --- View-header right-side action icons --- */
 body:not(.is-phone) .view-actions .clickable-icon:not(.mod-bookmark) {
-  border-radius: 999px;
+  border-radius: var(--cn-radius-pill);
   min-height: 32px;
   min-width: 32px;
   padding: 6px;
-  border: 1px solid var(--cn-border-subtle);
+  border: 1px solid transparent;
 }
 
 body:not(.is-phone) .view-actions .clickable-icon:not(.mod-bookmark):hover {
-  border-color: var(--cn-border-strong);
+  border-color: var(--cn-border-subtle);
 }
 
 /* Breathing room around the FAB cluster. The icons sit too close */
@@ -1822,17 +1969,23 @@ body:not(.is-phone) .mod-root .view-header .view-actions {
 }
 
 /* Preserve native header titles and rename controls in every view. */
+/* Opt-in exception (Style Settings: cn-hide-header-title): hide the header */
+/* title in Markdown notes while the inline title is shown. Core does the same */
+/* on phones. visibility (not display) keeps the header layout in place. */
+body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"] .view-header-title-container {
+  visibility: hidden;
+}
 
 /* --- Status bar items - */
 .status-bar-item.mod-clickable {
-  border-radius: 999px;
-  padding: 2px 6px;
+  border-radius: var(--cn-radius-pill);
+  padding: 1px 5px;
 }
 
 /* --- Popover / tooltip corner radius --- */
 .popover,
 .tooltip {
-  border-radius: 10px;
+  border-radius: var(--cn-radius);
 }
 
 /* --- Ribbon, folder, and vault-profile boxes --- */
@@ -1840,7 +1993,7 @@ body:not(.is-phone) .workspace-ribbon:is(.mod-left, .mod-primary) {
   /* Subtle (matches the sidebar nav boxes) so the box top edge does not */
   /* read as a bright line under the macOS traffic lights (was --cn-border-strong). */
   border: 1px solid var(--cn-border-subtle);
-  border-radius: 12px;
+  border-radius: var(--cn-radius-lg);
   /* Default top margin (36px) lines the ribbon-box top up with */
   margin: 36px 4px 8px 8px;
   -electron-corner-smoothing: 60%;
@@ -1848,6 +2001,9 @@ body:not(.is-phone) .workspace-ribbon:is(.mod-left, .mod-primary) {
   /* Load-bearing per v1.8.6: without these the ribbon container */
   align-self: stretch;
   height: auto;
+  /* The collapsed variant below changes margin-right by 4px. Animate it so the */
+  /* note does not jump 4px against the sidebar's own open/close motion. */
+  transition: margin-right var(--cn-transition);
 }
 
 /* When the left sidebar is collapsed only the ribbon box shows, */
@@ -1864,7 +2020,7 @@ body.mod-macos.is-hidden-frameless:not(.is-phone):not(.is-fullscreen) .workspace
 body:not(.is-phone) :is(:is(.mod-left-split, .mod-primary-split), :is(.mod-right-split, .mod-secondary-split)) .workspace-leaf-content:not([data-type="file-explorer"]):not([data-type="terminal"]):not([data-type="excalidraw"]) .view-content,
 body:not(.is-phone) :is(.mod-left-split, .mod-primary-split) .workspace-leaf-content[data-type="file-explorer"] .nav-files-container {
   border: 1px solid var(--cn-border-subtle);
-  border-radius: 12px;
+  border-radius: var(--cn-radius-lg);
   margin: 4px var(--cn-panel-side-inset) 8px;
   padding: 6px 4px;
   -electron-corner-smoothing: 60%;
@@ -1887,7 +2043,7 @@ body:not(.is-phone) .workspace-split:is(.mod-left-split, .mod-primary-split) > .
   left: var(--cn-panel-side-inset);
   right: var(--cn-panel-side-inset);
   border: 1px solid var(--cn-border-subtle);
-  border-radius: 12px;
+  border-radius: var(--cn-radius-lg);
   pointer-events: none;
   -electron-corner-smoothing: 60%;
   corner-shape: var(--corner-shape);
@@ -1913,10 +2069,7 @@ body:not(.is-phone) .workspace-split:is(.mod-left-split, .mod-primary-split) > .
   border-inline-end-color: rgba(55, 53, 47, 0.50);
 }
 
-/* Sidebar <-> editor divider: much fainter than the editor-pane dividers above. */
-/* The sidebar handle otherwise inherits --divider-color (0.22), which reads as a */
-/* hard line; keep it near the subtle box-border weight, with a hover boost so the */
-/* resize edge is still grabbable. Covers both left and right sidebars. */
+/* Dividers inside the sidebars stay faint; the hover rules below strengthen them. */
 .theme-dark .workspace-split:is(.mod-left-split, .mod-primary-split) .workspace-leaf-resize-handle:not(.is-active),
 .theme-dark .workspace-split:is(.mod-right-split, .mod-secondary-split) .workspace-leaf-resize-handle:not(.is-active) {
   border-inline-end-color: rgba(255, 255, 255, 0.09);
@@ -1938,6 +2091,15 @@ body:not(.is-phone) .workspace-split:is(.mod-left-split, .mod-primary-split) > .
 .theme-light .workspace-split:is(.mod-right-split, .mod-secondary-split) .workspace-leaf-resize-handle:not(.is-active):hover {
   border-inline-end-color: rgba(55, 53, 47, 0.30);
   border-inline-start-color: rgba(55, 53, 47, 0.30);
+}
+
+/* The sidebar's own outer edge (the handle that is a direct child of the split) */
+/* is invisible at rest and appears on hover. The handle stays in the layout: */
+/* display:none killed the drag in v1.9.x. */
+.workspace-split:is(.mod-left-split, .mod-primary-split) > .workspace-leaf-resize-handle:not(.is-active):not(:hover),
+.workspace-split:is(.mod-right-split, .mod-secondary-split) > .workspace-leaf-resize-handle:not(.is-active):not(:hover) {
+  border-inline-end-color: transparent;
+  border-inline-start-color: transparent;
 }
 
 /* ============================================================
@@ -1962,6 +2124,32 @@ body:not(.is-phone) .workspace-split:is(.mod-left-split, .mod-primary-split) > .
     --cn-accent: #274b8e;
     --cn-accent-hover: #274b8e;
     --cn-inline-code: #8b1914;
+    --cn-tag-text: #274b8e;
+    --cn-callout-default: #8a6100;
+    --code-function: #795d00;
+    --code-keyword: #ad2e6b;
+    --code-string: #057130;
+    --code-value: #6847cf;
+    --code-tag: #b82738;
+    --code-operator: #b82738;
+    --code-property: #006d6b;
+    --code-important: #994c00;
+    --callout-bug: #c82a3d;
+    --callout-error: #c82a3d;
+    --callout-fail: #c82a3d;
+    --callout-warning: #a85300;
+    --callout-question: #a85300;
+    --callout-success: #057c34;
+    --callout-tip: #007876;
+    --callout-important: #007876;
+    --callout-summary: #007876;
+    --callout-info: #0868d2;
+    --callout-todo: #0868d2;
+    --callout-default: #8a6100;
+    --callout-example: #734fe4;
+    --callout-quote: #6b6b6b;
+    --graph-node-tag: #057c34;
+    --graph-node-attachment: #866700;
     --cn-border-subtle: #777777;
     --cn-border-strong: #555555;
     --cn-checkbox-border: #555555;

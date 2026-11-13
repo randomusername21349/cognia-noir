@@ -7,6 +7,50 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.34
+
+Design pass: clearer interaction states and hierarchy, fewer outlines, a uniform
+dark surface, and fixes from two independent audits.
+
+- Hover and selected states use new translucent fills (`--cn-hover-fill`,
+  `--cn-active-fill`) for file rows, tabs, menus, and the Settings sidebar. The
+  command palette and quick switcher mark the selected row with a leading accent
+  bar. The gray selection outline is gone.
+- Dark mode is one uniform surface when Translucent window is off: the sidebar,
+  top bar, and note share a color in every tone. The Lifted sidebar style still
+  sets a darker sidebar. Light mode is unchanged.
+- Headings use a wider scale (1.5 / 1.3 / 1.15 / 1.05 em), H1 is heavier, and
+  H5 and H6 are muted. The note title is now 1.2 times the H1 size; it
+  previously rendered at the same size as H1.
+- Muted text tiers are retuned in both modes, with per-tone overrides in light
+  mode.
+- Inactive tabs and view-header icons have no resting border. The rule under the
+  tab row is hidden, and the sidebar's outer resize edge shows only on hover.
+  The status bar pill is smaller.
+- Radii follow one scale (4, 8, 12, 16, pill). Inputs and properties fields
+  share one focus style.
+- Callouts are a tinted card with a thin border; the left bar is removed.
+  Unknown callout types default to amber. Light mode has a darker callout
+  palette that clears 3:1 against the callout box, and code syntax colors that
+  clear WCAG AA.
+- Links have a single underline. Unresolved links are dashed at full opacity,
+  and links inside callouts take the text color.
+- Fixed HTML tags in code blocks being styled as tag pills.
+- Fixed a 4px jump at the start of the sidebar open and close animation.
+- Fonts set in Obsidian's Appearance settings now take precedence over the
+  theme's UI and note fonts. Obsidian's font size setting and zoom now scale
+  note text; the Editor font size slider is relative to Obsidian's default size.
+- Style Settings controls are grouped into Color, Surfaces, Typography, and
+  Layout. New settings: Hide header title and Note title alignment.
+- Print and PDF export use the light syntax and callout palettes.
+- README rewritten and DESIGN-NOTES.md updated.
+- Verified on macOS with Obsidian 1.15.1: contrast computed in the running app
+  for seven dark and six light backgrounds, Flat and Lifted sidebars, color and
+  grayscale, and dark translucent mode; sidebar animation traced at 120 fps;
+  phone and tablet layouts checked in mobile emulation. Light mode, the
+  non-default tones, the Settings sidebar, stacked sidebar panels, and PDF
+  export were not visually verified for this release.
+
 ## v1.10.33
 
 Accessibility, editor settings, and Obsidian 1.13.4+ compatibility fixes.
