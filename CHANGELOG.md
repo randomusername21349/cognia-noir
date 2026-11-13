@@ -7,6 +7,15 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.35
+
+- Fixed tags in the editor (Live Preview). They rendered as small colored text
+  with stray side padding; they now render as a single pill, the same as in
+  reading view.
+- README screenshots retaken for the current look.
+- Verified on macOS with Obsidian 1.15.1 in the editor, dark mode by eye and
+  light mode by computed styles.
+
 ## v1.10.34
 
 Design pass: clearer interaction states and hierarchy, fewer outlines, a uniform

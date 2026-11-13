@@ -1273,11 +1273,17 @@ of the pill. Tag text uses --cn-tag-text (section 1), and the radius
 is --cn-radius-pill.
 
 
-### `.cm-hashtag-begin, .cm-hashtag-end {`
+### `.cm-hashtag.cm-hashtag-begin,`
 
 
-Live Preview hashtag - keep it inline (no pill) so writing flow isn't disrupted;
-tag text color (--cn-tag-text) only.
+Live Preview: a tag is two adjacent spans, "#" and the name. Both take the
+pill fill and border from the rule above; these rules round and pad only the
+outer ends, so the two halves read as one pill and match reading view.
+Core shapes the halves at (0,2,0) and sets their outer border from
+--tag-border-width (0 by default), so the theme uses the same specificity
+and restates the outer border. An earlier rule at (0,1,0) tried to keep the
+tag as plain inline text; core's padding and radius still applied, which
+left colored text with stray side padding.
 
 
 ## 17. PROPERTIES / FRONTMATTER PANEL

@@ -10,9 +10,8 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.34 (Design pass: state fills, heading and text hierarchy, radius scale,
-            uniform dark surface, callout and link cleanup, grouped settings,
-            and independent-audit fixes.
+   v1.10.35 (Tags in Live Preview render as one joined pill, matching reading
+            view. Previous: v1.10.34 design pass.
             Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
@@ -1625,13 +1624,28 @@ a.tag:hover, .tag:not(.token):hover {
   color: var(--cn-accent-hover);
 }
 
-/* Live Preview hashtag - keep it inline (no pill) so writing flow isn't disrupted; */
-.cm-hashtag-begin, .cm-hashtag-end {
-  background-color: transparent;
-  border: none;
+/* Live Preview: a tag is two adjacent spans, "#" and the name. Both take the */
+/* pill fill and border from the rule above; these rules round and pad only */
+/* the outer ends so the two halves read as one pill, matching reading view. */
+/* Core shapes the halves at (0,2,0), so the same specificity is used here. */
+.cm-hashtag.cm-hashtag-begin,
+.cm-hashtag.cm-hashtag-end {
   border-radius: 0;
-  padding: 0;
-  color: var(--cn-tag-text);
+  padding-inline: 0;
+}
+.cm-hashtag.cm-hashtag-begin {
+  border-inline-start: 1px solid color-mix(in srgb, var(--cn-accent) 22%, transparent);
+  border-inline-end: none;
+  border-start-start-radius: var(--cn-radius-pill);
+  border-end-start-radius: var(--cn-radius-pill);
+  padding-inline-start: 8px;
+}
+.cm-hashtag.cm-hashtag-end {
+  border-inline-start: none;
+  border-inline-end: 1px solid color-mix(in srgb, var(--cn-accent) 22%, transparent);
+  border-start-end-radius: var(--cn-radius-pill);
+  border-end-end-radius: var(--cn-radius-pill);
+  padding-inline-end: 8px;
 }
 
 /* ============================================================
