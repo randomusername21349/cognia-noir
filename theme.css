@@ -10,8 +10,8 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.35 (Tags in Live Preview render as one joined pill, matching reading
-            view. Previous: v1.10.34 design pass.
+   v1.10.36 (Light mode is one uniform surface with a soft off-white Paper
+            tone; callout and table-header contrast fixes. Previous: v1.10.35.
             Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
@@ -79,7 +79,7 @@ settings:
   -
     id: cn-grayscale
     title: Grayscale UI
-    description: Desaturate the theme's colors (accent, links, callouts, tags, highlight, inline code, status) so the interface reads as pure black and white. Note images and code syntax highlighting keep their color.
+    description: Desaturate the theme's colors (accent, links, callouts, tags, highlight, inline code, status) so the interface reads as pure black and white. Note images, code syntax highlighting, and delete/warning buttons keep their color.
     type: class-toggle
     default: false
   -
@@ -308,7 +308,7 @@ settings:
     title: Hide header title
     description: Hides the note title next to the back and forward arrows in Markdown notes. Applies only while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note.
     type: class-toggle
-    default: false
+    default: true
 */
 
 /* ============================================================
@@ -484,14 +484,15 @@ settings:
    1b. CSS VARIABLES - LIGHT THEME (Notion-warm off-white) */
 
 .theme-light {
-  /* Notion light-mode palette - pure white canvas, warm near-black text, */
-  --cn-bg-primary: #ffffff;
+  /* Paper: soft warm off-white canvas, warm near-black text. */
+  --cn-bg-primary: #f5f4f0;
   --cn-bg-secondary: #f7f6f3;
   --cn-bg-tertiary: #ebebea;
   --cn-bg-elevated: #e8e7e5;
-  /* Tray tied to the box surface (--cn-bg-secondary) so the light sidebar is */
-  /* flush too, matching the dark-mode treatment (no grey seams behind boxes). */
-  --cn-bg-note-tray: var(--cn-bg-secondary);
+  /* Light mode is one uniform surface, like dark mode: the tray, the sidebar */
+  /* boxes (--background-secondary) and the top bar all take the note color. */
+  /* Floating surfaces (menus, dialogs, status pill) keep --cn-bg-secondary. */
+  --cn-bg-note-tray: var(--cn-bg-primary);
   --cn-border-subtle: rgba(55, 53, 47, 0.09);
   --cn-border-strong: rgba(55, 53, 47, 0.16);
   --cn-text-primary: #37352f;
@@ -536,7 +537,7 @@ settings:
 
   --background-primary: var(--cn-bg-primary);
   --background-primary-alt: var(--cn-bg-secondary);
-  --background-secondary: var(--cn-bg-secondary);
+  --background-secondary: var(--cn-bg-primary);
   --background-secondary-alt: var(--cn-bg-tertiary);
   --background-modifier-border: var(--cn-border-subtle);
   --background-modifier-border-hover: var(--cn-border-strong);
@@ -615,8 +616,8 @@ settings:
   --tab-background-active: var(--cn-bg-primary);
   --tab-text-color-focused-active: var(--cn-text-primary);
   --tab-outline-color: var(--cn-border-subtle);
-  --titlebar-background: var(--cn-bg-secondary);
-  --titlebar-background-focused: var(--cn-bg-secondary);
+  --titlebar-background: var(--cn-bg-primary);
+  --titlebar-background-focused: var(--cn-bg-primary);
   --h1-size: var(--h1);
   --h1-font: var(--cn-heading-font);
   --h2-size: var(--h2);
@@ -777,7 +778,7 @@ body:not(.is-mobile).theme-light.cn-sidebar-border .workspace-split:is(.mod-righ
   border-inline-start: 1px solid var(--cn-border-subtle);
 }
 
-.theme-light.cn-sidebar-lifted             { --background-secondary: #f1f0ed; --cn-bg-note-tray: #cdcbc6; }
+.theme-light.cn-sidebar-lifted             { --background-secondary: #ebeae6; --cn-bg-note-tray: #cdcbc6; }
 .theme-light.cn-sidebar-lifted.cn-bgl-white { --background-secondary: #f4f4f4; --cn-bg-note-tray: #e6e6e6; }
 .theme-light.cn-sidebar-lifted.cn-bgl-warm  { --background-secondary: #ebe5d9; --cn-bg-note-tray: #ddd6c8; }
 /* Zen tray: darker than its Lifted sidebar, with a warm undertone to match Zen surfaces. */
@@ -1027,9 +1028,11 @@ body.is-translucent.theme-light .workspace-split.mod-root .workspace-leaf-conten
   background-color: var(--cn-bg-primary);
 }
 body.is-translucent.theme-light :is(:is(.mod-left-split, .mod-primary-split), :is(.mod-right-split, .mod-secondary-split)) .workspace-leaf-content,
-body.is-translucent.theme-light .workspace-ribbon:is(.mod-left, .mod-primary),
-body.is-translucent.theme-light .titlebar {
+body.is-translucent.theme-light .workspace-ribbon:is(.mod-left, .mod-primary) {
   background-color: var(--background-secondary);
+}
+body.is-translucent.theme-light .titlebar {
+  background-color: var(--titlebar-background);
 }
 
 /* ============================================================
@@ -1148,6 +1151,12 @@ a.internal-link:hover, a.external-link:hover, .cm-link:hover {
   color: var(--cn-accent-hover);
   border-bottom-color: var(--cn-accent-hover);
 }
+/* Keep callout links on the text color while hovered (equal specificity, later). */
+.callout a.internal-link:hover,
+.callout a.external-link:hover {
+  color: inherit;
+  border-bottom-color: currentColor;
+}
 
 /* Bold - color only; let font-weight cascade so bold inside an H1 (weight */
 /* Inherit inline colors so links, callouts and plugin surfaces retain theirs. */
@@ -1228,6 +1237,10 @@ body.cn-grayscale :is(mark, .cm-highlight) {
   margin: 1.2em 0;
   mix-blend-mode: normal;
 }
+
+/* Unchecked checkbox border reaches 3:1 on the tinted callout box. */
+.theme-dark .callout { --cn-checkbox-border: #a3a3a3; }
+.theme-light .callout { --cn-checkbox-border: #636363; }
 
 .callout-title {
   padding: 0 0 4px 0;
@@ -1512,6 +1525,15 @@ body:not(.is-phone) .vertical-tab-nav-item.is-active,
   border-bottom: 1px solid var(--cn-border-subtle);
 }
 
+/* Header links take the text color: accent is 4.33-4.44:1 on the header surface. */
+.markdown-rendered th a.internal-link,
+.markdown-rendered th a.external-link,
+.markdown-rendered th a.internal-link:hover,
+.markdown-rendered th a.external-link:hover {
+  color: inherit;
+  border-bottom-color: currentColor;
+}
+
 .markdown-rendered td {
   border-top: 1px solid var(--cn-border-subtle);
   color: var(--cn-text-primary);
@@ -1622,6 +1644,20 @@ a.tag:hover, .tag:not(.token):hover {
   background-color: color-mix(in srgb, var(--cn-accent) 22%, transparent);
   border-color: color-mix(in srgb, var(--cn-accent) 38%, transparent);
   color: var(--cn-accent-hover);
+}
+
+/* Tags inside callouts take the text color: accent drops to 3.4-4.1:1 on the tint. */
+.callout a.tag,
+.callout .tag:not(.token),
+.callout .cm-hashtag {
+  color: var(--cn-text-primary);
+  background-color: color-mix(in srgb, currentColor 10%, transparent);
+  border-color: color-mix(in srgb, currentColor 28%, transparent);
+}
+.callout a.tag:hover, .callout .tag:not(.token):hover {
+  color: var(--cn-text-primary);
+  background-color: color-mix(in srgb, currentColor 16%, transparent);
+  border-color: color-mix(in srgb, currentColor 28%, transparent);
 }
 
 /* Live Preview: a tag is two adjacent spans, "#" and the name. Both take the */
@@ -1982,11 +2018,12 @@ body:not(.is-phone) .mod-root .view-header .view-actions {
   margin-left: auto;
 }
 
-/* Preserve native header titles and rename controls in every view. */
-/* Opt-in exception (Style Settings: cn-hide-header-title): hide the header */
+/* Non-Markdown views keep native header titles and rename controls. */
+/* Exception (Style Settings: cn-hide-header-title, on by default): hide the header */
 /* title in Markdown notes while the inline title is shown. Core does the same */
 /* on phones. visibility (not display) keeps the header layout in place. */
-body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"] .view-header-title-container {
+/* Notes with cssclass hide-title hide their inline title, so they keep the header title. */
+body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"]:not(:has(.hide-title)) .view-header-title-container {
   visibility: hidden;
 }
 

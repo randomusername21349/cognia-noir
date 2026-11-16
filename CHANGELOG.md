@@ -7,6 +7,32 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.36
+
+- Light mode is one uniform surface, like dark mode: the note, the sidebars,
+  and the top bar share a color in every light tone. The Lifted sidebar style
+  still sets a darker sidebar.
+- The default light tone (Paper) is a soft warm off-white (`#f5f4f0`); it was
+  pure white. Pure white is still available as its own tone. The Paper Lifted
+  sidebar is darker to match (`#ebeae6`).
+- "Hide header title" is on by default. Notes that use the `hide-title`
+  cssclass keep their header title, so a note is never left without one.
+- Tags inside callouts use the text color with a neutral pill; the accent
+  color fell to 3.4:1 on the tinted callout box.
+- Unchecked checkboxes inside callouts have a stronger border (it was 2.8:1 on
+  Slate).
+- Links inside callouts keep the text color on hover, and links in table
+  headers use the text color with an underline (the accent was 4.33:1 on Stone
+  and 4.44:1 on Slate).
+- With Translucent window on and the Lifted sidebar, the light title bar takes
+  the note color.
+- The Grayscale UI description says that delete and warning buttons keep
+  their color.
+- DESIGN-NOTES.md corrected where it described older behavior.
+- Verified on macOS with Obsidian 1.15.1 by computed styles in every tone and
+  callout type; hover states were not measured. The light-mode gallery
+  screenshots predate this release.
+
 ## v1.10.35
 
 - Fixed tags in the editor (Live Preview). They rendered as small colored text

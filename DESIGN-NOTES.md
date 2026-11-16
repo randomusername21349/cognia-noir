@@ -103,8 +103,8 @@ Dark mode is one uniform surface: the tray (section 4b), the sidebar
   and no seams show in any tone. Floating surfaces (menus, dialogs, the
   status pill) keep --cn-bg-secondary. The Lifted sidebar style sets its
   own darker --background-secondary and tray values in the sidebar
-  contrast variants below. Light mode is unchanged (white note,
-  off-white sidebar and tray; section 1b).
+  contrast variants below. Light mode follows the same uniform-surface
+  layout (section 1b).
 
 
 ### `--cn-inline-code: #ee6666;`
@@ -238,22 +238,21 @@ weight cascade, inline-title sizing, and Style Settings knobs all
 carry over so the two modes feel like one design.
 
 
-### `--cn-bg-primary: #ffffff;`
+### `--cn-bg-primary: #f5f4f0;`
 
 
-Notion light-mode palette - pure white canvas, warm near-black text,
-  subtle off-white sidebar. Fully opaque (Notion does not use macOS
+Paper palette - soft warm off-white canvas (#f5f4f0), warm near-black
+  text, sidebar on the same surface. Fully opaque (Notion does not use macOS
   vibrancy in light mode). High contrast, no decoration.
 
 
-### `--cn-bg-note-tray: var(--cn-bg-secondary);`
+### `--cn-bg-note-tray: var(--cn-bg-primary);`
 
 
-Tray painted behind the note panel in section 4b. Tied to the box
-  surface (--cn-bg-secondary) so the light sidebar is flush: the white
-  note sits against the off-white sidebar and tray, with no grey seams
-  behind the sidebar boxes. Light mode keeps this two-tone layout; only
-  dark mode is a uniform surface. The Lifted style swaps in a darker
+Tray painted behind the note panel in section 4b. Light mode is one
+  uniform surface, like dark mode: the tray, the sidebar boxes
+  (--background-secondary) and the top bar take the note color in every
+  tone. Floating surfaces keep --cn-bg-secondary. The Lifted style swaps in a darker
   tray per tone.
 
 
@@ -536,7 +535,7 @@ Same inner-edge-only rule for light mode.
 Zen Lifted tray (#c8c5c0): darker than the Zen Lifted sidebar (#e6e3de), with
 warm undertone to match Zen surfaces. (The "#d8d6d1" default named in the
 stylesheet comment is out of date; the Flat light tray follows
---cn-bg-secondary, #eeece8 on Zen.)
+--cn-bg-primary, #f5f3ef on Zen.)
 
 
 ### `.theme-light.cn-sidebar-lifted { --tab-text-color: #4a4945; }`
@@ -826,6 +825,14 @@ above: their internal styling assumes an opaque container, and our
 bg-primary force-paint can collide with their own backgrounds.
 
 
+### `body.is-translucent.theme-light .titlebar {`
+
+
+The light translucent titlebar paints --titlebar-background (the
+note surface, --cn-bg-primary) instead of --background-secondary, so
+the top bar matches the note surface.
+
+
 ## 4b. NOTE PANEL - soft card edge against the sidebar
 
 
@@ -838,11 +845,9 @@ panes, which round their inside edge (rules below); the note
 leaf itself is square (see the note-panel entry below).
 
 The tray (--cn-bg-note-tray) paints the area those rounded
-corners reveal. In light mode it is --cn-bg-secondary, so the
-off-white sidebar and tray frame the white note. In dark mode
-it is --cn-bg-primary (section 1): note, sidebar boxes, and
-tray are one surface, and only the Lifted sidebar style sets a
-darker tray.
+corners reveal. In both modes it is --cn-bg-primary (section 1):
+note, sidebar boxes, and tray are one surface, and only the
+Lifted sidebar style sets a darker sidebar and tray.
 
 In dark translucent mode the tab containers and the note leaf
 stay transparent so macOS vibrancy shows through one shared
@@ -954,6 +959,14 @@ Links inside callouts take the text color: the accent drops to about
 and keeps them identifiable.
 
 
+### `.callout a.internal-link:hover,`
+
+
+Callout links keep the text color while hovered. The general link hover
+rule has equal specificity and comes later, so this rule sits right
+after it to win on source order.
+
+
 ### `.markdown-rendered strong, .cm-s-obsidian .cm-strong { color: inherit; }`
 
 
@@ -1025,6 +1038,14 @@ sides and no left bar (the former 3px left border is gone). Light mode
 defines a darker per-type palette (section 1b), and section 20 applies
 the same palette in print. Links inside callouts take the text color
 (section 6).
+
+
+### `.theme-dark .callout { --cn-checkbox-border: #a3a3a3; }`
+
+
+Unchecked checkbox border inside callouts: the default #858585 is 2.8:1
+on a dark Slate note callout, under the 3:1 non-text minimum. Callouts
+use #a3a3a3 in dark and #636363 in light.
 
 
 ## 9. BLOCKQUOTES & DIVIDERS
@@ -1164,19 +1185,28 @@ Kept on border-collapse: collapse. Obsidian core borders every cell on all
   across Obsidian updates. Square corners are the safe trade.
 
 
-## 13. SCROLLBARS - minimal, scroll-triggered on workspace panels
+### `.markdown-rendered th a.internal-link,`
+
+
+Links in table headers take the text color with a solid currentColor
+underline, resting and hovered: the accent is 4.33:1 on the light Stone
+header surface and 4.44:1 on dark Slate. The :hover forms out-rank the
+general link hover rule.
+
+
+## 13. SCROLLBARS - minimal, visible at rest, stronger on hover
 
 
 ### `::-webkit-scrollbar { width: 10px; height: 10px; }`
 
 
-13. SCROLLBARS - minimal, scroll-triggered on workspace panels
-Default thumb stays visible (modals, settings, code blocks etc.).
-Inside .workspace-leaf-content (file explorer, outline, note view,
-side panels) the thumb is transparent and only fades in while the
-panel is actively scrolling. Requires the local "Scrollbar on Scroll"
-plugin (.obsidian/plugins/scrollbar-on-scroll), which toggles the
-.is-scrolling class on scroll events with a ~700ms tail.
+13. SCROLLBARS - minimal, visible at rest, stronger on hover
+Applies only with Obsidian's styled scrollbars (body.styled-scrollbars).
+The bar is 10px with a transparent track. The thumb is always visible
+in every panel, painted with --scrollbar-thumb-bg, rounded to 6px, and
+inset by a 2px transparent border (background-clip: padding-box). On
+hover or drag it shifts to --scrollbar-active-thumb-bg with a
+transition. There is no scroll-triggered fade.
 
 
 ## 14. STATUS BAR - floating pill, bottom-right
@@ -1271,6 +1301,15 @@ causing a jarring fill/overlay swap on click.
 .tag:not(.token) keeps Prism's `.token.tag` spans in code blocks out
 of the pill. Tag text uses --cn-tag-text (section 1), and the radius
 is --cn-radius-pill.
+
+
+### `.callout a.tag,`
+
+
+Tags inside callouts take --cn-text-primary with a neutral currentColor
+fill (10%, 16% on hover) and border (28%): accent tag text drops to
+3.4-4.1:1 on the tinted callout box. The hover rule out-ranks and follows
+the general tag hover and restates color, fill, and border.
 
 
 ### `.cm-hashtag.cm-hashtag-begin,`
@@ -1573,14 +1612,16 @@ the action icons left again. Scoped to non-phone in line with
 the FAB rule above -- mobile uses native iOS spacing.
 
 
-### `body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"] .view-header-title-container {`
+### `body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"]:not(:has(.hide-title)) .view-header-title-container {`
 
 
-Native header titles and rename controls are preserved in every
-view by default; the earlier always-on rule that hid the centered
-title is gone.
+By default the header title is hidden in Markdown notes while Show
+inline title is on; every other view keeps its native header title
+and rename control. The :not(:has(.hide-title)) guard keeps the header
+title on notes whose frontmatter cssclass hide-title hides the inline
+title, so those notes still show a title.
 
-Opt-in exception (Style Settings: cn-hide-header-title, off by
+Exception (Style Settings: cn-hide-header-title, on by
 default): hide the header title next to the back and forward
 arrows in Markdown notes, but only while Obsidian's "Show inline
 title" is on (body.show-inline-title), so the title stays visible

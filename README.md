@@ -9,11 +9,11 @@ Cognia Noir is a minimal dark and light theme for Obsidian, modeled on Notion's 
 ## What it does
 
 - Dark mode has seven background tones and light mode has six. You choose each one separately.
-- In dark mode, the note, the sidebars, and the top bar use the same color. In light mode with the default tone, the note is white and the sidebar is off-white. In both modes, each sidebar panel has a thin outline.
+- In both modes, the note, the sidebars, and the top bar use the same color (the Lifted sidebar style sets a darker sidebar), and each sidebar panel has a thin outline. The default light tone is a soft off-white.
 - On desktop, tabs are rounded and the status bar is a small rounded box in the bottom-right corner.
 - The default fonts are Inter for the interface, SF Pro Text for notes and headings, and SF Mono for code. An interface font or text font set in Settings > Appearance replaces the theme's UI font or note font. Headings follow the theme's **Heading font** setting either way.
 - Callouts, tags, tables, task lists, and code blocks are styled to match the theme.
-- **Grayscale UI** turns the theme's colors gray. Images in notes and code syntax highlighting keep their color.
+- **Grayscale UI** turns the theme's colors gray. Images in notes, code syntax highlighting, and delete/warning buttons keep their color.
 - Printing and PDF export use dark text on a white page in both modes.
 
 ## Install
@@ -62,7 +62,7 @@ The settings require the [Style Settings](https://github.com/mgmeyers/obsidian-s
 
 - **Line width**: maximum width of the note text. Slider from 500 to 1400 px in steps of 50, default 700 (the same as Obsidian's default).
 - **Bubble nav buttons**: on or off. Hides the button row at the top of the file explorer and bookmarks (new note, new folder, sort, expand) until you hover over it. Default on.
-- **Hide header title**: on or off. Hides the note title next to the back and forward arrows in Markdown notes. It only works while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note. Default off.
+- **Hide header title**: on or off. Hides the note title next to the back and forward arrows in Markdown notes. It only works while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note. Default on.
 
 ## Translucent windows (macOS)
 
