@@ -62,7 +62,7 @@ The settings require the [Style Settings](https://github.com/mgmeyers/obsidian-s
 
 - **Line width**: maximum width of the note text. Slider from 500 to 1400 px in steps of 10, default 640, about 90 characters per line (Obsidian's own default is 700).
 - **Bubble nav buttons**: on or off. Hides the button row at the top of the file explorer and bookmarks (new note, new folder, sort, expand) until you hover over it. Default on.
-- **Hide header title**: on or off. Hides the note title next to the back and forward arrows in Markdown notes. It only works while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note. Default on.
+- **Hide header title**: on or off. Hides the note title next to the back and forward arrows in Markdown notes. It only works while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note. A note that hides its inline title with the `hide-title` cssclass shows its title only in the tab. Default on.
 
 ## Translucent windows (macOS)
 

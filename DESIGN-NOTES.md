@@ -1617,14 +1617,17 @@ the action icons left again. Scoped to non-phone in line with
 the FAB rule above -- mobile uses native iOS spacing.
 
 
-### `body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"]:not(:has(.hide-title)) .view-header-title-container {`
+### `body.cn-hide-header-title.show-inline-title:not(.is-phone) .workspace-leaf-content[data-type="markdown"] .view-header-title-container {`
 
 
 By default the header title is hidden in Markdown notes while Show
 inline title is on; every other view keeps its native header title
-and rename control. The :not(:has(.hide-title)) guard keeps the header
-title on notes whose frontmatter cssclass hide-title hides the inline
-title, so those notes still show a title.
+and rename control. A :not(:has(.hide-title)) guard (1.10.36 to
+1.10.38) kept the header title on notes whose cssclass hide-title
+hides the inline title; it was removed in 1.10.39 because Obsidian's
+theme scan flags :has() for broad selector invalidation, and CSS has
+no other way to reach the header from a class inside the note. Do not
+re-add it. Such notes show their title only in the tab.
 
 Exception (Style Settings: cn-hide-header-title, on by
 default): hide the header title next to the back and forward

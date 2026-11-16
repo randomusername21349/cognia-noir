@@ -7,6 +7,15 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.39
+
+- Removed the theme's only `:has()` selector, which Obsidian's theme scan
+  flags for performance. It kept the header title visible on notes that use
+  the `hide-title` cssclass. Those notes now show their title only in the tab
+  while "Hide header title" is on; turn that setting off to get the header
+  title back.
+- Verified on macOS with Obsidian 1.15.1 by computed styles.
+
 ## v1.10.38
 
 - The selected tab has no fill and no outline. Its brighter title marks it,
