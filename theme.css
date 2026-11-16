@@ -10,8 +10,8 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.37 (Readability pass: 15px text, 640px line width, heading spacing,
-            neutral icons and markers, outlined active tab. Previous: v1.10.36.
+   v1.10.38 (Selected tab: text only, between separators; replaces the
+            1.10.37 outline. Previous: v1.10.37 readability pass.
             Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
@@ -1971,11 +1971,19 @@ body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-h
   background-color: var(--cn-hover-fill);
 }
 
-/* Selected tab: an outline on the page surface, not a gray fill. */
+/* Selected tab: no fill or outline. The brighter title marks it, between the */
+/* same thin separators as the other tabs (core hides the one after it). */
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header.is-active {
   background-color: transparent;
-  border-color: var(--cn-divider);
+  border-color: transparent;
   box-shadow: none;
+}
+body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header.is-active .workspace-tab-header-inner::after {
+  opacity: 1;
+}
+/* First tab has no neighbor to draw its left separator. */
+body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header.is-active:first-child {
+  background: linear-gradient(var(--tab-divider-color), var(--tab-divider-color)) no-repeat left center / 1px 1em;
 }
 
 /* Hide Obsidian's default tab "ear" pseudo-elements that paint */

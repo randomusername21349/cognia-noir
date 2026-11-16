@@ -7,6 +7,15 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.38
+
+- The selected tab has no fill and no outline. Its brighter title marks it,
+  and it sits between the same thin separators as the other tabs, including
+  one after it (Obsidian hides that one by default). This replaces the strong
+  outline from 1.10.37.
+- Verified on macOS with Obsidian 1.15.1 by computed styles in dark and light
+  mode. The case where the selected tab is the first tab was not tested.
+
 ## v1.10.37
 
 Readability pass, from two independent reviews measured in the running app.

@@ -1522,9 +1522,13 @@ the reference design. Round the inner icons consistently.
 --- Top-bar tab pills ---
 Rounded rectangles with min-height for body. Inactive tabs
 have no resting border (a transparent 1px border holds the
-size); hover adds --cn-hover-fill, and the active tab is an
-outline (--cn-divider border) on a transparent fill, so it
-reads as a shape on the page surface, not a gray block.
+size); hover adds --cn-hover-fill. The active tab has no fill
+and no outline: its title is brighter (--tab-text-color-focused-active)
+and it sits between the same thin separators as the other tabs.
+Core hides the separator after the active tab (opacity 0); the
+theme restores it, and draws a left one when the active tab is
+first. Owner rejected a strong outline (shipped in 1.10.37) and a
+thin underline (never shipped) before choosing this.
 The earlier faint persistent outline on every tab is gone.
 
 Mobile scope decision (locked v1.9.9, do not relitigate):
