@@ -7,6 +7,29 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.37
+
+Readability pass, from two independent reviews measured in the running app.
+
+- Note text is 15 px by default (was 14) and the default line width is 640 px
+  (was 700), about 89 characters per line instead of about 104. Both are still
+  sliders in Style Settings; the line width slider now moves in steps of 10.
+- Dark mode body text is brighter: `#f0f0f0` (was `#e8e8e8`), 13.79:1 on Slate.
+- Headings in the editor get Obsidian's space above them again, so a heading
+  sits closer to its own section, and folded headings no longer stack tightly.
+- Tables follow the note text size; they were pinned at 16 px.
+- Inline code and code blocks are 95% of the note text size (was 88%).
+- Link underlines use the full link color (was 30% opacity, 1.59:1 on Slate).
+- The selected tab is an outline on the page surface, not a gray fill.
+- Neutral gray replaces the accent color on the tab pin and link icons, the
+  fold arrow of collapsed headings and lists, the collapsed list bullet, math
+  delimiters, and the blockquote bar in the editor.
+- The active search-match highlight is lighter in dark mode so white text on
+  it passes contrast (3.72:1 to 5.40:1 on Slate).
+- Verified on macOS with Obsidian 1.15.1 by computed styles in the editor.
+  Reading view was not re-checked, and the gallery screenshots predate this
+  release.
+
 ## v1.10.36
 
 - Light mode is one uniform surface, like dark mode: the note, the sidebars,

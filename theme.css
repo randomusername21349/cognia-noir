@@ -10,8 +10,8 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.36 (Light mode is one uniform surface with a soft off-white Paper
-            tone; callout and table-header contrast fixes. Previous: v1.10.35.
+   v1.10.37 (Readability pass: 15px text, 640px line width, heading spacing,
+            neutral icons and markers, outlined active tab. Previous: v1.10.36.
             Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
@@ -202,7 +202,7 @@ settings:
     title: Editor font size
     description: Note text size in pixels when Obsidian's own font size is at its default of 16. Obsidian's font size setting and zoom scale it from there.
     type: variable-number-slider
-    default: 14
+    default: 15
     min: 12
     max: 20
     step: 1
@@ -290,12 +290,12 @@ settings:
   -
     id: file-line-width
     title: Line width
-    description: Maximum width of the note content area. Obsidian default is 700px.
+    description: Maximum width of the note content area. The theme default is 640px (about 90 characters per line); Obsidian's own default is 700px.
     type: variable-number-slider
-    default: 700
+    default: 640
     min: 500
     max: 1400
-    step: 50
+    step: 10
     format: 'px'
   -
     id: cn-bubble-nav
@@ -330,7 +330,7 @@ settings:
   /* core defines them on body, which shadows any :root value. */
   /* Editor font size (unitless: pixels at Obsidian's default 16px text size) */
   /* and line height - driven by Style Settings sliders. */
-  --cn-editor-font-size: 14;
+  --cn-editor-font-size: 15;
   --cn-note-line-height: 1.65;
   /* Heading font default - SF Pro Text to match body text (tight scale headers */
   --cn-heading-font: "SF Pro Text", -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
@@ -368,7 +368,7 @@ settings:
   --cn-bg-note-tray: var(--cn-bg-primary);
   --cn-border-subtle: rgba(255, 255, 255, 0.06);
   --cn-border-strong: rgba(255, 255, 255, 0.10);
-  --cn-text-primary: #e8e8e8;
+  --cn-text-primary: #f0f0f0;
   --cn-text-secondary: rgba(255, 255, 255, 0.72);
   --cn-text-faint: rgba(255, 255, 255, 0.55);
   --cn-accent: #5b8def;
@@ -442,7 +442,7 @@ settings:
   --text-accent-hover: var(--cn-accent-hover);
   --text-selection: color-mix(in srgb, var(--cn-accent) 30%, transparent);
   --text-highlight-bg: rgba(255, 221, 92, 0.38);
-  --text-highlight-bg-active: rgba(255, 221, 92, 0.52);
+  --text-highlight-bg-active: rgba(255, 221, 92, 0.38);
 
   --color-accent: var(--cn-accent);
   --interactive-accent: var(--cn-accent);
@@ -727,7 +727,7 @@ body.cn-grayscale.cn-grayscale.theme-dark {
   --cn-inline-code: #c9c9c9;
   --cn-amber-warning: #cccccc;
   --text-highlight-bg: rgba(200, 200, 200, 0.30);
-  --text-highlight-bg-active: rgba(222, 222, 222, 0.46);
+  --text-highlight-bg-active: rgba(222, 222, 222, 0.40);
 }
 body.cn-grayscale.cn-grayscale.theme-light {
   --cn-accent: #4d4d4d;
@@ -822,6 +822,15 @@ body {
   --link-external-decoration-hover: none;
   /* Core fades unresolved links to 70% opacity, which fails AA. */
   --link-unresolved-opacity: 1;
+  /* Fold arrow of a collapsed heading or list: neutral, not the accent. */
+  --collapse-icon-color-collapsed: var(--text-muted);
+  /* Readable measure: about 90 characters per line at the default text size. */
+  --file-line-width: 640px;
+  /* Code text close to body size (core: 0.875em). */
+  --code-size: 0.95em;
+  /* Collapsed list bullet and blockquote bar: neutral too. */
+  --list-marker-color-collapsed: var(--text-muted);
+  --blockquote-border-color: var(--text-faint);
 
   /* --font-interface runs core's chain: the user's font setting, then the theme. */
   font-family: var(--font-interface);
@@ -856,6 +865,8 @@ body.cn-heading-georgia { --cn-heading-font: Georgia, serif; }
   font-size: calc(var(--font-text-size, 16px) * var(--cn-editor-font-size) / 16);
   /* Core's inner editor scroller reads this inherited variable. */
   --line-height-normal: var(--cn-note-line-height);
+  /* Tables follow the note text size (core pins them to 16px). */
+  --table-text-size: 1em;
   line-height: var(--line-height-normal);
   letter-spacing: -0.003em;
 }
@@ -946,6 +957,8 @@ body.cn-title-left .inline-title {
 }
 
 .workspace-tab-header-inner { border-radius: var(--radius-s); }
+/* Tab pin and link icons: neutral, not core's accent. */
+.mod-root .workspace-tab-header-status-icon { color: var(--text-muted); }
 
 .workspace-tab-header.is-active {
   background-color: var(--cn-active-fill);
@@ -1120,7 +1133,10 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .wo
    6. EDITOR CONTENT */
 
 .markdown-source-view.mod-cm6 .cm-content { caret-color: var(--cn-accent); }
-.markdown-source-view.mod-cm6 .cm-line { padding: 1px 0; }
+/* Heading lines are excluded so core's space above headings applies. */
+.markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-header) { padding: 1px 0; }
+/* Math delimiters ($, $$) in the editor: neutral, not core's accent. */
+.cm-s-obsidian span.cm-formatting-math { color: var(--text-faint); }
 
 /* Accent-tinted selection is painted by core from --text-selection, */
 
@@ -1128,7 +1144,7 @@ body.is-translucent.theme-dark:not(.is-fullscreen) .workspace-split.mod-root .wo
 .cm-link, .cm-hmd-internal-link, a.internal-link, a.external-link {
   color: var(--cn-accent);
   text-decoration: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--cn-accent) 30%, transparent);
+  border-bottom: 1px solid var(--cn-accent);
   transition: color var(--cn-transition-fast), border-color var(--cn-transition-fast);
 }
 
@@ -1184,7 +1200,7 @@ a.internal-link:hover, a.external-link:hover, .cm-link:hover {
   border-radius: var(--radius-s);
   padding: 1px 6px;
   font-family: var(--font-monospace-theme);
-  font-size: 0.88em;
+  font-size: 0.95em;
   border: none;
 }
 
@@ -1209,7 +1225,7 @@ body.cn-grayscale :is(mark, .cm-highlight) {
 .markdown-rendered pre code {
   background: transparent;
   padding: 0;
-  font-size: 0.88em;
+  font-size: 0.95em;
   color: var(--cn-text-primary);
 }
 
@@ -1955,9 +1971,10 @@ body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-h
   background-color: var(--cn-hover-fill);
 }
 
+/* Selected tab: an outline on the page surface, not a gray fill. */
 body:not(.is-phone) .mod-root .workspace-tabs:not(.mod-stacked) .workspace-tab-header.is-active {
-  background-color: var(--cn-active-fill);
-  border-color: var(--cn-border-subtle);
+  background-color: transparent;
+  border-color: var(--cn-divider);
   box-shadow: none;
 }
 

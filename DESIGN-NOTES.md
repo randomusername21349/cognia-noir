@@ -1522,8 +1522,9 @@ the reference design. Round the inner icons consistently.
 --- Top-bar tab pills ---
 Rounded rectangles with min-height for body. Inactive tabs
 have no resting border (a transparent 1px border holds the
-size); hover adds --cn-hover-fill, and the active tab gets
---cn-active-fill plus a subtle --cn-border-subtle border.
+size); hover adds --cn-hover-fill, and the active tab is an
+outline (--cn-divider border) on a transparent fill, so it
+reads as a shape on the page surface, not a gray block.
 The earlier faint persistent outline on every tab is gone.
 
 Mobile scope decision (locked v1.9.9, do not relitigate):
@@ -2051,3 +2052,33 @@ users who enabled Reduce Motion. Every transition in the theme
 uses these two variables, so redefining them to 0s disables all
 motion without an !important universal reset. The theme has no
 @keyframes animations.
+
+
+## v1.10.37 READABILITY PASS - rationale for the rules it added
+
+Measured in the running app (Obsidian 1.15.1, Slate tone) before the change:
+14px note text in a 700px column held about 104 characters per line; the
+target was under 90. 15px in 640px gives 89.
+
+- --cn-editor-font-size 15 and --file-line-width 640px (body): size and
+  measure are set together; changing one without the other moves the
+  characters-per-line count out of range.
+- --cn-text-primary #f0f0f0 (dark): owner request for brighter body text.
+  Headings and bold stay #ffffff, so the tiers remain distinct.
+- .cm-line:not(.HyperMD-header) { padding: 1px 0 }: the old rule covered
+  heading lines too and cancelled core's padding-top: var(--p-spacing) on
+  them, so the gap above a heading equalled the gap below it and folded
+  headings stacked at bare line height. Excluding heading lines lets core's
+  rule apply; do not re-add a theme-side heading padding.
+- --table-text-size: 1em on the note containers: core sets it to
+  --font-preferred-size (16px), which made tables larger than body text.
+- --code-size 0.95em and the two 0.95em code rules: 0.88em rendered code at
+  12.3px beside 14px text.
+- Link border-bottom in full --cn-accent: the 30% underline measured 1.59:1
+  on Slate and was not a usable non-color cue.
+- --collapse-icon-color-collapsed, --list-marker-color-collapsed,
+  --blockquote-border-color, .cm-formatting-math, and
+  .mod-root .workspace-tab-header-status-icon: core defaults these to the
+  accent; the theme keeps the accent for links, tags, selection and focus.
+- --text-highlight-bg-active 0.38 (dark) and 0.40 (dark grayscale): white
+  text on the 0.52 fill measured 3.72:1 on Slate.

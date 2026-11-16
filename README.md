@@ -51,7 +51,7 @@ The settings require the [Style Settings](https://github.com/mgmeyers/obsidian-s
 ### Typography
 
 - **Heading scale**: Compact, Comfortable, or Large. Default Comfortable.
-- **Editor font size**: slider from 12 to 20, default 14. This is the note text size in pixels when Obsidian's own font size is at its default of 16; Obsidian's font size setting and zoom scale it from there.
+- **Editor font size**: slider from 12 to 20, default 15. This is the note text size in pixels when Obsidian's own font size is at its default of 16; Obsidian's font size setting and zoom scale it from there.
 - **UI font**: Inter, Avenir Next, or System (SF Pro). Default Inter.
 - **Note font**: SF Pro, New York (Apple serif), Georgia (classic serif), or Avenir Next. Default SF Pro.
 - **Heading font**: SF Pro, New York (Apple serif), or Georgia (classic serif). Default SF Pro.
@@ -60,7 +60,7 @@ The settings require the [Style Settings](https://github.com/mgmeyers/obsidian-s
 
 ### Layout
 
-- **Line width**: maximum width of the note text. Slider from 500 to 1400 px in steps of 50, default 700 (the same as Obsidian's default).
+- **Line width**: maximum width of the note text. Slider from 500 to 1400 px in steps of 10, default 640, about 90 characters per line (Obsidian's own default is 700).
 - **Bubble nav buttons**: on or off. Hides the button row at the top of the file explorer and bookmarks (new note, new folder, sort, expand) until you hover over it. Default on.
 - **Hide header title**: on or off. Hides the note title next to the back and forward arrows in Markdown notes. It only works while Obsidian's "Show inline title" is on, so the title stays visible in the tab and at the top of the note. Default on.
 
