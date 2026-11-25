@@ -7,6 +7,14 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.41
+
+- Linen now uses a single tone, #f4f3ed, for both the note and the sidebar
+  in the Flat and Border sidebar styles (chosen for text contrast: 11.0:1
+  for body text versus 10.5:1 on the deeper #eeeee5). Menus and dialogs
+  keep #eeeee5, and the Lifted sidebar style still separates the sidebar.
+- Verified on macOS with Obsidian by computed styles.
+
 ## v1.10.40
 
 - New "Linen (warm cream)" option under Light mode background: canvas
