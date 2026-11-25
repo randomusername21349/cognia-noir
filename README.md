@@ -44,7 +44,7 @@ The settings require the [Style Settings](https://github.com/mgmeyers/obsidian-s
 ### Surfaces
 
 - **Dark mode background**: Charcoal, Slate (neutral gray), Graphite (deep neutral), Pure black (OLED), True black (#000), Warm charcoal, or Zen (soft warm gray). Default Charcoal. No effect in light mode.
-- **Light mode background**: Paper, Pure white, Mist (light gray), Stone (deeper gray), Warm paper, or Zen (soft warm). Default Paper. No effect in dark mode.
+- **Light mode background**: Paper, Pure white, Mist (light gray), Stone (deeper gray), Warm paper, Zen (soft warm), or Linen (warm cream). Default Paper. No effect in dark mode.
 - **Sidebar contrast**: Flat, Subtle border, or Lifted (slightly darker). Default Flat.
 - **Translucency tint**: Pure vibrancy, Light, Medium, or Heavy. Default Medium. Applies only in dark mode with translucent windows on.
 

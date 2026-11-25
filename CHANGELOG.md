@@ -7,6 +7,15 @@ files). Recent releases are also on the GitHub releases page. Entries in
 the "Earlier history" section are preserved verbatim from the old header,
 including their original wording and punctuation.
 
+## v1.10.40
+
+- New "Linen (warm cream)" option under Light mode background: canvas
+  #f4f3ed, sidebar #eeeee5, with warm code and input surfaces. Linen keeps
+  the sidebar color distinct from the note in the Flat and Border sidebar
+  styles; Lifted adds its usual darker tray. Light mode only.
+- Verified on macOS with Obsidian by computed styles in opaque and
+  translucent modes.
+
 ## v1.10.39
 
 - Removed the theme's only `:has()` selector, which Obsidian's theme scan

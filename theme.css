@@ -10,8 +10,8 @@
    measure. Highlightr is
    editor-content only (no workspace leaf), so it needs no opt-out and is
    unaffected by the force-paint either way.
-   v1.10.39 (Removed the only has-pseudo-class selector, flagged by Obsidian's theme
-            scan. Previous: v1.10.38 text-only selected tab.
+   v1.10.40 (New Linen light background: warm cream canvas with a deeper sidebar.
+            Previous: v1.10.39 removed the only has-pseudo-class selector.
             Full version history lives in CHANGELOG.md and on the GitHub releases page.)
 
    SECTIONS
@@ -119,7 +119,7 @@ settings:
   -
     id: cn-bg-tone-light
     title: Light mode background
-    description: Background surfaces in light mode (no effect in dark mode). Paper (warm white) is the default; Pure white is crisp neutral; Mist and Stone are neutral grays; Warm and Zen add warmth.
+    description: Background surfaces in light mode (no effect in dark mode). Paper (warm white) is the default; Pure white is crisp neutral; Mist and Stone are neutral grays; Warm, Zen, and Linen add warmth.
     type: class-select
     default: cn-bgl-paper
     options:
@@ -141,6 +141,9 @@ settings:
       -
         value: cn-bgl-zen
         label: Zen (soft warm)
+      -
+        value: cn-bgl-linen
+        label: Linen (warm cream)
   -
     id: cn-sidebar-style
     title: Sidebar contrast
@@ -703,6 +706,16 @@ settings:
   --cn-bg-elevated: #e9e6e1;
 }
 
+/* Linen: warm cream canvas (#f4f3ed) with a slightly deeper sidebar (#eeeee5). */
+.theme-light.cn-bgl-linen {
+  --cn-bg-primary: #f4f3ed;
+  --cn-bg-secondary: #eeeee5;
+  --cn-bg-tertiary: #e9e8de;
+  --cn-bg-elevated: #e5e4d9;
+  /* Linen keeps a distinct sidebar even in Flat sidebar style. */
+  --background-secondary: #eeeee5;
+}
+
 /* Neutral gray tones - light parity (clean grays, no warm tint). Mist is the */
 .theme-light.cn-bgl-mist {
   --cn-bg-primary: #f4f4f4;
@@ -785,6 +798,14 @@ body:not(.is-mobile).theme-light.cn-sidebar-border .workspace-split:is(.mod-righ
 .theme-light.cn-sidebar-lifted.cn-bgl-zen   { --background-secondary: #e6e3de; --cn-bg-note-tray: #c8c5c0; }
 .theme-light.cn-sidebar-lifted.cn-bgl-mist  { --background-secondary: #e9e9e9; --cn-bg-note-tray: #d6d6d6; }
 .theme-light.cn-sidebar-lifted.cn-bgl-stone { --background-secondary: #e2e2e2; --cn-bg-note-tray: #cfcfcf; }
+.theme-light.cn-sidebar-lifted.cn-bgl-linen { --background-secondary: #eeeee5; --cn-bg-note-tray: #dedcd0; }
+/* Linen (Flat/Border): paint the whole side panel, tab strip, and ribbon surround */
+/* with the sidebar color so it reads as one surface. The note keeps the canvas. */
+body:not(.is-mobile).theme-light.cn-bgl-linen:not(.cn-sidebar-lifted) .workspace,
+body:not(.is-mobile).theme-light.cn-bgl-linen:not(.cn-sidebar-lifted) .workspace-split:is(.mod-left-split, .mod-right-split),
+body:not(.is-mobile).theme-light.cn-bgl-linen:not(.cn-sidebar-lifted) .workspace-split:is(.mod-left-split, .mod-right-split) :is(.workspace-tab-container, .workspace-tab-header-container) {
+  background-color: var(--background-secondary);
+}
 /* Tab titles sit on the darker Lifted tray; keep them at the stronger gray. */
 .theme-light.cn-sidebar-lifted { --tab-text-color: #4a4945; }
 
